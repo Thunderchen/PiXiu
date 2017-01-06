@@ -9,12 +9,12 @@
 #define List_init(T, name) \
 int name ## _len = 0; \
 int name ## _capacity = 2; \
-T ptrAs(name) = (T ptr) malloc(sizeof(T) * name ## _capacity);
+T ptrAs(name) = (T *) malloc(sizeof(T) * name ## _capacity);
 
 #define List_append(T, name, val) \
 if (name ## _len >= name ## _capacity) { \
     name ## _capacity *= 2; \
-    T ptrAs(_ ## name) = (T ptr) malloc(sizeof(T) * name ## _capacity); \
+    T ptrAs(_ ## name) = (T *) malloc(sizeof(T) * name ## _capacity); \
     memcpy(_ ## name, name, sizeof(T) * name ## _len); \
     free(name); \
     name = _ ## name; \
@@ -36,7 +36,7 @@ if (idx == name ## _len) { \
 } else { \
     if (name ## _len >= name ## _capacity) { \
         name ## _capacity *= 2; \
-        T ptrAs(_ ## name) = (T ptr) malloc(sizeof(T) * name ## _capacity); \
+        T ptrAs(_ ## name) = (T *) malloc(sizeof(T) * name ## _capacity); \
         if (idx > 0) { \
         memcpy(_ ## name, name, sizeof(T) * idx); \
         } \
