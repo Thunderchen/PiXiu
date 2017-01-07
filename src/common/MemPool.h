@@ -2,7 +2,7 @@
 #include <stddef.h>
 
 #define POOL_BLOCK_NUM 65535
-#define POOL_BLOCK_SIZE (sizeof(void *))
+#define POOL_BLOCK_SIZE sizeof(void *)
 
 struct Pool {
     Pool ptrAs(prev_pool);

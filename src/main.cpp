@@ -2,6 +2,7 @@
 #include "common/List.h"
 #include "common/MemPool.h"
 #include "common/Que.h"
+#include "proj/PiXiuStr.h"
 #include <stdio.h>
 
 void t_gen(void);
@@ -10,6 +11,8 @@ void t_List(void);
 
 void t_MemPool(void);
 
+void t_PiXiuStr(void);
+
 void t_Que(void);
 
 int main() {
@@ -17,12 +20,17 @@ int main() {
     t_gen();
     t_List();
     t_MemPool();
+    t_PiXiuStr();
     t_Que();
 
     printf("\nt_OK\n");
 #endif
 
     return 0;
+}
+
+void t_PiXiuStr(void) {
+    assert(sizeof(PiXiuStr) == 2);
 }
 
 void t_MemPool(void) {
