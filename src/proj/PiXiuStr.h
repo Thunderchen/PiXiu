@@ -17,7 +17,7 @@ struct PiXiuChunk {
     int used_num = 0;
 };
 
-PiXiuStr * PiXiuStr_init_k(uint8_t[], int);
+PiXiuStr * PiXiuStr_init_key(uint8_t[], int);
 
 PiXiuStr * PiXiuStr_init(uint8_t[], int);
 
