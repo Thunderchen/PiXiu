@@ -25,7 +25,6 @@ int main() {
 
     printf("\nt_OK\n");
 #endif
-
     return 0;
 }
 

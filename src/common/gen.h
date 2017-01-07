@@ -9,6 +9,8 @@
 
 struct Generator {
     int _line = 0;
+
+    bool operator()();
 };
 
 #define $gen(name) struct name: Generator
