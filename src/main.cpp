@@ -55,11 +55,11 @@ void t_MemPool(void) {
     assert(memPool.used_num == 2);
 
     v = (void *) 2;
-    auto chunk = (void **) memPool.p_malloc(POOL_BLOCK_SIZE * (POOL_BLOCK_NUM + 1));
+    auto huge_chunk = (void **) memPool.p_malloc(POOL_BLOCK_SIZE * (POOL_BLOCK_NUM + 1));
     assert(memPool.used_num == 2);
 
     for (int i = 0; i < POOL_BLOCK_NUM + 1; ++i) {
-        chunk[i] = v;
+        huge_chunk[i] = v;
     }
     for (int i = 0; i < POOL_BLOCK_NUM + 1; ++i) {
         auto val = memPool.curr_pool->prev_pool->blocks[i];

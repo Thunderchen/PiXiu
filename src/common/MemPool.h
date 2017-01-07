@@ -13,7 +13,6 @@ struct MemPool {
     Pool ptrAs(curr_pool) = NULL;
     int used_num;
 
-    // ---
     void * p_malloc(int size);
 
     void free_all(void);
