@@ -86,7 +86,7 @@ void t_Que(void) {
 }
 
 $gen(range0_10) {
-    // vars
+    // var
     int i;
     // constructor
 

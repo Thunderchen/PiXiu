@@ -1,5 +1,6 @@
 #ifndef GEN_H
 #define GEN_H
+
 /*
  * generator/continuation for C++
  * author: Andrew Fedoniouk @ terrainformatica.com
