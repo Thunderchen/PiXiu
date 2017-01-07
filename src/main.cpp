@@ -38,6 +38,7 @@ void t_MemPool(void) {
     for (int i = 0; i < POOL_BLOCK_NUM; ++i) {
         assert(memPool.curr_pool->blocks[i] == v);
     }
+    assert(memPool.used_num == POOL_BLOCK_NUM);
 
     for (int i = 0; i < POOL_BLOCK_NUM - 1; ++i) {
         auto adr = (void **) memPool.p_malloc(sizeof(v));
@@ -53,13 +54,13 @@ void t_MemPool(void) {
     memPool.p_malloc(sizeof(v) * 2);
     assert(memPool.used_num == 2);
 
-    auto chunk = (void **) memPool.p_malloc(POOL_BLOCK_SIZE * (POOL_BLOCK_NUM + 1));
     v = (void *) 2;
+    auto chunk = (void **) memPool.p_malloc(POOL_BLOCK_SIZE * (POOL_BLOCK_NUM + 1));
+    assert(memPool.used_num == 2);
+
     for (int i = 0; i < POOL_BLOCK_NUM + 1; ++i) {
         chunk[i] = v;
     }
-    assert(memPool.used_num == 2);
-
     for (int i = 0; i < POOL_BLOCK_NUM + 1; ++i) {
         auto val = memPool.curr_pool->prev_pool->blocks[i];
         assert(val == v);
