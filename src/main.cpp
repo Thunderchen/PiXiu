@@ -1,5 +1,4 @@
 #include "common/List.h"
-#include "data_struct/CritBitTree.h"
 #include <stdio.h>
 
 void t_List(void);
@@ -57,5 +56,4 @@ void t_List(void) {
 }
 
 void t_CritBitTree(void) {
-    assert(sizeof(CBTInner) == 24);
 }
