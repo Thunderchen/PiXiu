@@ -1,18 +1,67 @@
+#include "common/gen.h"
 #include "common/List.h"
+#include "common/Que.h"
 #include <stdio.h>
-
-void t_List(void);
 
 void t_CritBitTree(void);
 
+void t_gen(void);
+
+void t_List(void);
+
+void t_Que(void);
+
 int main() {
 #ifndef NDEBUG
-    t_List();
     t_CritBitTree();
+    t_gen();
+    t_List();
+    t_Que();
 
     printf("\nt_OK\n");
 #endif
+
+
     return 0;
+}
+
+void t_Que(void) {
+    int q[] = {0, 0, 0};
+    int q_len = 3;
+    int q_cursor = 0;
+
+    Que_push(q, 1);
+    Que_push(q, 2);
+    Que_push(q, 3);
+    Que_push(q, 4);
+    Que_push(q, 5);
+
+    assert(Que_get(q, 0) == 3);
+    assert(Que_get(q, 1) == 4);
+    assert(Que_get(q, 2) == 5);
+}
+
+$gen(range0_10) {
+    // vars
+    int i;
+    // constructor
+
+    // body
+    $emit(int)
+            for (i = 0; i < 10; ++i) {
+                $yield(i);
+            }
+    $stop;
+};
+
+void t_gen(void) {
+    range0_10 gen;
+    int rv;
+    for (int i = 0; i < 10; ++i) {
+        assert(gen(rv));
+        assert(rv == i);
+    }
+    assert(!gen(rv));
 }
 
 void t_List(void) {

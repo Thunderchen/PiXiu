@@ -5,6 +5,5 @@ set(CMAKE_CXX_STANDARD 14)
 
 set(SOURCE_FILES
         src/main.cpp
-        src/data_struct/CritBitTree.cpp
         )
 add_executable(PiXiuPlus ${SOURCE_FILES})
