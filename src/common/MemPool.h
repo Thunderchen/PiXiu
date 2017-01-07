@@ -1,3 +1,6 @@
+#ifndef MEM_POOL_H
+#define MEM_POOL_H
+
 #include "style.h"
 #include <stddef.h>
 
@@ -17,3 +20,5 @@ struct MemPool {
 
     void free_all(void);
 };
+
+#endif

@@ -1,3 +1,6 @@
+#ifndef PIXIU_STR_H
+#define PIXIU_STR_H
+
 #include "../common/gen.h"
 #include <stdint.h>
 
@@ -22,3 +25,5 @@ PiXiuStr * PiXiuStr_init_key(uint8_t[], int);
 PiXiuStr * PiXiuStr_init(uint8_t[], int);
 
 PiXiuStr * PiXiuStr_init_stream(uint8_t, int, int);
+
+#endif
