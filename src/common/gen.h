@@ -10,7 +10,7 @@ struct Generator {
     int _line = 0;
 };
 
-#define $gen(name) struct name: public Generator
+#define $gen(name) struct name: Generator
 
 #define $emit(T) \
 bool operator()(T & _rv) { \

@@ -5,5 +5,6 @@ set(CMAKE_CXX_STANDARD 14)
 
 set(SOURCE_FILES
         src/main.cpp
+        src/common/MemPool.cpp
         )
 add_executable(PiXiuPlus ${SOURCE_FILES})
