@@ -12,8 +12,6 @@
 #define PXS_STREAM_OFF -2
 #define PXS_STREAM_PASS -3
 
-#define PXS_STREAM(...) PiXiuStr_init_stream((PXSMsg) __VA_ARGS__)
-
 #define PXC_STR_NUM 65535
 
 struct PiXiuChunk;
@@ -33,6 +31,11 @@ struct PXSRecordBig {
     uint16_t from;
 };
 
+union PXSRecord {
+    PXSRecordSmall small;
+    PXSRecordBig big;
+};
+
 struct PXSMsg {
     int chunk_idx__cmd;
     int pxs_idx;
@@ -43,7 +46,7 @@ struct PiXiuStr {
     uint16_t len;
     uint8_t data[];
 
-    Generator parse(int, int, PiXiuChunk *);
+    Generator * parse(int, int, PiXiuChunk *);
 
     PiXiuStr * concat(PiXiuStr *);
 };

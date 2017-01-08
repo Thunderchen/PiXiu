@@ -47,10 +47,10 @@ void t_PiXiuStr(void) {
     free(str);
     // --- PXS
 #ifndef NDEBUG
+#define PXS_STREAM(...) PiXiuStr_init_stream((PXSMsg) __VA_ARGS__)
+
 #define set_expect(...) expect = (uint8_t[]) { __VA_ARGS__ }
-#define assert_out(target) \
-    for (int i = 0; i < target->len; ++i)  \
-        assert(target->data[i] == expect[i])
+#define assert_out(target) for(int i=0;i<target->len;++i) assert(target->data[i]==expect[i])
 #define assert_pxs() assert_out(pxs)
 #endif
     // init
