@@ -13,14 +13,18 @@ PiXiuStr * PiXiuStr_init(uint8_t src[], int src_len) {
     return escape_unique(src, src_len, false);
 };
 
-PiXiuStr * PiXiuStr_init_stream(uint8_t msg_char, int chunk_idx, int pxs_idx) {
-    static uint8_t ptrAs(list);
+PiXiuStr * PiXiuStr_init_stream(PXSMsg msg) {
     static int list_len;
     static int list_capacity;
+    static uint8_t ptrAs(list);
 
     static int compress_len;
     static int compress_idx;
     static int compress_to;
+
+    auto chunk_idx = msg.chunk_idx__cmd;
+    auto pxs_idx = msg.pxs_idx;
+    auto msg_char = msg.val;
     PiXiuStr ptrAs(ret);
 
     auto try_explode = [&]() {
@@ -76,6 +80,7 @@ PiXiuStr * PiXiuStr_init_stream(uint8_t msg_char, int chunk_idx, int pxs_idx) {
             try_explode();
             ret = (PiXiuStr *) malloc(sizeof(PiXiuStr) + list_len);
             ret->len = (uint16_t) list_len;
+            assert(list_len <= UINT16_MAX);
             memcpy(ret->data, list, (size_t) list_len);
             free(list);
             break;

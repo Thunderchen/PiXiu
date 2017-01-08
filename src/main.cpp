@@ -79,6 +79,42 @@ void t_PiXiuStr(void) {
     // stream init
     assert(sizeof(PXSRecordSmall) == 6);
     assert(sizeof(PXSRecordBig) == 8);
+
+    PiXiuStr_init_stream((PXSMsg) {.chunk_idx__cmd=PXS_STREAM_ON});
+    for (int i = 0; i < 4; ++i) {
+        PiXiuStr_init_stream((PXSMsg) {.chunk_idx__cmd=PXS_STREAM_PASS, .val=1});
+    }
+    for (int i = 0; i < 6; ++i) {
+        PiXiuStr_init_stream((PXSMsg) {.chunk_idx__cmd=2, .pxs_idx=i, .val=3});
+    }
+    PiXiuStr_init_stream((PXSMsg) {.chunk_idx__cmd=PXS_STREAM_PASS, .val=1});
+    for (int i = 0; i < 7; ++i) {
+        PiXiuStr_init_stream((PXSMsg) {.chunk_idx__cmd=3, .pxs_idx=i, .val=4});
+    }
+    pxs = PiXiuStr_init_stream((PXSMsg) {.chunk_idx__cmd=PXS_STREAM_OFF});
+
+    expect = (uint8_t[]) {1, 1, 1, 1, 3, 3, 3, 3, 3, 3, 1, 251, 7, 3, 0, 7, 0};
+    for (int i = 0; i < pxs->len; ++i) {
+        assert(pxs->data[i] == expect[i]);
+    }
+
+    PiXiuStr_init_stream((PXSMsg) {.chunk_idx__cmd=PXS_STREAM_ON});
+    for (int i = 0; i < 1; ++i) {
+        PiXiuStr_init_stream((PXSMsg) {.chunk_idx__cmd=PXS_STREAM_PASS, .val=1});
+    }
+    for (int i = 0; i < 255; ++i) {
+        PiXiuStr_init_stream((PXSMsg) {.chunk_idx__cmd=2, .pxs_idx=i, .val=3});
+    }
+    PiXiuStr_init_stream((PXSMsg) {.chunk_idx__cmd=PXS_STREAM_PASS, .val=1});
+    for (int i = 0; i < 256; ++i) {
+        PiXiuStr_init_stream((PXSMsg) {.chunk_idx__cmd=3, .pxs_idx=i, .val=4});
+    }
+    pxs = PiXiuStr_init_stream((PXSMsg) {.chunk_idx__cmd=PXS_STREAM_OFF});
+
+    expect = (uint8_t[]) {1, 251, 255, 2, 0, 255, 0, 1, 251, 1, 3, 0, 0, 1, 0, 0};
+    for (int i = 0; i < pxs->len; ++i) {
+        assert(pxs->data[i] == expect[i]);
+    }
 }
 
 void t_MemPool(void) {

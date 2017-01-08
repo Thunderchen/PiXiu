@@ -31,6 +31,12 @@ struct PXSRecordBig {
     uint16_t from;
 };
 
+struct PXSMsg {
+    int chunk_idx__cmd;
+    int pxs_idx;
+    uint8_t val;
+};
+
 struct PiXiuStr {
     uint16_t len;
     uint8_t data[];
@@ -55,7 +61,7 @@ PiXiuStr * PiXiuStr_init_key(uint8_t[], int);
 
 PiXiuStr * PiXiuStr_init(uint8_t[], int);
 
-PiXiuStr * PiXiuStr_init_stream(uint8_t, int, int);
+PiXiuStr * PiXiuStr_init_stream(PXSMsg);
 
 void PiXiuStr_free(PiXiuStr *);
 
