@@ -7,6 +7,7 @@
 #define PXS_UNIQUE 251
 #define PXS_KEY 0
 #define PXS_COMPRESS 1
+
 #define PXS_STREAM_ON -1
 #define PXS_STREAM_OFF -2
 #define PXS_STREAM_PASS -3
@@ -14,6 +15,21 @@
 #define PXC_STR_NUM 65535
 
 struct PiXiuChunk;
+
+struct PXSRecordSmall {
+    uint8_t head;
+    uint8_t len;
+    uint16_t idx;
+    uint16_t to;
+};
+
+struct PXSRecordBig {
+    uint8_t head;
+    uint8_t sign;
+    uint16_t idx;
+    uint16_t to;
+    uint16_t from;
+};
 
 struct PiXiuStr {
     uint16_t len;

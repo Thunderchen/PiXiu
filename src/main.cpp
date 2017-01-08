@@ -46,6 +46,7 @@ void t_PiXiuStr(void) {
 
     free(str);
     // --- PXS
+    // init
     uint8_t ptrAs(expect);
     uint8_t input[] = {1, PXS_UNIQUE, 2, PXS_UNIQUE, 4};
 
@@ -75,6 +76,9 @@ void t_PiXiuStr(void) {
     PiXiuStr_free(a);
     PiXiuStr_free(b);
     PiXiuStr_free(merge);
+    // stream init
+    assert(sizeof(PXSRecordSmall) == 6);
+    assert(sizeof(PXSRecordBig) == 8);
 }
 
 void t_MemPool(void) {
