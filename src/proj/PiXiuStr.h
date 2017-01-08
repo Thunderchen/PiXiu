@@ -4,7 +4,14 @@
 #include "../common/gen.h"
 #include <stdint.h>
 
-#define CHUNK_STR_NUM 65535
+#define PXS_UNIQUE 251
+#define PXS_KEY 0
+#define PXS_COMPRESS 1
+#define PXS_STREAM_ON -1
+#define PXS_STREAM_OFF -2
+#define PXS_STREAM_PASS -3
+
+#define PXC_STR_NUM 65535
 
 struct PiXiuChunk;
 
@@ -18,7 +25,7 @@ struct PiXiuStr {
 };
 
 struct PiXiuChunk {
-    PiXiuStr * strs[CHUNK_STR_NUM];
+    PiXiuStr * strs[PXC_STR_NUM];
     int used_num = 0;
 
     PiXiuStr * getitem(int);
@@ -33,5 +40,7 @@ PiXiuStr * PiXiuStr_init_key(uint8_t[], int);
 PiXiuStr * PiXiuStr_init(uint8_t[], int);
 
 PiXiuStr * PiXiuStr_init_stream(uint8_t, int, int);
+
+void PiXiuStr_free(PiXiuStr *);
 
 #endif

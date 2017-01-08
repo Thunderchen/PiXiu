@@ -29,6 +29,7 @@ int main() {
 }
 
 void t_PiXiuStr(void) {
+    // --- PXC
     assert(sizeof(PiXiuStr) == 2);
     PiXiuChunk chunk;
     auto str = (PiXiuStr *) malloc(sizeof(PiXiuStr));
@@ -37,13 +38,24 @@ void t_PiXiuStr(void) {
     assert(chunk.used_num++ == 0);
     chunk.strs[0] = str;
     assert(chunk.getitem(0)->len == 17);
-
     assert(!chunk.is_delitem(0));
+
     chunk.delitem(0);
     assert(chunk.is_delitem(0));
     assert(chunk.getitem(0)->len == 17);
 
     free(str);
+    // --- PXS
+    uint8_t ptrAs(expect);
+    uint8_t input[] = {1, PXS_UNIQUE, 2, PXS_UNIQUE, 4};
+
+    auto pxs = PiXiuStr_init_key(input, 5);
+    expect = (uint8_t[]) {1, PXS_UNIQUE, PXS_UNIQUE, 2, PXS_UNIQUE, PXS_UNIQUE, 4,
+                          PXS_UNIQUE, PXS_KEY};
+    for (int i = 0; i < pxs->len; ++i) {
+        assert(pxs->data[i] == expect[i]);
+    }
+    PiXiuStr_free(pxs);
 }
 
 void t_MemPool(void) {
