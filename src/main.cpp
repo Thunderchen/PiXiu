@@ -30,6 +30,20 @@ int main() {
 
 void t_PiXiuStr(void) {
     assert(sizeof(PiXiuStr) == 2);
+    PiXiuChunk chunk;
+    auto str = (PiXiuStr *) malloc(sizeof(PiXiuStr));
+    str->len = 17;
+
+    assert(chunk.used_num++ == 0);
+    chunk.strs[0] = str;
+    assert(chunk.getitem(0)->len == 17);
+
+    assert(!chunk.is_delitem(0));
+    chunk.delitem(0);
+    assert(chunk.is_delitem(0));
+    assert(chunk.getitem(0)->len == 17);
+
+    free(str);
 }
 
 void t_MemPool(void) {

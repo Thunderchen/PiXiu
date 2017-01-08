@@ -6,6 +6,8 @@
 
 #define CHUNK_STR_NUM 65535
 
+struct PiXiuChunk;
+
 struct PiXiuStr {
     uint16_t len;
     uint8_t data[];
@@ -18,6 +20,12 @@ struct PiXiuStr {
 struct PiXiuChunk {
     PiXiuStr * strs[CHUNK_STR_NUM];
     int used_num = 0;
+
+    PiXiuStr * getitem(int);
+
+    void delitem(int);
+
+    bool is_delitem(int);
 };
 
 PiXiuStr * PiXiuStr_init_key(uint8_t[], int);
