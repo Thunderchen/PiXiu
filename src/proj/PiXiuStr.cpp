@@ -18,7 +18,12 @@ PiXiuStr * PiXiuStr_init_stream(uint8_t msg_char, int chunk_idx, int offset) {
 };
 
 PiXiuStr * PiXiuStr::concat(PiXiuStr * another) {
-
+    auto ret = (PiXiuStr *) malloc(sizeof(PiXiuStr) + this->len + another->len);
+    ret->len = this->len + another->len;
+    assert(ret->len <= 65535);
+    memcpy(ret->data, this->data, this->len);
+    memcpy(adrOf(ret->data[this->len]), another->data, another->len);
+    return ret;
 }
 
 Generator PiXiuStr::parse(int op, int ed, PiXiuChunk * ctx) {

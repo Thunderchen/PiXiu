@@ -56,6 +56,25 @@ void t_PiXiuStr(void) {
         assert(pxs->data[i] == expect[i]);
     }
     PiXiuStr_free(pxs);
+
+    pxs = PiXiuStr_init(input, 5);
+    assert(pxs->len == 7);
+    for (int i = 0; i < pxs->len; ++i) {
+        assert(pxs->data[i] == expect[i]);
+    }
+    PiXiuStr_free(pxs);
+
+    auto a = PiXiuStr_init(input, 2);
+    auto b = PiXiuStr_init(input, 2);
+    auto merge = a->concat(b);
+    expect = (uint8_t[]) {1, PXS_UNIQUE, PXS_UNIQUE, 1, PXS_UNIQUE, PXS_UNIQUE};
+    assert(merge->len == 6);
+    for (int i = 0; i < merge->len; ++i) {
+        assert(merge->data[i] == expect[i]);
+    }
+    PiXiuStr_free(a);
+    PiXiuStr_free(b);
+    PiXiuStr_free(merge);
 }
 
 void t_MemPool(void) {
