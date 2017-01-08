@@ -47,39 +47,32 @@ void t_PiXiuStr(void) {
     free(str);
     // --- PXS
 #ifndef NDEBUG
-#define ASSERT_OUTPUT(...) \
-    expect = (uint8_t[]) __VA_ARGS__; \
-    for (int i = 0; i < pxs->len; ++i) { \
-        assert(pxs->data[i] == expect[i]); \
-    }
+#define SET_EXPECT(...) expect = (uint8_t[]) { __VA_ARGS__ }
+#define ASSERT_OUT(target) \
+    for (int i = 0; i < target->len; ++i)  \
+        assert(target->data[i] == expect[i])
+#define ASSERT_PXS() ASSERT_OUT(pxs)
 #endif
     // init
     uint8_t ptrAs(expect);
-    uint8_t input[] = {1, PXS_UNIQUE, 2, PXS_UNIQUE, 4};
 
+    uint8_t input[] = {1, PXS_UNIQUE, 2, PXS_UNIQUE, 4};
     auto pxs = PiXiuStr_init_key(input, 5);
-    expect = (uint8_t[]) {1, PXS_UNIQUE, PXS_UNIQUE, 2, PXS_UNIQUE, PXS_UNIQUE, 4,
-                          PXS_UNIQUE, PXS_KEY};
-    for (int i = 0; i < pxs->len; ++i) {
-        assert(pxs->data[i] == expect[i]);
-    }
+    SET_EXPECT(1, 251, 251, 2, 251, 251, 4, 251, 0);
+    ASSERT_PXS();
     PiXiuStr_free(pxs);
 
     pxs = PiXiuStr_init(input, 5);
     assert(pxs->len == 7);
-    for (int i = 0; i < pxs->len; ++i) {
-        assert(pxs->data[i] == expect[i]);
-    }
+    ASSERT_PXS();
     PiXiuStr_free(pxs);
 
     auto a = PiXiuStr_init(input, 2);
     auto b = PiXiuStr_init(input, 2);
     auto merge = a->concat(b);
-    expect = (uint8_t[]) {1, PXS_UNIQUE, PXS_UNIQUE, 1, PXS_UNIQUE, PXS_UNIQUE};
     assert(merge->len == 6);
-    for (int i = 0; i < merge->len; ++i) {
-        assert(merge->data[i] == expect[i]);
-    }
+    SET_EXPECT(1, 251, 251, 1, 251, 251);
+    ASSERT_OUT(merge);
     PiXiuStr_free(a);
     PiXiuStr_free(b);
     PiXiuStr_free(merge);
@@ -100,13 +93,11 @@ void t_PiXiuStr(void) {
     }
     pxs = PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_OFF });
 
-    expect = (uint8_t[]) {1, 1, 1, 1, 3, 3, 3, 3, 3, 3, 1, 251, 7, 3, 0, 7, 0};
-    for (int i = 0; i < pxs->len; ++i) {
-        assert(pxs->data[i] == expect[i]);
-    }
+    SET_EXPECT(1, 1, 1, 1, 3, 3, 3, 3, 3, 3, 1, 251, 7, 3, 0, 7, 0);
+    ASSERT_PXS();
     PiXiuStr_free(pxs);
 
-    PiXiuStr_init_stream((PXSMsg) {.chunk_idx__cmd=PXS_STREAM_ON});
+    PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_ON });
     for (int i = 0; i < 1; ++i) {
         PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_PASS, .val = 1 });
     }
@@ -119,10 +110,8 @@ void t_PiXiuStr(void) {
     }
     pxs = PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_OFF });
 
-    expect = (uint8_t[]) {1, 251, 255, 2, 0, 255, 0, 1, 251, 1, 3, 0, 0, 1, 0, 0};
-    for (int i = 0; i < pxs->len; ++i) {
-        assert(pxs->data[i] == expect[i]);
-    }
+    SET_EXPECT(1, 251, 255, 2, 0, 255, 0, 1, 251, 1, 3, 0, 0, 1, 0, 0);
+    ASSERT_PXS();
     PiXiuStr_free(pxs);
 
     // parse
@@ -143,11 +132,9 @@ void t_PiXiuStr(void) {
     }
     pxs = PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_OFF });
 
-    expect = (uint8_t[]) {1, 251, 251, 1, 251, 251, 3,
-                          251, 11, 2, 0, 11, 0, 3, 251, 1, 3, 0, 1, 1, 1, 0};
-    for (int i = 0; i < pxs->len; ++i) {
-        assert(pxs->data[i] == expect[i]);
-    }
+    SET_EXPECT(1, 251, 251, 1, 251, 251, 3,
+               251, 11, 2, 0, 11, 0, 3, 251, 1, 3, 0, 1, 1, 1, 0);
+    ASSERT_PXS();
 
     PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_ON });
     for (int i = 0; i < 11; ++i) {
