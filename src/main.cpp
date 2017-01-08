@@ -47,32 +47,32 @@ void t_PiXiuStr(void) {
     free(str);
     // --- PXS
 #ifndef NDEBUG
-#define SET_EXPECT(...) expect = (uint8_t[]) { __VA_ARGS__ }
-#define ASSERT_OUT(target) \
+#define set_expect(...) expect = (uint8_t[]) { __VA_ARGS__ }
+#define assert_out(target) \
     for (int i = 0; i < target->len; ++i)  \
         assert(target->data[i] == expect[i])
-#define ASSERT_PXS() ASSERT_OUT(pxs)
+#define assert_pxs() assert_out(pxs)
 #endif
     // init
     uint8_t ptrAs(expect);
 
     uint8_t input[] = {1, PXS_UNIQUE, 2, PXS_UNIQUE, 4};
     auto pxs = PiXiuStr_init_key(input, 5);
-    SET_EXPECT(1, 251, 251, 2, 251, 251, 4, 251, 0);
-    ASSERT_PXS();
+    set_expect(1, 251, 251, 2, 251, 251, 4, 251, 0);
+    assert_pxs();
     PiXiuStr_free(pxs);
 
     pxs = PiXiuStr_init(input, 5);
     assert(pxs->len == 7);
-    ASSERT_PXS();
+    assert_pxs();
     PiXiuStr_free(pxs);
 
     auto a = PiXiuStr_init(input, 2);
     auto b = PiXiuStr_init(input, 2);
     auto merge = a->concat(b);
     assert(merge->len == 6);
-    SET_EXPECT(1, 251, 251, 1, 251, 251);
-    ASSERT_OUT(merge);
+    set_expect(1, 251, 251, 1, 251, 251);
+    assert_out(merge);
     PiXiuStr_free(a);
     PiXiuStr_free(b);
     PiXiuStr_free(merge);
@@ -93,8 +93,8 @@ void t_PiXiuStr(void) {
     }
     pxs = PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_OFF });
 
-    SET_EXPECT(1, 1, 1, 1, 3, 3, 3, 3, 3, 3, 1, 251, 7, 3, 0, 7, 0);
-    ASSERT_PXS();
+    set_expect(1, 1, 1, 1, 3, 3, 3, 3, 3, 3, 1, 251, 7, 3, 0, 7, 0);
+    assert_pxs();
     PiXiuStr_free(pxs);
 
     PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_ON });
@@ -110,8 +110,8 @@ void t_PiXiuStr(void) {
     }
     pxs = PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_OFF });
 
-    SET_EXPECT(1, 251, 255, 2, 0, 255, 0, 1, 251, 1, 3, 0, 0, 1, 0, 0);
-    ASSERT_PXS();
+    set_expect(1, 251, 255, 2, 0, 255, 0, 1, 251, 1, 3, 0, 0, 1, 0, 0);
+    assert_pxs();
     PiXiuStr_free(pxs);
 
     // parse
@@ -132,16 +132,15 @@ void t_PiXiuStr(void) {
     }
     pxs = PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_OFF });
 
-    SET_EXPECT(1, 251, 251, 1, 251, 251, 3,
-               251, 11, 2, 0, 11, 0, 3, 251, 1, 3, 0, 1, 1, 1, 0);
-    ASSERT_PXS();
+    set_expect(1, 251, 251, 1, 251, 251, 3, 251, 11, 2, 0, 11, 0, 3, 251, 1, 3, 0, 1, 1, 1, 0);
+    assert_pxs();
 
     PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_ON });
     for (int i = 0; i < 11; ++i) {
         PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_PASS, .val = 2 });
     }
     PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_PASS, .val = 8 });
-    auto pxs_id2 = PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_OFF });
+    auto pxs_idx_2 = PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_OFF });
 
     PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_ON });
     PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_PASS, .val = 8 });
@@ -149,11 +148,11 @@ void t_PiXiuStr(void) {
         PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_PASS, .val = 3 });
     }
     PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_PASS, .val = 8 });
-    auto pxs_id3 = PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_OFF });
+    auto pxs_idx_3 = PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_OFF });
 
     PiXiuStr_free(pxs);
-    PiXiuStr_free(pxs_id2);
-    PiXiuStr_free(pxs_id3);
+    PiXiuStr_free(pxs_idx_2);
+    PiXiuStr_free(pxs_idx_3);
 }
 
 void t_MemPool(void) {
