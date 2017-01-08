@@ -12,6 +12,8 @@
 #define PXS_STREAM_OFF -2
 #define PXS_STREAM_PASS -3
 
+#define PXS_STREAM(...) PiXiuStr_init_stream((PXSMsg) __VA_ARGS__)
+
 #define PXC_STR_NUM 65535
 
 struct PiXiuChunk;
