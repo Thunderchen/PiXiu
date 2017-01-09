@@ -90,12 +90,10 @@ $gen(PXSGen) {
     PiXiuChunk * ctx;
 
     int len;
-    int src_cursor;
     int ret_cursor;
-
-    int supply;
+    int src_cursor;
     PXSGen * sub_gen;
-    PXSRecord record;
+
     uint8_t cmd;
     uint8_t next_cmd;
 
@@ -105,6 +103,8 @@ $gen(PXSGen) {
     // <body>
     $emit(uint8_t)
             int sub_from, sub_to;
+            int supply;
+            PXSRecord record;
 
             assert(from >= 0 && to >= from);
             len = to - from;
