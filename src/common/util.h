@@ -16,4 +16,14 @@ T adr_de_spec(T p) {
     return adr_is_spec(p) ? (T) (((intptr_t) p) ^ 1) : p;
 }
 
+template<typename T>
+T min(T a, T b) {
+    return a < b ? a : b;
+}
+
+template<typename T>
+T max(T a, T b) {
+    return a > b ? a : b;
+}
+
 #endif
