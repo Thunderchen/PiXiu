@@ -85,19 +85,18 @@ src_cursor++;
 
 $gen(PXSGen) {
     PiXiuStr * self;
+    PiXiuChunk * ctx;
+    PXSGen * sub_gen;
+
     int from;
     int to;
-    PiXiuChunk * ctx;
-
     int len;
     int ret_cursor;
     int src_cursor;
-    PXSGen * sub_gen;
+    int i;
 
     uint8_t cmd;
     uint8_t next_cmd;
-
-    int i;
     // <var/>
 
     // <body>
