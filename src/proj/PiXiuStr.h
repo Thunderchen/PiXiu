@@ -99,15 +99,13 @@ $gen(PXSGen) {
     uint8_t cmd;
     uint8_t next_cmd;
 
-    int sub_from;
-    int sub_to;
-
     int i;
-    uint8_t rv;
     // <var/>
 
     // <body>
     $emit(uint8_t)
+            int sub_from, sub_to;
+
             assert(from >= 0 && to >= from);
             len = to - from;
             src_cursor = ret_cursor = 0;
@@ -143,6 +141,7 @@ $gen(PXSGen) {
                             sub_to = min<int>(record.big.to, sub_from + (len - ret_cursor));
                             sub_gen = ctx->strs[record.big.idx]->parse(sub_from, sub_to, ctx);
 
+                            uint8_t rv;
                             while (sub_gen->operator()(rv)) {
                                 $yield(rv);
                             }
