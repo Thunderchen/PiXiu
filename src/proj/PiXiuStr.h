@@ -70,4 +70,6 @@ PiXiuStr * PiXiuStr_init_stream(PXSMsg);
 
 void PiXiuStr_free(PiXiuStr *);
 
+void PXSGen_free(Generator *);
+
 #endif

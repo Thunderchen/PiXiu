@@ -115,6 +115,7 @@ void t_PiXiuStr(void) {
     PiXiuStr_free(pxs);
 
     // parse
+    assert(sizeof(PXSRecord) == sizeof(PXSRecordBig));
     PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_ON });
     PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_PASS, .val = 1 });
     PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_PASS, .val = PXS_UNIQUE });
