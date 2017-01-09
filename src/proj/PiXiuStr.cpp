@@ -86,12 +86,7 @@ PiXiuStr * PiXiuStr_init_stream(PXSMsg msg) {
             break;
 
         default:
-            if (compress_len == 0) {
-                set_record();
-            } else {
-                compress_to++;
-                compress_len++;
-            }
+            set_record();
             List_append(uint8_t, list, msg_char);
             break;
     }
@@ -108,8 +103,15 @@ PiXiuStr * PiXiuStr::concat(PiXiuStr * another) {
     return ret;
 }
 
-Generator PiXiuStr::parse(int op, int ed, PiXiuChunk * ctx) {
+PXSGen * PiXiuStr::parse(int from, int to, PiXiuChunk * ctx) {
+    auto gen = (PXSGen *) malloc(sizeof(PXSGen));
+    gen->_line = 0;
 
+    gen->self = this;
+    gen->from = from;
+    gen->to = to;
+    gen->ctx = ctx;
+    return gen;
 }
 
 void PiXiuChunk::delitem(int idx) {
@@ -177,4 +179,8 @@ static PiXiuStr * escape_unique(uint8_t src[], int src_len, bool is_key) {
 
     List_free(occur_list);
     return pxs;
+}
+
+void PXSGen_free(PXSGen * g) {
+    free(g);
 }
