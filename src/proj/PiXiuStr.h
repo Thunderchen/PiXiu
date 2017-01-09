@@ -3,6 +3,7 @@
 
 #include "../common/gen.h"
 #include "../common/util.h"
+#include <assert.h>
 #include <stdint.h>
 
 #define PXS_UNIQUE 251
@@ -87,13 +88,13 @@ $gen(PXSGen) {
     int from;
     int to;
     PiXiuChunk * ctx;
-    int len;
 
+    int len;
     int src_cursor;
     int ret_cursor;
 
-    PXSGen * sub_gen;
     int supply;
+    PXSGen * sub_gen;
     PXSRecord record;
     uint8_t cmd;
     uint8_t next_cmd;
@@ -107,6 +108,7 @@ $gen(PXSGen) {
 
     // <body>
     $emit(uint8_t)
+            assert(from >= 0 && to >= from);
             len = to - from;
             src_cursor = ret_cursor = 0;
 
@@ -144,10 +146,10 @@ $gen(PXSGen) {
                             while (sub_gen->operator()(rv)) {
                                 $yield(rv);
                             }
+                            ret_cursor += sub_to - sub_from;
                             PXSGen_free(sub_gen);
                         }
-                    } else
-                        assert(false);
+                    } else { assert(false); }
                 } else {
                     PXSG_TRY_WRITE;
                 }

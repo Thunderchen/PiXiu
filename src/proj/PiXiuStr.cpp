@@ -1,7 +1,5 @@
 #include "../common/List.h"
-#include "../common/util.h"
 #include "PiXiuStr.h"
-#include <assert.h>
 
 static PiXiuStr * escape_unique(uint8_t[], int, bool);
 
@@ -136,6 +134,10 @@ void PiXiuStr_free(PiXiuStr * pxs) {
     free(pxs);
 };
 
+void PXSGen_free(PXSGen * gen) {
+    free(gen);
+}
+
 static PiXiuStr * escape_unique(uint8_t src[], int src_len, bool is_key) {
     List_init(int, occur_list);
 
@@ -179,8 +181,4 @@ static PiXiuStr * escape_unique(uint8_t src[], int src_len, bool is_key) {
 
     List_free(occur_list);
     return pxs;
-}
-
-void PXSGen_free(PXSGen * g) {
-    free(g);
 }

@@ -141,19 +141,39 @@ void t_PiXiuStr(void) {
         PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_PASS, .val = 2 });
     }
     PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_PASS, .val = 8 });
-    auto pxs_idx_2 = PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_OFF });
+    auto pxs_22 = PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_OFF });
 
     PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_ON });
     PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_PASS, .val = 8 });
     for (int i = 0; i < 256; ++i) {
-        PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_PASS, .val = 3 });
+        PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_PASS, .val = 6 });
     }
     PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_PASS, .val = 8 });
-    auto pxs_idx_3 = PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_OFF });
+    auto pxs_36 = PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_OFF });
 
+    chunk.strs[2] = pxs_22;
+    chunk.strs[3] = pxs_36;
+    auto gen = pxs->parse(1, 272, adrOf(chunk));
+
+    uint8_t rv_arr[271];
+    int i = 0;
+    while (gen->operator()(rv_arr[i])) {
+        i++;
+    }
+
+    i = 6;
+    for (int j = 0; j < 11; ++j) {
+        assert(rv_arr[i++] == 2);
+    }
+    assert(rv_arr[i++] == 3);
+    for (int j = 0; j < 271 - 1 - 11 - 6; ++j) {
+        assert(rv_arr[i++] == 6);
+    }
+
+    PXSGen_free(gen);
     PiXiuStr_free(pxs);
-    PiXiuStr_free(pxs_idx_2);
-    PiXiuStr_free(pxs_idx_3);
+    PiXiuStr_free(pxs_22);
+    PiXiuStr_free(pxs_36);
 }
 
 void t_MemPool(void) {
