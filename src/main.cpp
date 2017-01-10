@@ -253,7 +253,7 @@ void t_MemPool(void) {
         assert(val == v);
     }
 
-    memPool.free_all();
+    memPool.free_prop();
     assert(memPool.curr_pool == NULL);
 }
 

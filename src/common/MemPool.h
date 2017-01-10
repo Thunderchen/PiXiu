@@ -1,7 +1,6 @@
 #ifndef MEM_POOL_H
 #define MEM_POOL_H
 
-#include "style.h"
 #include <stddef.h>
 
 #define POOL_BLOCK_NUM 65535
@@ -18,7 +17,7 @@ struct MemPool {
 
     void * p_malloc(int size);
 
-    void free_all(void);
+    void free_prop(void);
 };
 
 #endif

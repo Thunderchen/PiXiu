@@ -28,7 +28,7 @@ void * MemPool::p_malloc(int size) {
     return ret;
 }
 
-void MemPool::free_all() {
+void MemPool::free_prop() {
     Pool * cursor = this->curr_pool;
     while (cursor != NULL) {
         auto next_cursor = cursor->prev_pool;
