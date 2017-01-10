@@ -17,6 +17,10 @@ struct CBTInter {
     uint8_t mask;
 };
 
+struct CritBitTree {
+    CBTNode root = NULL;
+};
+
 CBTInter * CBTInter_init(void);
 
 void CBTInter_free(CBTInter *);
