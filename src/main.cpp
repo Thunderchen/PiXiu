@@ -59,7 +59,7 @@ void t_PiXiuStr(void) {
 #define assert_pxs() assert_out(pxs)
 #endif
     // init
-    uint8_t ptrAs(expect);
+    uint8_t * expect;
 
     uint8_t input[] = {1, PXS_UNIQUE, 2, PXS_UNIQUE, 4};
     auto pxs = PiXiuStr_init_key(input, 5);
@@ -289,7 +289,7 @@ void t_gen(void) {
 }
 
 void t_List(void) {
-    int ptrAs(expect);
+    int * expect;
     List_init(int, list);
 
     List_append(int, list, 3);

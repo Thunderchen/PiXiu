@@ -29,7 +29,7 @@ void * MemPool::p_malloc(int size) {
 }
 
 void MemPool::free_all() {
-    Pool ptrAs(cursor) = this->curr_pool;
+    Pool * cursor = this->curr_pool;
     while (cursor != NULL) {
         auto next_cursor = cursor->prev_pool;
         free(cursor);
