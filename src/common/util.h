@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+#define lenOf(arr) (sizeof(arr) / sizeof(arr[0]))
+
 #define adr_is_spec(p) ((bool) (((intptr_t) p) & 1))
 
 template<typename T>
