@@ -43,7 +43,7 @@ void t_PiXiuStr(void) {
     chunk.delitem(0);
     assert(chunk.is_delitem(0));
     assert(chunk.getitem(0)->len == 17);
-    free(str);
+    PiXiuStr_free(str);
 
     auto chunk_nf = (PiXiuChunk *) malloc(sizeof(PiXiuChunk));
     for (int i = 0; i < PXC_STR_NUM; ++i) {
@@ -146,7 +146,7 @@ void t_PiXiuStr(void) {
         PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_PASS, .val = 2 });
     }
     PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_PASS, .val = 8 });
-    auto pxs_22 = PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_OFF });
+    auto pxs_i2v2 = PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_OFF });
 
     PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_ON });
     PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_PASS, .val = 8 });
@@ -154,10 +154,10 @@ void t_PiXiuStr(void) {
         PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_PASS, .val = 6 });
     }
     PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_PASS, .val = 8 });
-    auto pxs_36 = PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_OFF });
+    auto pxs_i3v6 = PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_OFF });
 
-    chunk.strs[2] = pxs_22;
-    chunk.strs[3] = pxs_36;
+    chunk.strs[2] = pxs_i2v2;
+    chunk.strs[3] = pxs_i3v6;
     auto gen = pxs->parse(1, 272, adrOf(chunk));
 
     uint8_t rv_arr[271];
@@ -177,8 +177,32 @@ void t_PiXiuStr(void) {
 
     PXSGen_free(gen);
     PiXiuStr_free(pxs);
-    PiXiuStr_free(pxs_22);
-    PiXiuStr_free(pxs_36);
+    PiXiuStr_free(pxs_i2v2);
+    PiXiuStr_free(pxs_i3v6);
+
+    // key equal
+    PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_ON });
+    PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_PASS, .val = 1 });
+    PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_PASS, .val = PXS_UNIQUE });
+    PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_PASS, .val = PXS_KEY });
+    auto k1 = PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_OFF });
+
+    PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_ON });
+    PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_PASS, .val = 2 });
+    auto k2 = PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_OFF });
+
+    PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_ON });
+    PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_PASS, .val = 1 });
+    PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_PASS, .val = PXS_UNIQUE });
+    PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_PASS, .val = PXS_KEY });
+    PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_PASS, .val = 7 });
+    auto k1_ = PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_OFF });
+
+    assert(k1->key_eq(k1_, adrOf(chunk)));
+    assert(!k1->key_eq(k2, adrOf(chunk)));
+    PiXiuStr_free(k1);
+    PiXiuStr_free(k2);
+    PiXiuStr_free(k1_);
 }
 
 void t_MemPool(void) {

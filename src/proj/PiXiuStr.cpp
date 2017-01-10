@@ -80,7 +80,7 @@ PiXiuStr * PiXiuStr_init_stream(PXSMsg msg) {
             ret->len = (uint16_t) list_len;
             assert(list_len <= PXSG_MAX_TO);
             memcpy(ret->data, list, (size_t) list_len);
-            free(list);
+            List_free(list);
             break;
 
         default:
@@ -101,9 +101,26 @@ PiXiuStr * PiXiuStr::concat(PiXiuStr * another) {
     return ret;
 }
 
-bool PiXiuStr::key_eq(PiXiuStr * another) {
-    
-    return false;
+bool PiXiuStr::key_eq(PiXiuStr * another, PiXiuChunk * ctx) {
+    auto ret = false;
+    auto my_gen = this->parse(0, PXSG_MAX_TO, ctx);
+    auto your_gen = another->parse(0, PXSG_MAX_TO, ctx);
+
+    auto spec_mode = false;
+    uint8_t my_val, your_val;
+    while (my_gen->operator()(my_val) && your_gen->operator()(your_val) && my_val == your_val) {
+        if (!spec_mode && my_val == PXS_UNIQUE) { spec_mode = true; }
+        else if (spec_mode) {
+            if (my_val == PXS_KEY) {
+                ret = true;
+                break;
+            } else { spec_mode = false; }
+        }
+    }
+
+    PXSGen_free(my_gen);
+    PXSGen_free(your_gen);
+    return ret;
 }
 
 PXSGen * PiXiuStr::parse(int from, int to, PiXiuChunk * ctx) {

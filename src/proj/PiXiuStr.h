@@ -54,7 +54,7 @@ struct PiXiuStr {
 
     PiXiuStr * concat(PiXiuStr *);
 
-    bool key_eq(PiXiuStr *);
+    bool key_eq(PiXiuStr *, PiXiuChunk *);
 };
 
 struct PiXiuChunk {
