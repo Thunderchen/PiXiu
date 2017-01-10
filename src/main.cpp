@@ -5,6 +5,8 @@
 #include "proj/PiXiuStr.h"
 #include <stdio.h>
 
+void t_CritBitTree(void);
+
 void t_gen(void);
 
 void t_List(void);
@@ -17,6 +19,7 @@ void t_Que(void);
 
 int main() {
 #ifndef NDEBUG
+    t_CritBitTree();
     t_gen();
     t_List();
     t_MemPool();
@@ -26,6 +29,10 @@ int main() {
     printf("\nt_OK\n");
 #endif
     return 0;
+}
+
+void t_CritBitTree(void) {
+
 }
 
 void t_PiXiuStr(void) {
