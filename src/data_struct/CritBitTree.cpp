@@ -1,11 +1,22 @@
+#include "../common/Que.h"
 #include "CritBitTree.h"
-#include <stddef.h>
 
-CBTInter * CBTInter_init(void) {
-    auto ret = (CBTInter *) malloc(offsetof(CBTInter, mask) + sizeof(CBTInter::mask));
-    return ret;
+int CritBitTree::setitem(PiXiuStr * src, PiXiuChunk * ctx, int idx) {
+
 }
 
-void CBTInter_free(CBTInter * inter) {
-    free(inter);
+char * CritBitTree::repr(void) {
+
+}
+
+tuple<void *, void *, void *> CritBitTree::find_best_match(PiXiuStr * src) {
+
+}
+
+CBTInner * CBTInner_init(void) {
+    return (CBTInner *) malloc(offsetof(CBTInner, mask) + sizeof(CBTInner::mask));
+}
+
+void CBTInner_free(CBTInner * inner) {
+    free(inner);
 }

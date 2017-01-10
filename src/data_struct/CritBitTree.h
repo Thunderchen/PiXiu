@@ -1,26 +1,28 @@
 #include "../proj/PiXiuStr.h"
+#include <tuple>
 
-struct CBTInter;
+using std::tuple;
 
-union CBTNode {
-    CBTInter * inter;
-    PiXiuChunk * outer;
-};
-
-struct CBTInter {
-    CBTNode crit_0;
-    CBTNode crit_1;
-    uint16_t c0_idx;
-    uint16_t c1_idx;
+struct CBTInner {
+    void * crit_node[2];
+    uint16_t outer_idx[2];
 
     uint16_t diff_at;
     uint8_t mask;
 };
 
 struct CritBitTree {
-    CBTNode root = NULL;
+    void * root = NULL;
+    uint16_t outer_idx;
+
+    int setitem(PiXiuStr *, PiXiuChunk *, int);
+
+    char * repr(void);
+
+private:
+    tuple<void *, void *, void *> find_best_match(PiXiuStr *);
 };
 
-CBTInter * CBTInter_init(void);
+CBTInner * CBTInner_init(void);
 
-void CBTInter_free(CBTInter *);
+void CBTInner_free(CBTInner *);
