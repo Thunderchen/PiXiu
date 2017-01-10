@@ -134,6 +134,13 @@ void PiXiuStr_free(PiXiuStr * pxs) {
     free(pxs);
 };
 
+void PiXiuChunk_free(PiXiuChunk * chunk) {
+    for (int i = 0; i < PXC_STR_NUM; ++i) {
+        free(chunk->getitem(i));
+    }
+    free(chunk);
+}
+
 void PXSGen_free(PXSGen * gen) {
     free(gen);
 }

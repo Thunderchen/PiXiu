@@ -43,8 +43,13 @@ void t_PiXiuStr(void) {
     chunk.delitem(0);
     assert(chunk.is_delitem(0));
     assert(chunk.getitem(0)->len == 17);
-
     free(str);
+
+    auto chunk_nf = (PiXiuChunk *) malloc(sizeof(PiXiuChunk));
+    for (int i = 0; i < PXC_STR_NUM; ++i) {
+        chunk_nf->strs[i] = (PiXiuStr *) malloc(1);
+    }
+    PiXiuChunk_free(chunk_nf);
     // --- PXS
 #ifndef NDEBUG
 #define PXS_STREAM(...) PiXiuStr_init_stream((PXSMsg) __VA_ARGS__)
