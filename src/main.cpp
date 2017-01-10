@@ -254,6 +254,7 @@ void t_MemPool(void) {
     }
 
     memPool.free_all();
+    assert(memPool.curr_pool == NULL);
 }
 
 void t_Que(void) {

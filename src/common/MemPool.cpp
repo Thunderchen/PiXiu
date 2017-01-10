@@ -35,4 +35,5 @@ void MemPool::free_all() {
         free(cursor);
         cursor = next_cursor;
     }
+    this->curr_pool = cursor;
 }
