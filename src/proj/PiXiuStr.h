@@ -14,6 +14,7 @@
 #define PXS_STREAM_OFF -2
 #define PXS_STREAM_PASS -3
 
+#define PXSG_MAX_TO 65535
 #define PXC_STR_NUM 65535
 
 struct PiXiuChunk;
@@ -52,6 +53,8 @@ struct PiXiuStr {
     PXSGen * parse(int, int, PiXiuChunk *);
 
     PiXiuStr * concat(PiXiuStr *);
+
+    bool key_eq(PiXiuStr *);
 };
 
 struct PiXiuChunk {
@@ -111,7 +114,7 @@ $gen(PXSGen) {
             len = to - from;
             src_cursor = ret_cursor = 0;
 
-            for (i = 0; ret_cursor < len; ++i) {
+            for (i = 0; ret_cursor < len && i < self->len; ++i) {
                 cmd = self->data[i];
 
                 if (cmd == PXS_UNIQUE) {

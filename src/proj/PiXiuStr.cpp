@@ -78,7 +78,7 @@ PiXiuStr * PiXiuStr_init_stream(PXSMsg msg) {
             try_explode();
             ret = (PiXiuStr *) malloc(sizeof(PiXiuStr) + list_len);
             ret->len = (uint16_t) list_len;
-            assert(list_len <= UINT16_MAX);
+            assert(list_len <= PXSG_MAX_TO);
             memcpy(ret->data, list, (size_t) list_len);
             free(list);
             break;
@@ -95,10 +95,15 @@ PiXiuStr * PiXiuStr_init_stream(PXSMsg msg) {
 PiXiuStr * PiXiuStr::concat(PiXiuStr * another) {
     auto ret = (PiXiuStr *) malloc(sizeof(PiXiuStr) + this->len + another->len);
     ret->len = this->len + another->len;
-    assert(ret->len <= UINT16_MAX);
+    assert(ret->len <= PXSG_MAX_TO);
     memcpy(ret->data, this->data, this->len);
     memcpy(adrOf(ret->data[this->len]), another->data, another->len);
     return ret;
+}
+
+bool PiXiuStr::key_eq(PiXiuStr * another) {
+    
+    return false;
 }
 
 PXSGen * PiXiuStr::parse(int from, int to, PiXiuChunk * ctx) {
@@ -155,7 +160,7 @@ static PiXiuStr * escape_unique(uint8_t src[], int src_len, bool is_key) {
     }
 
     int len = src_len + occur_list_len + (is_key ? 2 : 0);
-    assert(len <= UINT16_MAX);
+    assert(len <= PXSG_MAX_TO);
     auto pxs = (PiXiuStr *) malloc(sizeof(PiXiuStr) + len);
     pxs->len = (uint16_t) len;
 
