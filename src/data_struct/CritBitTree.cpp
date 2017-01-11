@@ -39,7 +39,7 @@ char * CritBitTree::repr(void) {
 }
 
 CritBitTree::fbm_ret CritBitTree::find_best_match(PiXiuStr * src) {
-    auto q[] = {NULL, NULL, this->root};
+    void * q[] = {NULL, NULL, this->root};
     auto q_len = lenOf(q);
     auto q_cursor = 0;
 
