@@ -23,14 +23,19 @@ int CritBitTree::setitem(PiXiuStr * src, PiXiuChunk * ctx, uint16_t chunk_idx) {
 
         auto idx = pa->chunk_idx[pa->get_direct(crit_node)];
         auto crit_pxs = crit_node->getitem(idx);
+
         auto crit_gen = crit_pxs->parse(0, PXSG_MAX_TO, crit_node);
         auto src_gen = src->parse(0, PXSG_MAX_TO, NULL);
 
-        uint8_t crit_rv, src_rv;
         uint16_t diff_at = 0;
-        while (crit_gen->operator()(crit_rv) && src_gen->operator()(src_rv)) {
+        auto spec_mode = false;
+        uint8_t crit_rv, src_rv;
+        while (crit_gen->operator()(crit_rv) && src_gen->operator()(src_rv) && crit_rv == src_rv) {
 
         }
+
+        PXSGen_free(crit_gen);
+        PXSGen_free(src_gen);
     }
 }
 
