@@ -5,7 +5,7 @@ using std::tuple;
 
 struct CBTInner {
     void * crit_node[2];
-    uint16_t outer_idx[2];
+    uint16_t chunk_idx[2];
 
     uint16_t diff_at;
     uint8_t mask;
@@ -13,7 +13,7 @@ struct CBTInner {
 
 struct CritBitTree {
     void * root = NULL;
-    uint16_t outer_idx;
+    uint16_t chunk_idx;
 
     int setitem(PiXiuStr *, PiXiuChunk *, int);
 
