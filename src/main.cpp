@@ -307,7 +307,7 @@ void t_List(void) {
     for (int i = 0; i < list_len; ++i) {
         assert(list[i] == expect[i]);
     }
-    assert(list_len == 3 && list_capacity == 4);
+    assert(list_len == 3 && list_capacity == 3);
 
     List_del(int, list, 1);
     assert(list[0] == 3 && list[1] == 1);
@@ -331,7 +331,7 @@ void t_List(void) {
     for (int i = 0; i < list_len; ++i) {
         assert(list[i] == expect[i]);
     }
-    assert(list_len == 5 && list_capacity == 8);
+    assert(list_len == 5 && list_capacity == 6);
 
     List_free(list);
 }

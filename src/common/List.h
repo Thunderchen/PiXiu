@@ -13,7 +13,7 @@ T ptrAs(name) = (T *) malloc(sizeof(T) * name ## _capacity);
 
 #define List_append(T, name, val) \
 if (name ## _len >= name ## _capacity) { \
-    name ## _capacity *= 2; \
+    name ## _capacity = (int) (name ## _capacity * 1.5); \
     T ptrAs(_ ## name) = (T *) malloc(sizeof(T) * name ## _capacity); \
     memcpy(_ ## name, name, sizeof(T) * name ## _len); \
     free(name); \
@@ -35,7 +35,7 @@ if (idx == name ## _len) { \
     List_append(T, name, val); \
 } else { \
     if (name ## _len >= name ## _capacity) { \
-        name ## _capacity *= 2; \
+        name ## _capacity = (int) (name ## _capacity * 1.5); \
         T ptrAs(_ ## name) = (T *) malloc(sizeof(T) * name ## _capacity); \
         if (idx > 0) { \
         memcpy(_ ## name, name, sizeof(T) * idx); \
