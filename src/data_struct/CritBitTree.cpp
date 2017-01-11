@@ -4,6 +4,7 @@
 
 #define is_inner(p) adr_is_spec(p)
 #define normal(p) adr_de_spec(p)
+#define specfy(p) adr_mk_spec(p)
 
 int CBTInner::get_direct(void * node) {
     if (node == normal(this->crit_node_arr[0])) {
@@ -52,33 +53,36 @@ int CritBitTree::setitem(PiXiuStr * src, PiXiuChunk * ctx, uint16_t chunk_idx) {
 
             auto inner_node = CBTInner_init();
             inner_node->crit_node_arr[direct] = ctx;
-            inner_node->chunk_idx_arr[diff_at] = chunk_idx;
+            inner_node->chunk_idx_arr[direct] = chunk_idx;
             inner_node->diff_at = diff_at;
             inner_node->mask = mask;
 
             CBTInner * parent = NULL;
-            auto replace_point = (CBTInner *) this->root;
+            auto replace_ptr = this->root;
+            auto replace_node = (CBTInner *) normal(replace_ptr);
             int curr_direct = -1;
             while (true) {
-                if (!is_inner(replace_point)
-                    || replace_point->diff_at > diff_at
-                    || (replace_point->diff_at == diff_at && replace_point->mask > inner_node->mask)) {
+                if (!is_inner(replace_ptr)
+                    || replace_node->diff_at > diff_at
+                    || (replace_node->diff_at == diff_at && replace_node->mask > inner_node->mask)) {
                     break;
                 }
 
-                uint8_t crit_byte = src->len > replace_point->diff_at ? src->data[replace_point->diff_at] : (uint8_t) 0;
-                curr_direct = (1 + (replace_point->mask | crit_byte)) >> 8;
-                parent = replace_point;
-                replace_point = (CBTInner *) replace_point->crit_node_arr[curr_direct];
+                uint8_t crit_byte = src->len > replace_node->diff_at ? src->data[replace_node->diff_at] : (uint8_t) 0;
+                curr_direct = (1 + (replace_node->mask | crit_byte)) >> 8;
+
+                parent = replace_node;
+                replace_ptr = replace_node->crit_node_arr[curr_direct];
+                replace_node = (CBTInner *) normal(replace_ptr);
             }
 
             if (parent == NULL) {
-                this->root = inner_node;
+                this->root = specfy(inner_node);
             } else {
                 assert(curr_direct >= 0);
-                parent->crit_node_arr[curr_direct] = inner_node;
+                parent->crit_node_arr[curr_direct] = specfy(inner_node);
             }
-            inner_node->crit_node_arr[(direct + 1) % 2] = replace_point;
+            inner_node->crit_node_arr[(direct + 1) % 2] = replace_ptr;
         };
 
         while (crit_gen->operator()(crit_rv) && src_gen->operator()(src_rv) && crit_rv == src_rv) {
