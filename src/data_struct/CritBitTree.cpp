@@ -2,6 +2,15 @@
 #include "CritBitTree.h"
 #include <stddef.h>
 
+int CBTInner::get_direct(void * cursor) {
+    if (cursor == adr_de_spec(this->crit_node[0])) {
+        return 0;
+    } else {
+        assert(cursor == adr_de_spec(this->crit_node[1]));
+        return 1;
+    }
+};
+
 int CritBitTree::setitem(PiXiuStr * src, PiXiuChunk * ctx, uint16_t chunk_idx) {
     if (this->root == NULL) {
         this->root = ctx;
@@ -12,15 +21,17 @@ int CritBitTree::setitem(PiXiuStr * src, PiXiuChunk * ctx, uint16_t chunk_idx) {
         auto pa = (CBTInner *) ret.pa;
         auto crit_node = (PiXiuChunk *) ret.crit_node;
 
-        uint16_t diff_at = 0;
+        auto idx = pa->chunk_idx[pa->get_direct(crit_node)];
+        auto crit_pxs = crit_node->getitem(idx);
     }
 }
 
 char * CritBitTree::repr(void) {
+
 }
 
 CritBitTree::fbm_ret CritBitTree::find_best_match(PiXiuStr * src) {
-    void * q[] = {NULL, NULL, this->root};
+    auto q[] = {NULL, NULL, this->root};
     auto q_len = lenOf(q);
     auto q_cursor = 0;
 
