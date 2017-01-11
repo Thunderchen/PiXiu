@@ -1,7 +1,4 @@
 #include "../proj/PiXiuStr.h"
-#include <tuple>
-
-using std::tuple;
 
 struct CBTInner {
     void * crit_node[2];
@@ -15,12 +12,18 @@ struct CritBitTree {
     void * root = NULL;
     uint16_t chunk_idx;
 
-    int setitem(PiXiuStr *, PiXiuChunk *, int);
+    int setitem(PiXiuStr *, PiXiuChunk *, uint16_t);
 
     char * repr(void);
 
 private:
-    tuple<void *, void *, void *> find_best_match(PiXiuStr *);
+    struct fbm_ret {
+        void * grand;
+        void * pa;
+        void * crit_node;
+    };
+
+    fbm_ret find_best_match(PiXiuStr *);
 };
 
 CBTInner * CBTInner_init(void);

@@ -1,15 +1,14 @@
 #include "../common/Que.h"
 #include "CritBitTree.h"
+#include <stddef.h>
 
-int CritBitTree::setitem(PiXiuStr * src, PiXiuChunk * ctx, int idx) {
-
+int CritBitTree::setitem(PiXiuStr * src, PiXiuChunk * ctx, uint16_t chunk_idx) {
 }
 
 char * CritBitTree::repr(void) {
-
 }
 
-tuple<void *, void *, void *> CritBitTree::find_best_match(PiXiuStr * src) {
+CritBitTree::fbm_ret CritBitTree::find_best_match(PiXiuStr * src) {
     void * q[] = {NULL, NULL, this->root};
     auto q_len = lenOf(q);
     auto q_cursor = 0;
@@ -23,7 +22,7 @@ tuple<void *, void *, void *> CritBitTree::find_best_match(PiXiuStr * src) {
         Que_push(q, cursor);
         cursor = inner->crit_node[direct];
     }
-    return tuple<void *, void *, void *>{Que_get(q, 0), Que_get(q, 1), Que_get(q, 2)};
+    return CritBitTree::fbm_ret{.grand=Que_get(q, 0), .pa=Que_get(q, 1), .crit_node=Que_get(q, 2)};
 }
 
 CBTInner * CBTInner_init(void) {
