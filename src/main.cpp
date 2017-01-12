@@ -2,6 +2,7 @@
 #include "common/List.h"
 #include "common/MemPool.h"
 #include "common/Que.h"
+#include "data_struct/CritBitTree.h"
 #include "proj/PiXiuStr.h"
 #include <stdio.h>
 

@@ -32,3 +32,5 @@ struct CritBitTree {
 CBTInner * CBTInner_init(void);
 
 void CBTInner_free(CBTInner *);
+
+void CritBitTree_free(CritBitTree *);

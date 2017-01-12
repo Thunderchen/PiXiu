@@ -1,8 +1,7 @@
 #include "../common/List.h"
 #include "../common/Que.h"
 #include "CritBitTree.h"
-#include <stddef.h>
-#include <stdio.h>
+#include <functional>
 
 #define is_inner(p) adr_is_spec(p)
 #define normal(p) adr_de_spec(p)
@@ -111,7 +110,7 @@ int CritBitTree::setitem(PiXiuStr * src, PiXiuChunk * ctx, uint16_t chunk_idx) {
 char * CritBitTree::repr(void) {
     List_init(char, output);
 
-    auto print = [&](void * ptr, int lv) {
+    std::function<void(void *, int)> print = [&](void * ptr, int lv) {
         int intent = 4 * lv;
         for (int i = 0; i < intent; ++i) {
             List_append(char, output, ' ');
@@ -169,5 +168,20 @@ CBTInner * CBTInner_init(void) {
 }
 
 void CBTInner_free(CBTInner * inner) {
+    for (int i = 0; i < 2; ++i) {
+        auto sub_ptr = inner->crit_node_arr[i];
+        if (is_inner(sub_ptr)) {
+            CBTInner_free((CBTInner *) normal(sub_ptr));
+        } else {
+            auto chunk = (PiXiuChunk *) sub_ptr;
+            chunk->used_num--;
+            if (chunk->used_num == 0) { PiXiuChunk_free(chunk); }
+        }
+    }
     free(inner);
+}
+
+void CritBitTree_free(CritBitTree * cbt) {
+    if (is_inner(cbt->root)) { CBTInner_free((CBTInner *) normal(cbt->root)); }
+    else { PiXiuChunk_free((PiXiuChunk *) cbt->root); }
 }
