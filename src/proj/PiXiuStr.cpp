@@ -92,6 +92,10 @@ PiXiuStr * PiXiuStr_init_stream(PXSMsg msg) {
     return ret;
 };
 
+PiXiuChunk * PiXiuChunk_init(void) {
+    return (PiXiuChunk *) calloc(1, sizeof(PiXiuChunk));
+}
+
 PiXiuStr * PiXiuStr::concat(PiXiuStr * another) {
     auto ret = (PiXiuStr *) malloc(sizeof(PiXiuStr) + this->len + another->len);
     ret->len = this->len + another->len;

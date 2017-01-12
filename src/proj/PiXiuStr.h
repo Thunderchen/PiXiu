@@ -75,6 +75,8 @@ PiXiuStr * PiXiuStr_init(uint8_t[], int);
 
 PiXiuStr * PiXiuStr_init_stream(PXSMsg);
 
+PiXiuChunk * PiXiuChunk_init(void);
+
 void PiXiuStr_free(PiXiuStr *);
 
 void PiXiuChunk_free(PiXiuChunk *);
