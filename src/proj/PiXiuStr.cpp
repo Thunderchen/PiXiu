@@ -157,7 +157,7 @@ void PiXiuStr_free(PiXiuStr * pxs) {
 };
 
 void PiXiuChunk_free(PiXiuChunk * chunk) {
-    for (int i = 0; i < PXC_STR_NUM; ++i) {
+    for (int i = 0; i < PXC_STR_NUM && chunk->strs[i] != NULL; ++i) {
         free(chunk->getitem(i));
     }
     free(chunk);

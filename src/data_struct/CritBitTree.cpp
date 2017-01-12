@@ -143,7 +143,6 @@ char * CritBitTree::repr(void) {
 
     if (this->root == NULL) {
         List_append(char, output, '~');
-        List_append(char, output, '\n');
     } else if (is_inner(this->root)) {
         print(this->root, 0);
     } else {
