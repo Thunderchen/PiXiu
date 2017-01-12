@@ -1,5 +1,7 @@
 #include "../proj/PiXiuStr.h"
 
+#define CBT_SET_REPLACE 1
+
 struct CBTInner {
     void * crit_node_arr[2];
     uint16_t chunk_idx_arr[2];
