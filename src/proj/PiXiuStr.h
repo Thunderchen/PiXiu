@@ -60,7 +60,7 @@ struct PiXiuStr {
 
 struct PiXiuChunk {
     PiXiuStr * strs[PXC_STR_NUM];
-    int used_num = 0;
+    uint16_t used_num = 0;
 
     PiXiuStr * getitem(int);
 

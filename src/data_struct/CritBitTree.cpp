@@ -141,7 +141,14 @@ char * CritBitTree::repr(void) {
         }
     };
 
-    print(this->root, 0);
+    if (this->root == NULL) {
+        List_append(char, output, '~');
+        List_append(char, output, '\n');
+    } else if (is_inner(this->root)) {
+        print(this->root, 0);
+    } else {
+        print(((PiXiuChunk *) this->root)->getitem(this->chunk_idx), 0);
+    }
     List_append(char, output, '\0');
     return output;
 }
