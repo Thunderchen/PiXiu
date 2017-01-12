@@ -20,6 +20,8 @@ struct CritBitTree {
 
     char * repr(void);
 
+    void free_prop(void);
+
     struct fbm_ret {
         void * grand;
         void * pa;
@@ -32,5 +34,3 @@ struct CritBitTree {
 CBTInner * CBTInner_init(void);
 
 void CBTInner_free(CBTInner *);
-
-void CritBitTree_free(CritBitTree *);

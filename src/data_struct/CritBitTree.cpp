@@ -146,6 +146,14 @@ char * CritBitTree::repr(void) {
     return output;
 }
 
+void CritBitTree::free_prop(void) {
+    if (this->root == NULL) {
+        return;
+    }
+    if (is_inner(this->root)) { CBTInner_free((CBTInner *) normal(this->root)); }
+    else { PiXiuChunk_free((PiXiuChunk *) this->root); }
+}
+
 CritBitTree::fbm_ret CritBitTree::find_best_match(PiXiuStr * src) {
     void * q[] = {NULL, NULL, this->root};
     auto q_len = lenOf(q);
@@ -179,9 +187,4 @@ void CBTInner_free(CBTInner * inner) {
         }
     }
     free(inner);
-}
-
-void CritBitTree_free(CritBitTree * cbt) {
-    if (is_inner(cbt->root)) { CBTInner_free((CBTInner *) normal(cbt->root)); }
-    else { PiXiuChunk_free((PiXiuChunk *) cbt->root); }
 }
