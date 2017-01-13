@@ -58,6 +58,18 @@ void t_CritBitTree(void) {
             "        ejjc$";
     assert(strcmp(cbt.repr(), expect));
 
+    auto cbt_delete = [&](uint8_t src[]) {
+        int len;
+        for (len = 0; src[len] != '\0'; ++len);
+        auto pxs = PiXiuStr_init_key(src, len);
+        cbt.delitem(pxs);
+        PiXiuStr_free(pxs);
+    };
+
+    printf("%s", cbt.repr());
+    cbt_delete((uint8_t *) "ejjc$");
+    printf("%s", cbt.repr());
+
     cbt.free_prop();
 }
 
