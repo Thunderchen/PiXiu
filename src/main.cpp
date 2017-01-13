@@ -3,7 +3,6 @@
 #include "common/MemPool.h"
 #include "common/Que.h"
 #include "data_struct/CritBitTree.h"
-#include "proj/PiXiuStr.h"
 #include <stdio.h>
 
 void t_CritBitTree(void);
@@ -33,8 +32,33 @@ int main() {
 }
 
 void t_CritBitTree(void) {
+    assert(sizeof(CBTInner) == 24);
     CritBitTree cbt;
+    auto chunk = PiXiuChunk_init();
 
+    auto cbt_insert = [&](uint8_t src[]) {
+        int len;
+        for (len = 0; src[len] != '\0'; ++len);
+        auto pxs = PiXiuStr_init(src, len);
+        chunk->strs[chunk->used_num] = pxs;
+        cbt.setitem(pxs, chunk, chunk->used_num);
+        chunk->used_num++;
+    };
+
+    cbt_insert((uint8_t *) "ec$");
+    cbt_insert((uint8_t *) "abec$");
+    cbt_insert((uint8_t *) "ejjc$");
+    cbt_insert((uint8_t *) "acd$");
+    auto expect = "diff: 0, mask: 251\n"
+            "    diff: 1, mask: 254\n"
+            "        abec$\n"
+            "        acd$\n"
+            "    diff: 1, mask: 247\n"
+            "        ec$\n"
+            "        ejjc$";
+    assert(strcmp(cbt.repr(), expect));
+
+    cbt.free_prop();
 }
 
 void t_PiXiuStr(void) {
