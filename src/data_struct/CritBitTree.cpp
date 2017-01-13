@@ -73,6 +73,7 @@ int CritBitTree::setitem(PiXiuStr * src, PiXiuChunk * ctx, uint16_t chunk_idx) {
             auto parent_direct = -1;
             auto replace_ptr = this->root;
             auto replace_node = (CBTInner *) normal(replace_ptr);
+            auto replace_chunk_idx = this->chunk_idx;
             while (true) {
                 if (!is_inner(replace_ptr)
                     || replace_node->diff_at > diff_at
@@ -86,6 +87,7 @@ int CritBitTree::setitem(PiXiuStr * src, PiXiuChunk * ctx, uint16_t chunk_idx) {
                 parent = replace_node;
                 replace_ptr = replace_node->crit_node_arr[parent_direct];
                 replace_node = (CBTInner *) normal(replace_ptr);
+                replace_chunk_idx = replace_node->chunk_idx_arr[parent_direct];
             }
 
             if (parent == NULL) {
@@ -94,7 +96,9 @@ int CritBitTree::setitem(PiXiuStr * src, PiXiuChunk * ctx, uint16_t chunk_idx) {
                 assert(parent_direct >= 0 && pa_direct <= 1);
                 parent->crit_node_arr[parent_direct] = special(inner_node);
             }
-            inner_node->crit_node_arr[(direct + 1) % 2] = replace_ptr;
+            auto temp_i = (direct + 1) % 2;
+            inner_node->crit_node_arr[temp_i] = replace_ptr;
+            inner_node->chunk_idx_arr[temp_i] = replace_chunk_idx;
         };
 
         auto spec_mode = false;
