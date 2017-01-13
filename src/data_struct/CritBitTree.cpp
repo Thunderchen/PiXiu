@@ -39,8 +39,13 @@ int CritBitTree::setitem(PiXiuStr * src, PiXiuChunk * ctx, uint16_t chunk_idx) {
         auto replace = [&]() {
             sign = CBT_SET_REPLACE;
             crit_chunk->delitem(crit_chunk_idx);
-            pa->crit_node_arr[pa_direct] = ctx;
-            pa->chunk_idx_arr[pa_direct] = chunk_idx;
+            if (pa != NULL) {
+                pa->crit_node_arr[pa_direct] = ctx;
+                pa->chunk_idx_arr[pa_direct] = chunk_idx;
+            } else {
+                this->root = ctx;
+                this->chunk_idx = chunk_idx;
+            }
         };
 
         auto insert = [&]() {
