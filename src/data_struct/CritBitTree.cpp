@@ -29,7 +29,7 @@ int CritBitTree::setitem(PiXiuStr * src, PiXiuChunk * ctx, uint16_t chunk_idx) {
         uint8_t pa_direct = 3;
         int crit_chunk_idx = this->chunk_idx;
         if (pa != NULL) {
-            pa_direct = pa->get_direct(crit_chunk);
+            pa_direct = ret.pa_direct;
             crit_chunk_idx = pa->chunk_idx_arr[pa_direct];
         }
         auto crit_pxs = crit_chunk->getitem(crit_chunk_idx);
@@ -178,16 +178,17 @@ CritBitTree::fbm_ret CritBitTree::find_best_match(PiXiuStr * src) {
     auto q_len = lenOf(q);
     auto q_cursor = 0;
 
+    uint8_t direct = 3;
     auto ptr = Que_get(q, 2);
     while (is_inner(ptr)) {
         auto inner = (CBTInner *) normal(ptr);
 
         uint8_t crit_byte = src->len > inner->diff_at ? src->data[inner->diff_at] : (uint8_t) 0;
-        uint8_t direct = ((uint8_t) 1 + (inner->mask | crit_byte)) >> 8;
+        direct = ((uint8_t) 1 + (inner->mask | crit_byte)) >> 8;
         ptr = inner->crit_node_arr[direct];
         Que_push(q, ptr);
     }
-    return CritBitTree::fbm_ret{normal(Que_get(q, 0)), normal(Que_get(q, 1)), normal(Que_get(q, 2))};
+    return CritBitTree::fbm_ret{normal(Que_get(q, 0)), normal(Que_get(q, 1)), normal(Que_get(q, 2)), direct};
 }
 
 CBTInner * CBTInner_init(void) {

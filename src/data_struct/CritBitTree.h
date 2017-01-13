@@ -26,6 +26,7 @@ struct CritBitTree {
         void * grand;
         void * pa;
         void * crit_node;
+        uint8_t pa_direct;
     };
 
     fbm_ret find_best_match(PiXiuStr *);
