@@ -8,8 +8,6 @@ struct CBTInner {
 
     uint16_t diff_at;
     uint8_t mask;
-
-    int get_direct(void *);
 };
 
 struct CritBitTree {

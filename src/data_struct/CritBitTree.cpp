@@ -7,15 +7,6 @@
 #define normal(p) adr_de_spec(p)
 #define special(p) adr_mk_spec(p)
 
-int CBTInner::get_direct(void * node) {
-    if (node == normal(this->crit_node_arr[0])) {
-        return 0;
-    } else {
-        assert(node == normal(this->crit_node_arr[1]));
-        return 1;
-    }
-};
-
 int CritBitTree::setitem(PiXiuStr * src, PiXiuChunk * ctx, uint16_t chunk_idx) {
     auto sign = 0;
     if (this->root == NULL) {
@@ -87,7 +78,7 @@ int CritBitTree::setitem(PiXiuStr * src, PiXiuChunk * ctx, uint16_t chunk_idx) {
                 parent = replace_node;
                 replace_ptr = replace_node->crit_node_arr[parent_direct];
                 replace_node = (CBTInner *) normal(replace_ptr);
-                replace_chunk_idx = replace_node->chunk_idx_arr[parent_direct];
+                replace_chunk_idx = parent->chunk_idx_arr[parent_direct];
             }
 
             if (parent == NULL) {
