@@ -137,13 +137,7 @@ int CritBitTree::delitem(PiXiuStr * src) {
                 this->root = pa->crit_node_arr[temp_i];
                 this->chunk_idx = pa->chunk_idx_arr[temp_i];
             } else {
-                uint8_t grand_direct;
-                if (normal(grand->crit_node_arr[0]) == pa) {
-                    grand_direct = 0;
-                } else {
-                    assert(normal(grand->crit_node_arr[1]) == pa);
-                    grand_direct = 1;
-                }
+                auto grand_direct = normal(grand->crit_node_arr[0]) == pa ? 0 : 1;
                 grand->crit_node_arr[grand_direct] = pa->crit_node_arr[temp_i];
                 grand->chunk_idx_arr[grand_direct] = pa->chunk_idx_arr[temp_i];
             }
