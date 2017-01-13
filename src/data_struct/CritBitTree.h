@@ -1,3 +1,6 @@
+#ifndef CRIT_BIT_TREE_H
+#define CRIT_BIT_TREE_H
+
 #include "../proj/PiXiuStr.h"
 
 #define CBT_SET_REPLACE 1
@@ -38,3 +41,5 @@ struct CritBitTree {
 CBTInner * CBTInner_init(void);
 
 void CBTInner_free(CBTInner *);
+
+#endif
