@@ -153,6 +153,7 @@ int CritBitTree::delitem(PiXiuStr * src) {
     auto i = 0;
     auto spec_mode = false;
     while (crit_gen->operator()(rv) && i < src->len && rv == src->data[i]) {
+        i++;
         if (!spec_mode && rv == PXS_UNIQUE) { spec_mode = true; }
         else if (spec_mode) {
             if (rv == PXS_KEY) {
