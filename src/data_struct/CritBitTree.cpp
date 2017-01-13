@@ -163,6 +163,7 @@ int CritBitTree::delitem(PiXiuStr * src) {
         }
     }
 
+    PXSGen_free(crit_gen);
     return sign;
 };
 
@@ -194,6 +195,7 @@ bool CritBitTree::contains(PiXiuStr * src) {
         }
     }
 
+    free(crit_gen);
     return sign;
 };
 
