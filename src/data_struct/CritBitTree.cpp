@@ -26,7 +26,7 @@ int CritBitTree::setitem(PiXiuStr * src, PiXiuChunk * ctx, uint16_t chunk_idx) {
         auto pa = (CBTInner *) ret.pa;
         auto crit_chunk = (PiXiuChunk *) ret.crit_node;
 
-        int pa_direct = -1;
+        uint8_t pa_direct = 3;
         int crit_chunk_idx = this->chunk_idx;
         if (pa != NULL) {
             pa_direct = pa->get_direct(crit_chunk);
@@ -61,7 +61,7 @@ int CritBitTree::setitem(PiXiuStr * src, PiXiuChunk * ctx, uint16_t chunk_idx) {
 
             // 0b0111_1111 => 0b0100_0000
             mask = (mask & ~(mask >> 1)) ^ (uint8_t) UINT8_MAX;
-            auto direct = (1 + (mask | src->data[diff_at])) >> 8;
+            uint8_t direct = ((uint8_t) 1 + (mask | src->data[diff_at])) >> 8;
 
             auto inner_node = CBTInner_init();
             inner_node->crit_node_arr[direct] = ctx;
@@ -70,7 +70,7 @@ int CritBitTree::setitem(PiXiuStr * src, PiXiuChunk * ctx, uint16_t chunk_idx) {
             inner_node->mask = mask;
 
             CBTInner * parent = NULL;
-            auto parent_direct = -1;
+            uint8_t parent_direct = 3;
             auto replace_ptr = this->root;
             auto replace_node = (CBTInner *) normal(replace_ptr);
             auto replace_chunk_idx = this->chunk_idx;
@@ -82,7 +82,7 @@ int CritBitTree::setitem(PiXiuStr * src, PiXiuChunk * ctx, uint16_t chunk_idx) {
                 }
 
                 uint8_t crit_byte = src->len > replace_node->diff_at ? src->data[replace_node->diff_at] : (uint8_t) 0;
-                parent_direct = (1 + (replace_node->mask | crit_byte)) >> 8;
+                parent_direct = ((uint8_t) 1 + (replace_node->mask | crit_byte)) >> 8;
 
                 parent = replace_node;
                 replace_ptr = replace_node->crit_node_arr[parent_direct];
@@ -140,7 +140,7 @@ char * CritBitTree::repr(void) {
 
         auto inner = (CBTInner *) normal(ptr);
         char temp[50];
-        sprintf(temp, "diff at: %i, mask: %i", inner->diff_at, inner->mask);
+        sprintf(temp, "diff: %i, mask: %i", inner->diff_at, inner->mask);
         for (int i = 0; temp[i] != '\0'; ++i) {
             List_append(char, output, temp[i]);
         }
