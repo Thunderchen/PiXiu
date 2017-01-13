@@ -166,6 +166,37 @@ int CritBitTree::delitem(PiXiuStr * src) {
     return sign;
 };
 
+bool CritBitTree::contains(PiXiuStr * src) {
+    auto sign = false;
+    if (this->root == NULL) {
+        return sign;
+    }
+
+    auto fmb_ret = this->find_best_match(src);
+    auto pa = (CBTInner *) fmb_ret.pa;
+    auto crit_chunk = (PiXiuChunk *) fmb_ret.crit_node;
+    uint8_t pa_direct = fmb_ret.pa_direct;
+
+    auto crit_pxs = crit_chunk->getitem(pa == NULL ? this->chunk_idx : pa->chunk_idx_arr[pa_direct]);
+    auto crit_gen = crit_pxs->parse(0, PXSG_MAX_TO, crit_chunk);
+
+    uint8_t rv;
+    auto i = 0;
+    auto spec_mode = false;
+    while (crit_gen->operator()(rv) && i < src->len && rv == src->data[i]) {
+        i++;
+        if (!spec_mode && rv == PXS_UNIQUE) { spec_mode = true; }
+        else if (spec_mode) {
+            if (rv == PXS_KEY) {
+                sign = true;
+                break;
+            } else { spec_mode = false; }
+        }
+    }
+
+    return sign;
+};
+
 char * CritBitTree::repr(void) {
     List_init(char, output);
 

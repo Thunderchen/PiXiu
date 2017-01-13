@@ -19,6 +19,8 @@ struct CritBitTree {
 
     int delitem(PiXiuStr *);
 
+    bool contains(PiXiuStr *);
+
     char * repr(void);
 
     void free_prop(void);
