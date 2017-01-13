@@ -92,10 +92,6 @@ PiXiuStr * PiXiuStr_init_stream(PXSMsg msg) {
     return ret;
 };
 
-PiXiuChunk * PiXiuChunk_init(void) {
-    return (PiXiuChunk *) calloc(1, sizeof(PiXiuChunk));
-}
-
 PiXiuStr * PiXiuStr::concat(PiXiuStr * another) {
     auto ret = (PiXiuStr *) malloc(sizeof(PiXiuStr) + this->len + another->len);
     ret->len = this->len + another->len;
@@ -159,6 +155,10 @@ PiXiuStr * PiXiuChunk::getitem(int idx) {
 void PiXiuStr_free(PiXiuStr * pxs) {
     free(pxs);
 };
+
+PiXiuChunk * PiXiuChunk_init(void) {
+    return (PiXiuChunk *) calloc(1, sizeof(PiXiuChunk));
+}
 
 void PiXiuChunk_free(PiXiuChunk * chunk) {
     for (int i = 0; i < PXC_STR_NUM && chunk->strs[i] != NULL; ++i) {
