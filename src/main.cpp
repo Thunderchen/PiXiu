@@ -39,7 +39,7 @@ void t_CritBitTree(void) {
     auto cbt_insert = [&](uint8_t src[]) {
         int len;
         for (len = 0; src[len] != '\0'; ++len);
-        auto pxs = PiXiuStr_init(src, len);
+        auto pxs = PiXiuStr_init_key(src, len);
         chunk->strs[chunk->used_num] = pxs;
         cbt.setitem(pxs, chunk, chunk->used_num);
         chunk->used_num++;
