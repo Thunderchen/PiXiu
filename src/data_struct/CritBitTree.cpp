@@ -26,13 +26,16 @@ int CritBitTree::setitem(PiXiuStr * src, PiXiuChunk * ctx, uint16_t chunk_idx) {
         auto pa = (CBTInner *) ret.pa;
         auto crit_chunk = (PiXiuChunk *) ret.crit_node;
 
-        auto pa_direct = pa->get_direct(crit_chunk);
-        auto crit_chunk_idx = pa->chunk_idx_arr[pa_direct];
+        int pa_direct = -1;
+        int crit_chunk_idx = this->chunk_idx;
+        if (pa != NULL) {
+            pa_direct = pa->get_direct(crit_chunk);
+            crit_chunk_idx = pa->chunk_idx_arr[pa_direct];
+        }
         auto crit_pxs = crit_chunk->getitem(crit_chunk_idx);
 
         auto crit_gen = crit_pxs->parse(0, PXSG_MAX_TO, crit_chunk);
         auto src_gen = src->parse(0, PXSG_MAX_TO, NULL);
-
         uint16_t diff_at = 0;
         uint8_t crit_rv, src_rv;
 
@@ -40,6 +43,7 @@ int CritBitTree::setitem(PiXiuStr * src, PiXiuChunk * ctx, uint16_t chunk_idx) {
             sign = CBT_SET_REPLACE;
             crit_chunk->delitem(crit_chunk_idx);
             if (pa != NULL) {
+                assert(pa_direct >= 0 && pa_direct <= 1);
                 pa->crit_node_arr[pa_direct] = ctx;
                 pa->chunk_idx_arr[pa_direct] = chunk_idx;
             } else {
