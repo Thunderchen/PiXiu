@@ -16,11 +16,10 @@ int CritBitTree::setitem(PiXiuStr * src, PiXiuChunk * ctx, uint16_t chunk_idx) {
         auto ret = this->find_best_match(src);
         auto pa = (CBTInner *) ret.pa;
         auto crit_chunk = (PiXiuChunk *) ret.crit_node;
+        uint8_t pa_direct = ret.pa_direct;
 
-        uint8_t pa_direct = 3;
         int crit_chunk_idx = this->chunk_idx;
         if (pa != NULL) {
-            pa_direct = ret.pa_direct;
             crit_chunk_idx = pa->chunk_idx_arr[pa_direct];
         }
         auto crit_pxs = crit_chunk->getitem(crit_chunk_idx);
@@ -110,6 +109,67 @@ int CritBitTree::setitem(PiXiuStr * src, PiXiuChunk * ctx, uint16_t chunk_idx) {
     }
     return sign;
 }
+
+int CritBitTree::delitem(PiXiuStr * src) {
+    auto sign = CBT_DEL_NOT_FOUND;
+    if (this->root == NULL) {
+        return sign;
+    }
+
+    auto ret = this->find_best_match(src);
+    auto grand = (CBTInner *) ret.grand;
+    auto pa = (CBTInner *) ret.pa;
+    auto crit_chunk = (PiXiuChunk *) ret.crit_node;
+    uint8_t pa_direct = ret.pa_direct;
+
+    int crit_chunk_idx = this->chunk_idx;
+    if (pa != NULL) {
+        crit_chunk_idx = pa->chunk_idx_arr[pa_direct];
+    }
+
+    auto case_del = [&]() {
+        sign = 0;
+        if (pa == NULL) {
+            this->root = NULL;
+        } else {
+            auto temp_i = (1 + pa_direct) % 2;
+            if (grand == NULL) {
+                this->root = pa->crit_node_arr[temp_i];
+                this->chunk_idx = pa->chunk_idx_arr[temp_i];
+            } else {
+                uint8_t grand_direct;
+                if (normal(grand->crit_node_arr[0]) == pa) {
+                    grand_direct = 0;
+                } else {
+                    assert(normal(grand->crit_node_arr[1]) == pa);
+                    grand_direct = 1;
+                }
+                grand->crit_node_arr[grand_direct] = pa->crit_node_arr[temp_i];
+                grand->chunk_idx_arr[grand_direct] = pa->chunk_idx_arr[temp_i];
+            }
+            free(pa);
+        }
+        crit_chunk->delitem(crit_chunk_idx);
+    };
+
+    auto crit_pxs = crit_chunk->getitem(crit_chunk_idx);
+    auto crit_gen = crit_pxs->parse(0, PXSG_MAX_TO, crit_chunk);
+
+    uint8_t rv;
+    auto i = 0;
+    auto spec_mode = false;
+    while (crit_gen->operator()(rv) && i < src->len && rv == src->data[i]) {
+        if (!spec_mode && rv == PXS_UNIQUE) { spec_mode = true; }
+        else if (spec_mode) {
+            if (rv == PXS_KEY) {
+                case_del();
+                break;
+            } else { spec_mode = false; }
+        }
+    }
+
+    return sign;
+};
 
 char * CritBitTree::repr(void) {
     List_init(char, output);

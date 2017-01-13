@@ -1,6 +1,7 @@
 #include "../proj/PiXiuStr.h"
 
 #define CBT_SET_REPLACE 1
+#define CBT_DEL_NOT_FOUND 1
 
 struct CBTInner {
     void * crit_node_arr[2];
@@ -15,6 +16,8 @@ struct CritBitTree {
     uint16_t chunk_idx;
 
     int setitem(PiXiuStr *, PiXiuChunk *, uint16_t);
+
+    int delitem(PiXiuStr *);
 
     char * repr(void);
 
