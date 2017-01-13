@@ -34,6 +34,7 @@ int main() {
 void t_CritBitTree(void) {
     assert(sizeof(CBTInner) == 24);
     CritBitTree cbt;
+    char * output;
     auto chunk = PiXiuChunk_init();
 
     auto cbt_insert = [&](uint8_t src[]) {
@@ -51,13 +52,14 @@ void t_CritBitTree(void) {
     cbt_insert((uint8_t *) "ejjc$");
     cbt_insert((uint8_t *) "acd$");
 
-    assert(!strcmp(cbt.repr(), "diff: 0, mask: 251\n"
+    assert(!strcmp((output = cbt.repr()), "diff: 0, mask: 251\n"
             "    diff: 1, mask: 254\n"
             "        abec$\n"
             "        acd$\n"
             "    diff: 1, mask: 247\n"
             "        ec$\n"
             "        ejjc$\n"));
+    free(output);
 
     auto cbt_delete = [&](uint8_t src[]) {
         int len;
@@ -71,9 +73,10 @@ void t_CritBitTree(void) {
     cbt_delete((uint8_t *) "ejjc$");
     cbt_delete((uint8_t *) "abec$");
 
-    assert(!strcmp(cbt.repr(), "diff: 0, mask: 251\n"
+    assert(!strcmp((output = cbt.repr()), "diff: 0, mask: 251\n"
             "    acd$\n"
             "    ec$\n"));
+    free(output);
 
     cbt_delete((uint8_t *) "ec$");
     cbt_delete((uint8_t *) "acd$");
