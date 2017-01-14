@@ -3,9 +3,8 @@
 
 #include "../common/List.h"
 #include "../common/MemPool.h"
+#include <functional>
 #include <math.h>
-#include <stddef.h>
-#include <stdlib.h>
 
 template<typename T>
 struct SGTNode {
@@ -74,10 +73,10 @@ struct ScapegoatTree {
 
     };
 
-
     struct fsg_ret {
         SGTN * pa = NULL;
         SGTN * scapegoat = NULL;
+        int size;
     };
 
     fsg_ret find_scapegoat(SGTN * path[], int path_len, SGTN * cursor) {
@@ -97,6 +96,7 @@ struct ScapegoatTree {
                 sibling = parent->small;
             }
 
+            ret.size = size;
             height++;
             size += this->get_size(sibling) + 1;
             if (height > log2(size)) {
@@ -111,7 +111,49 @@ struct ScapegoatTree {
     }
 
     void rebuild(fsg_ret ret) {
+        auto pa = ret.pa;
+        auto scapegoat = ret.scapegoat;
+        auto size = ret.size;
+        assert(this->get_size(scapegoat) == size);
 
+        SGTN * ordered_nodes[size];
+        auto i = 0;
+        std::function<void(SGTN *)> add = [&](SGTN * node) {
+            if (node->small != NULL) {
+                add(node->small);
+            }
+            ordered_nodes[i] = node;
+            i++;
+            if (node->big != NULL) {
+                add(node->big);
+            }
+        };
+        add(scapegoat);
+        assert(i == size);
+
+        auto pick_mid = [](int op, int ed) -> int {
+            return (op + ed) / 2;
+        };
+        auto build_tree = [&](int op, int ed) -> SGTN * {
+            if (op > ed) { return NULL; }
+            if (op == ed) { return ordered_nodes[op]; }
+
+            auto mi = pick_mid(op, ed);
+            auto mi_node = ordered_nodes[mi];
+            mi_node->small = build_tree(op, mi - 1);
+            mi_node->big = build_tree(mi + 1, ed);
+            return mi_node;
+        };
+
+        auto sub = build_tree(0, size - 1);
+        if (pa == NULL) {
+            this->root = sub;
+        } else if (pa->small == scapegoat) {
+            pa->small = sub;
+        } else {
+            assert(pa->big = scapegoat);
+            pa->big = sub;
+        }
     }
 
     int get_size(SGTN * node) {
