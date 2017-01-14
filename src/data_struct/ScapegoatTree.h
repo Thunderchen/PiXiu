@@ -1,10 +1,11 @@
 #ifndef SCAPEGOAT_TREE_H
 #define SCAPEGOAT_TREE_H
 
-#include "../common/List.h"
 #include "../common/MemPool.h"
 #include <functional>
 #include <math.h>
+
+#define SGT_FACTOR 0.618
 
 template<typename T>
 struct SGTNode {
@@ -13,7 +14,7 @@ struct SGTNode {
     T * obj;
 };
 
-template<typename T, float factor = 0.618>
+template<typename T, int max_size = 256>
 struct ScapegoatTree {
     typedef SGTNode<T> SGTN;
 
@@ -34,7 +35,8 @@ struct ScapegoatTree {
             return;
         }
         auto height = 0;
-        List_init(SGTN *, path);
+        SGTN * path[max_size];
+        auto path_len = 0;
 
         auto cursor = this->root;
         while (true) {
@@ -43,7 +45,8 @@ struct ScapegoatTree {
             }
 
             height++;
-            List_append(SGTN *, path, cursor);
+            path[path_len] = cursor;
+            path_len++;
             if (obj->operator<(cursor->obj)) {
                 cursor = cursor->small;
 
@@ -63,10 +66,9 @@ struct ScapegoatTree {
             }
         }
 
-        if (height > (log(this->size) / log(1 / factor))) {
+        if (height > (log(this->size) / log(1 / SGT_FACTOR))) {
             this->rebuild(this->find_scapegoat(path, path_len, cursor));
         }
-        List_free(path);
     };
 
     T * getitem(T * obj) {
@@ -74,8 +76,8 @@ struct ScapegoatTree {
     };
 
     struct fsg_ret {
-        SGTN * pa = NULL;
-        SGTN * scapegoat = NULL;
+        SGTN * pa;
+        SGTN * scapegoat;
         int size;
     };
 
@@ -98,7 +100,7 @@ struct ScapegoatTree {
 
             height++;
             size += this->get_size(sibling) + 1;
-            if (height > (log(size) / log(1 / factor))) {
+            if (height > (log(size) / log(1 / SGT_FACTOR))) {
                 ret.scapegoat = parent;
                 break;
             }
@@ -116,7 +118,7 @@ struct ScapegoatTree {
         auto size = ret.size;
         assert(this->get_size(scapegoat) == size);
 
-        SGTN * ordered_nodes[size];
+        SGTN * ordered_nodes[max_size];
         auto i = 0;
         std::function<void(SGTN *)> add = [&](SGTN * node) {
             if (node->small != NULL) {
