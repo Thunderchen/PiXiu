@@ -45,6 +45,10 @@ void t_CritBitTree(void) {
         cbt.setitem(pxs, chunk, chunk->used_num);
         chunk->used_num++;
         assert(cbt.contains(pxs));
+
+        auto item = cbt.getitem(pxs)->consume_repr();
+        assert(!strcmp((char *) src, item));
+        free(item);
     };
 
     cbt_insert((uint8_t *) "ec$");
@@ -86,6 +90,7 @@ void t_CritBitTree(void) {
         auto pxs = PiXiuStr_init_key(src, len);
         cbt.delitem(pxs);
         assert(!cbt.contains(pxs));
+        assert(cbt.getitem(pxs) == NULL);
         PiXiuStr_free(pxs);
     };
 

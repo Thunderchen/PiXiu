@@ -163,6 +163,19 @@ $gen(PXSGen) {
                 }
             }
     $stop;
+
+    char * consume_repr(void) {
+        List_init(char, output);
+        uint8_t rv;
+        while (this->operator()(rv)) {
+            if (char_visible(rv)) {
+                List_append(char, output, rv);
+            }
+        }
+        List_append(char, output, '\0');
+        PXSGen_free(this);
+        return output;
+    }
 };
 
 #endif

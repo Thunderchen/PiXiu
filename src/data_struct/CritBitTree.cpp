@@ -199,6 +199,33 @@ bool CritBitTree::contains(PiXiuStr * src) {
     return sign;
 };
 
+PXSGen * CritBitTree::getitem(PiXiuStr * src) {
+    if (this->root == NULL) {
+        return NULL;
+    }
+
+    auto ret = this->find_best_match(src);
+    auto pa = (CBTInner *) ret.pa;
+    auto chunk = (PiXiuChunk *) ret.crit_node;
+    uint8_t pa_direct = ret.pa_direct;
+
+    if (chunk == NULL) {
+        return NULL;
+    }
+
+    int chunk_idx = this->chunk_idx;
+    if (pa != NULL) {
+        chunk_idx = pa->chunk_idx_arr[pa_direct];
+    }
+    auto pxs = chunk->getitem(chunk_idx);
+
+    if (pxs->key_eq(src, chunk)) {
+        return pxs->parse(0, PXSG_MAX_TO, chunk);
+    }
+
+    return NULL;
+};
+
 char * CritBitTree::repr(void) {
     List_init(char, output);
 

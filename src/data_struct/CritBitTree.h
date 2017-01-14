@@ -23,9 +23,11 @@ struct CritBitTree {
 
     int setitem(PiXiuStr *, PiXiuChunk *, uint16_t);
 
-    int delitem(PiXiuStr *);
-
     bool contains(PiXiuStr *);
+
+    PXSGen * getitem(PiXiuStr *);
+
+    int delitem(PiXiuStr *);
 
     char * repr(void);
 
@@ -75,8 +77,8 @@ $gen(CBTGen) {
             CBTInner * inner;
             PiXiuChunk * chunk;
             PiXiuStr * pxs;
-            uint16_t chunk_idx;
             void * cursor;
+            uint16_t chunk_idx;
             CritBitTree::fbm_ret ret;
 
             ret = self->find_best_match(prefix);
@@ -89,7 +91,6 @@ $gen(CBTGen) {
                 chunk_idx = pa->chunk_idx_arr[pa_direct];
             }
             pxs = chunk->getitem(chunk_idx);
-
             if (pxs->startswith(prefix, chunk)) {
                 $yield(pxs->parse(0, PXSG_MAX_TO, chunk));
 
