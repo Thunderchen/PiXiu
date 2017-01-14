@@ -137,7 +137,10 @@ struct ScapegoatTree {
         };
         std::function<SGTN *(int, int)> build_tree = [&](int op, int ed) -> SGTN * {
             if (op > ed) { return NULL; }
-            if (op == ed) { return ordered_nodes[op]; }
+            if (op == ed) {
+                ordered_nodes[op]->small = ordered_nodes[op]->big = NULL;
+                return ordered_nodes[op];
+            }
 
             auto mi = pick_mid(op, ed);
             auto mi_node = ordered_nodes[mi];
