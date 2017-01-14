@@ -65,7 +65,7 @@ struct ScapegoatTree {
         }
 
         if (height > log2(this->size)) {
-            this->rebuild(this->find_scapegoat(path, cursor));
+            this->rebuild(this->find_scapegoat(path, path_len, cursor));
         }
         List_free(path);
     };
@@ -80,16 +80,47 @@ struct ScapegoatTree {
         SGTN * scapegoat = NULL;
     };
 
-    fsg_ret find_scapegoat(SGTN * path[], SGTN * cursor) {
-        fsg_ret ret;
+    fsg_ret find_scapegoat(SGTN * path[], int path_len, SGTN * cursor) {
+        fsg_ret ret{};
+        auto size = 1;
+        auto height = 1;
 
+        while (path_len) {
+            auto parent = path[path_len - 1];
+            path_len--;
+
+            SGTN * sibling;
+            if (parent->small == cursor) {
+                sibling = parent->big;
+            } else {
+                assert(parent->big == cursor);
+                sibling = parent->small;
+            }
+
+            height++;
+            size += this->get_size(sibling) + 1;
+            if (height > log2(size)) {
+                cursor = parent;
+            } else {
+                ret.pa = parent;
+                break;
+            }
+        }
+        ret.scapegoat = cursor;
+        return ret;
     }
 
     void rebuild(fsg_ret ret) {
 
     }
 
-    int get_size() {
+    int get_size(SGTN * node) {
+        if (node == NULL) {
+            return 0;
+        }
+        auto size_small = this->get_size(node->small);
+        auto size_big = this->get_size(node->big);
+        return size_small + size_big + 1;
     }
 };
 
