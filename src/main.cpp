@@ -51,7 +51,9 @@ void t_ScapegoatTree(void) {
     for (int i = 0; i < 100; ++i) {
         auto obj = (cmp_int *) pool.p_malloc(sizeof(cmp_int));
         obj->val = i;
+        assert(sgt.getitem(obj) == NULL);
         sgt.setitem(obj, adrOf(pool));
+        assert(sgt.getitem(obj)->operator==(obj));
     }
     pool.free_prop();
 };

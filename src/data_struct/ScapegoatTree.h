@@ -72,7 +72,21 @@ struct ScapegoatTree {
     };
 
     T * getitem(T * obj) {
+        auto cursor = this->root;
+        while (true) {
+            if (cursor == NULL) {
+                return NULL;
+            }
+            if (cursor->obj->operator==(obj)) {
+                return cursor->obj;
+            }
 
+            if (obj->operator<(cursor->obj)) {
+                cursor = cursor->small;
+            } else {
+                cursor = cursor->big;
+            }
+        }
     };
 
     struct fsg_ret {
