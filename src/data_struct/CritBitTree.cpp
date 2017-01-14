@@ -345,9 +345,9 @@ void t_CritBitTree(void) {
         chunk->used_num++;
         assert(cbt.contains(pxs));
 
-        auto item = cbt.getitem(pxs)->consume_repr();
-        assert(!strcmp((char *) src, item));
-        free(item);
+        auto repr = cbt.getitem(pxs)->consume_repr();
+        assert(!strcmp((char *) src, repr));
+        free(repr);
     };
 
     cbt_insert((uint8_t *) "ec$");

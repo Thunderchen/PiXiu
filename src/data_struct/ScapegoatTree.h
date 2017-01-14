@@ -106,6 +106,7 @@ struct ScapegoatTree {
                 break;
             }
         }
+        if (!path_len) { ret.size = size; }
         ret.scapegoat = cursor;
         return ret;
     }
