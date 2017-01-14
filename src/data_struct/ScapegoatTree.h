@@ -13,7 +13,7 @@ struct SGTNode {
     T * obj;
 };
 
-template<typename T>
+template<typename T, float factor = 0.618>
 struct ScapegoatTree {
     typedef SGTNode<T> SGTN;
 
@@ -63,7 +63,7 @@ struct ScapegoatTree {
             }
         }
 
-        if (height > (log(this->size) / log(1 / 0.75))) {
+        if (height > (log(this->size) / log(1 / factor))) {
             this->rebuild(this->find_scapegoat(path, path_len, cursor));
         }
         List_free(path);
@@ -98,7 +98,7 @@ struct ScapegoatTree {
 
             height++;
             size += this->get_size(sibling) + 1;
-            if (height > (log(size) / log(1 / 0.75))) {
+            if (height > (log(size) / log(1 / factor))) {
                 ret.scapegoat = parent;
                 break;
             }

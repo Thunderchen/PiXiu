@@ -48,11 +48,10 @@ void t_ScapegoatTree(void) {
 
     MemPool pool;
     ScapegoatTree<cmp_int> sgt;
-    int arr[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
-    for (int i = 0; i < lenOf(arr); ++i) {
-        auto ci = (cmp_int *) pool.p_malloc(sizeof(cmp_int));
-        ci->val = arr[i];
-        sgt.setitem(ci, adrOf(pool));
+    for (int i = 0; i < 100; ++i) {
+        auto obj = (cmp_int *) pool.p_malloc(sizeof(cmp_int));
+        obj->val = i;
+        sgt.setitem(obj, adrOf(pool));
     }
     pool.free_prop();
 };
