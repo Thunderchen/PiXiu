@@ -1,6 +1,5 @@
 #include "common/gen.h"
 #include "common/List.h"
-#include "common/MemPool.h"
 #include "common/Que.h"
 #include "data_struct/CritBitTree.h"
 #include <stdio.h>
@@ -29,51 +28,6 @@ int main() {
     printf("\nt_OK\n");
 #endif
     return 0;
-}
-
-void t_MemPool(void) {
-    MemPool memPool;
-    auto v = (void *) 1;
-
-    for (int i = 0; i < POOL_BLOCK_NUM; ++i) {
-        auto adr = (void **) memPool.p_malloc(sizeof(v));
-        valIn(adr) = v;
-    }
-
-    assert(memPool.curr_pool != NULL && memPool.curr_pool->prev_pool == NULL);
-    for (int i = 0; i < POOL_BLOCK_NUM; ++i) {
-        assert(memPool.curr_pool->blocks[i] == v);
-    }
-    assert(memPool.used_num == POOL_BLOCK_NUM);
-
-    for (int i = 0; i < POOL_BLOCK_NUM - 1; ++i) {
-        auto adr = (void **) memPool.p_malloc(sizeof(v));
-        valIn(adr) = v;
-    }
-
-    assert(memPool.curr_pool->prev_pool != NULL);
-    for (int i = 0; i < POOL_BLOCK_NUM - 1; ++i) {
-        assert(memPool.curr_pool->blocks[i] == v);
-    }
-    assert(memPool.used_num == POOL_BLOCK_NUM - 1);
-
-    memPool.p_malloc(sizeof(v) * 2);
-    assert(memPool.used_num == 2);
-
-    v = (void *) 2;
-    auto huge_chunk = (void **) memPool.p_malloc(POOL_BLOCK_SIZE * (POOL_BLOCK_NUM + 1));
-    assert(memPool.used_num == 2);
-
-    for (int i = 0; i < POOL_BLOCK_NUM + 1; ++i) {
-        huge_chunk[i] = v;
-    }
-    for (int i = 0; i < POOL_BLOCK_NUM + 1; ++i) {
-        auto val = memPool.curr_pool->prev_pool->blocks[i];
-        assert(val == v);
-    }
-
-    memPool.free_prop();
-    assert(memPool.curr_pool == NULL);
 }
 
 void t_Que(void) {
