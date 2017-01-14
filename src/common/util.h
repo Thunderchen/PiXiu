@@ -3,7 +3,10 @@
 
 #include <stdint.h>
 
+#define char_visible(c) (33 <= (c) && (c) <= 126)
+
 #define lenOf(arr) (sizeof(arr) / sizeof(arr[0]))
+
 #define adr_is_spec(p) ((bool) (((intptr_t) p) & 1))
 
 template<typename T>

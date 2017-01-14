@@ -123,6 +123,27 @@ bool PiXiuStr::key_eq(PiXiuStr * another, PiXiuChunk * ctx) {
     return ret;
 }
 
+bool PiXiuStr::startswith(PiXiuStr * another, PiXiuChunk * ctx) {
+    auto ret = true;
+
+    uint8_t rv;
+    auto i = 0;
+    auto gen = this->parse(0, PXSG_MAX_TO, ctx);
+    while (gen->operator()(rv) && i < another->len) {
+        if (rv != another->data[i]) {
+            ret = false;
+            break;
+        }
+        i++;
+    }
+    if (i != another->len) {
+        ret = false;
+    }
+
+    PXSGen_free(gen);
+    return ret;
+}
+
 PXSGen * PiXiuStr::parse(int from, int to, PiXiuChunk * ctx) {
     auto gen = (PXSGen *) malloc(sizeof(PXSGen));
     gen->_line = 0;

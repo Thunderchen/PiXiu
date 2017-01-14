@@ -61,6 +61,25 @@ void t_CritBitTree(void) {
             "        ejjc$\n"));
     free(output);
 
+    auto prefix = PiXiuStr_init((uint8_t *) "e", 1);
+    auto cbt_gen = cbt.iter(prefix);
+
+    auto expect = "ec$ejjc$";
+    auto i = 0;
+    PXSGen * pxs_gen;
+    uint8_t rv;
+    while (cbt_gen->operator()(pxs_gen)) {
+        while (pxs_gen->operator()(rv)) {
+            if (char_visible(rv)) {
+                assert(rv == expect[i]);
+                i++;
+            }
+        }
+        PXSGen_free(pxs_gen);
+    }
+    CBTGen_free(cbt_gen);
+    PiXiuStr_free(prefix);
+
     auto cbt_delete = [&](uint8_t src[]) {
         int len;
         for (len = 0; src[len] != '\0'; ++len);

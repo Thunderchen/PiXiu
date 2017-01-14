@@ -211,7 +211,7 @@ char * CritBitTree::repr(void) {
         if (!is_inner(ptr)) {
             auto pxs = (PiXiuStr *) ptr;
             for (int i = 0; i < pxs->len; ++i) {
-                if (33 <= pxs->data[i] && pxs->data[i] <= 126) {
+                if (char_visible(pxs->data[i])) {
                     List_append(char, output, pxs->data[i]);
                 }
             }

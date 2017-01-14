@@ -54,43 +54,59 @@ $gen(CBTGen) {
     CritBitTree * self;
     PiXiuStr * prefix;
 
-    static void * node_sub(CBTInner * node, uint8_t direct) {
+    CBTInner * pa;
+    void ** q;
+    int q_len;
+    int q_capacity;
+    int pa_direct;
+
+    void * node_sub(CBTInner * node, uint8_t direct) {
         auto ptr = node->crit_node_arr[direct];
         if (adr_is_spec(ptr)) {
             return ptr;
         } else {
             auto chunk = (PiXiuChunk *) ptr;
-            return chunk->getitem(node->chunk_idx_arr[direct]);
+            auto pxs = chunk->getitem(node->chunk_idx_arr[direct]);
+            return pxs->parse(0, PXSG_MAX_TO, chunk);
         }
     }
 
-    $emit(PiXiuStr *)
-            auto ret = self->find_best_match(prefix);
-            auto pa = (CBTInner *) ret.pa;
-            auto chunk = (PiXiuChunk *) ret.crit_node;
-            auto pa_direct = ret.pa_direct;
+    $emit(PXSGen *)
+            CBTInner * inner;
+            PiXiuChunk * chunk;
+            PiXiuStr * pxs;
+            uint16_t chunk_idx;
+            void * cursor;
+            CritBitTree::fbm_ret ret;
 
-            auto chunk_idx = self->chunk_idx;
+            ret = self->find_best_match(prefix);
+            pa = (CBTInner *) ret.pa;
+            chunk = (PiXiuChunk *) ret.crit_node;
+            pa_direct = ret.pa_direct;
+
+            chunk_idx = self->chunk_idx;
             if (pa != NULL) {
                 chunk_idx = pa->chunk_idx_arr[pa_direct];
             }
-            auto pxs = chunk->getitem(chunk_idx);
+            pxs = chunk->getitem(chunk_idx);
 
-            if (pxs->key_eq(prefix, NULL)) {
-                $yield(pxs);
+            if (pxs->startswith(prefix, chunk)) {
+                $yield(pxs->parse(0, PXSG_MAX_TO, chunk));
 
                 if (pa_direct != 1) {
-                    List_init(void *, q);
+                    q_len = 0;
+                    q_capacity = 2;
+                    q = (void **) malloc(sizeof(void *) * q_capacity);
                     List_append(void *, q, this->node_sub(pa, 1));
 
                     while (q_len) {
-                        auto cursor = q[q_len - 1];
+                        cursor = q[q_len - 1];
                         List_del(void *, q, q_len - 1);
 
                         if (!adr_is_spec(cursor)) {
-                            $yield((PiXiuStr *) cursor);
+                            $yield((PXSGen *) cursor);
                         } else {
-                            auto inner = (CBTInner *) cursor;
+                            inner = (CBTInner *) adr_de_spec(cursor);
                             List_append(void *, q, this->node_sub(inner, 1));
                             List_append(void *, q, this->node_sub(inner, 0));
                         }

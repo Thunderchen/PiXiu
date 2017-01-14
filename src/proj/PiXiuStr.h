@@ -56,6 +56,8 @@ struct PiXiuStr {
     PiXiuStr * concat(PiXiuStr *);
 
     bool key_eq(PiXiuStr *, PiXiuChunk *);
+
+    bool startswith(PiXiuStr *, PiXiuChunk *);
 };
 
 struct PiXiuChunk {
