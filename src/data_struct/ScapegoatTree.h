@@ -63,7 +63,7 @@ struct ScapegoatTree {
             }
         }
 
-        if (height > log2(this->size)) {
+        if (height > (log(this->size) / log(1 / 0.75))) {
             this->rebuild(this->find_scapegoat(path, path_len, cursor));
         }
         List_free(path);
@@ -99,7 +99,7 @@ struct ScapegoatTree {
             ret.size = size;
             height++;
             size += this->get_size(sibling) + 1;
-            if (height > log2(size)) {
+            if (height > (log(size) / log(1 / 0.75))) {
                 cursor = parent;
             } else {
                 ret.pa = parent;
