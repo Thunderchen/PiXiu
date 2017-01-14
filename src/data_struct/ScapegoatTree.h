@@ -104,6 +104,7 @@ struct ScapegoatTree {
             }
             cursor = parent;
         }
+
         ret.size = size;
         ret.pa = path_len ? path[path_len - 1] : NULL;
         return ret;
