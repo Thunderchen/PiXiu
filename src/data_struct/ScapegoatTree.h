@@ -82,7 +82,7 @@ struct ScapegoatTree {
     fsg_ret find_scapegoat(SGTN * path[], int path_len, SGTN * cursor) {
         fsg_ret ret{};
         auto size = 1;
-        auto height = 1;
+        auto height = 0;
 
         while (path_len) {
             auto parent = path[path_len - 1];
@@ -96,18 +96,16 @@ struct ScapegoatTree {
                 sibling = parent->small;
             }
 
-            ret.size = size;
             height++;
             size += this->get_size(sibling) + 1;
-            if (height <= (log(size) / log(1 / 0.75))) {
-                cursor = parent;
-            } else {
-                ret.pa = parent;
+            if (height > (log(size) / log(1 / 0.75))) {
+                ret.scapegoat = parent;
                 break;
             }
+            cursor = parent;
         }
-        if (!path_len) { ret.size = size; }
-        ret.scapegoat = cursor;
+        ret.size = size;
+        ret.pa = path_len ? path[path_len - 1] : NULL;
         return ret;
     }
 
@@ -142,11 +140,11 @@ struct ScapegoatTree {
                 return ordered_nodes[op];
             }
 
-            auto mi = pick_mid(op, ed);
-            auto mi_node = ordered_nodes[mi];
-            mi_node->small = build_tree(op, mi - 1);
-            mi_node->big = build_tree(mi + 1, ed);
-            return mi_node;
+            auto mid = pick_mid(op, ed);
+            auto mid_node = ordered_nodes[mid];
+            mid_node->small = build_tree(op, mid - 1);
+            mid_node->big = build_tree(mid + 1, ed);
+            return mid_node;
         };
 
         auto sub = build_tree(0, size - 1);
