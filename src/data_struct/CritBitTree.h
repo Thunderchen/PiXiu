@@ -6,6 +6,8 @@
 #define CBT_SET_REPLACE 1
 #define CBT_DEL_NOT_FOUND 1
 
+struct CBTGen;
+
 struct CBTInner {
     void * crit_node_arr[2];
     uint16_t chunk_idx_arr[2];
@@ -36,10 +38,41 @@ struct CritBitTree {
     };
 
     fbm_ret find_best_match(PiXiuStr *);
+
+    CBTGen * iter(PiXiuStr *);
 };
 
 CBTInner * CBTInner_init(void);
 
 void CBTInner_free(CBTInner *);
+
+void CBTGen_free(CBTGen *);
+
+
+$gen(CBTGen) {
+    CritBitTree * self;
+    PiXiuStr * prefix;
+
+    $emit(PiXiuStr *)
+            auto ret = self->find_best_match(prefix);
+            auto pa = (CBTInner *) ret.pa;
+            auto chunk = (PiXiuChunk *) ret.crit_node;
+            uint8_t pa_direct = ret.pa_direct;
+
+            int chunk_idx = self->chunk_idx;
+            if (pa != NULL) {
+                chunk_idx = pa->chunk_idx_arr[pa_direct];
+            }
+            auto pxs = chunk->getitem(chunk_idx);
+
+            if (pxs->key_eq(prefix, NULL)) {
+                $yield(pxs);
+
+                if (pa_direct != 1) {
+
+                }
+            }
+    $stop;
+};
 
 #endif

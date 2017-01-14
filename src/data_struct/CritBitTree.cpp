@@ -272,6 +272,15 @@ CritBitTree::fbm_ret CritBitTree::find_best_match(PiXiuStr * src) {
     return CritBitTree::fbm_ret{normal(Que_get(q, 0)), normal(Que_get(q, 1)), normal(Que_get(q, 2)), direct};
 }
 
+CBTGen * CritBitTree::iter(PiXiuStr * prefix) {
+    auto gen = (CBTGen *) malloc(sizeof(CBTGen));
+    gen->_line = 0;
+
+    gen->self = this;
+    gen->prefix = prefix;
+    return gen;
+};
+
 CBTInner * CBTInner_init(void) {
     return (CBTInner *) malloc(offsetof(CBTInner, mask) + sizeof(CBTInner::mask));
 }
@@ -288,4 +297,8 @@ void CBTInner_free(CBTInner * inner) {
         }
     }
     free(inner);
+}
+
+void CBTGen_free(CBTGen * gen) {
+    free(gen);
 }
