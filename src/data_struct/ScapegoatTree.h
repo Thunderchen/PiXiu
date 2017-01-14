@@ -99,7 +99,7 @@ struct ScapegoatTree {
             ret.size = size;
             height++;
             size += this->get_size(sibling) + 1;
-            if (height > (log(size) / log(1 / 0.75))) {
+            if (height <= (log(size) / log(1 / 0.75))) {
                 cursor = parent;
             } else {
                 ret.pa = parent;
