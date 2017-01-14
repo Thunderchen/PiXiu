@@ -1,7 +1,6 @@
 #include "MemPool.h"
 #include "style.h"
 #include <assert.h>
-#include <math.h>
 
 void * MemPool::p_malloc(int size) {
     if (this->curr_pool == NULL) {
@@ -25,7 +24,10 @@ void * MemPool::p_malloc(int size) {
     }
 
     auto ret = adrOf(this->curr_pool->blocks[this->used_num]);
-    this->used_num += ceil(size / POOL_BLOCK_SIZE);
+    int num = size / POOL_BLOCK_SIZE;
+    int remainder = size % POOL_BLOCK_SIZE;
+    if (remainder != 0) { num++; }
+    this->used_num += num;
     return ret;
 }
 
