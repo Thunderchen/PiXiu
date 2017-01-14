@@ -13,14 +13,14 @@ struct SGTNode {
     T * obj;
 };
 
-template<typename T, MemPool * pool>
+template<typename T>
 struct ScapegoatTree {
     typedef SGTNode<T> SGTN;
 
     SGTN * root = NULL;
     int size = 0;
 
-    void setitem(T * obj) {
+    void setitem(T * obj, MemPool * pool) {
         auto mk_node = [&]() {
             auto node = (SGTN *) pool->p_malloc(sizeof(SGTN));
             node->small = node->big = NULL;
@@ -44,7 +44,7 @@ struct ScapegoatTree {
 
             height++;
             List_append(SGTN *, path, cursor);
-            if (obj->operator<(cursor)) {
+            if (obj->operator<(cursor->obj)) {
                 cursor = cursor->small;
 
                 if (cursor == NULL) {
@@ -134,7 +134,7 @@ struct ScapegoatTree {
         auto pick_mid = [](int op, int ed) -> int {
             return (op + ed) / 2;
         };
-        auto build_tree = [&](int op, int ed) -> SGTN * {
+        std::function<SGTN *(int, int)> build_tree = [&](int op, int ed) -> SGTN * {
             if (op > ed) { return NULL; }
             if (op == ed) { return ordered_nodes[op]; }
 

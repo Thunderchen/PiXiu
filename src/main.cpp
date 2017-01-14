@@ -2,7 +2,7 @@
 #include "common/List.h"
 #include "common/Que.h"
 #include "data_struct/CritBitTree.h"
-#include <stdio.h>
+#include "data_struct/ScapegoatTree.h"
 
 void t_CritBitTree(void);
 
@@ -16,6 +16,8 @@ void t_PiXiuStr(void);
 
 void t_Que(void);
 
+void t_ScapegoatTree(void);
+
 int main() {
 #ifndef NDEBUG
     t_CritBitTree();
@@ -24,11 +26,36 @@ int main() {
     t_MemPool();
     t_PiXiuStr();
     t_Que();
+    t_ScapegoatTree();
 
     printf("\nt_OK\n");
 #endif
     return 0;
 }
+
+void t_ScapegoatTree(void) {
+    struct cmp_int {
+        int val;
+
+        bool operator<(cmp_int * another) {
+            return val < another->val;
+        }
+
+        bool operator==(cmp_int * another) {
+            return val == another->val;
+        }
+    };
+
+    MemPool pool;
+    ScapegoatTree<cmp_int> sgt;
+    int arr[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
+    for (int i = 0; i < lenOf(arr); ++i) {
+        auto ci = (cmp_int *) pool.p_malloc(sizeof(cmp_int));
+        ci->val = arr[i];
+        sgt.setitem(ci, adrOf(pool));
+    }
+    pool.free_prop();
+};
 
 void t_Que(void) {
     int q[] = {0, 0, 0};
