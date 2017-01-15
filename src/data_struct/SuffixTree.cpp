@@ -1,13 +1,5 @@
 #include "SuffixTree.h"
 
-#define SET_AB_CHAR() \
-a_char = Glob_Ctx->getitem(this->chunk_idx)->data[0]; \
-if (another->from > another->to) { \
-    b_char = (uint8_t) another->chunk_idx; \
-} else { \
-    b_char = Glob_Ctx->getitem(another->chunk_idx)->data[0]; \
-}
-
 static MemPool * Glob_Pool = NULL;
 static PiXiuChunk * Glob_Ctx = NULL;
 
@@ -19,6 +11,14 @@ STNode * STNode::get_sub(uint8_t key) {
     STNode cmp{.from=1, .to=0};
     cmp.chunk_idx = key;
     return this->subs.getitem(adrOf(cmp));
+}
+
+#define SET_AB_CHAR() \
+a_char = Glob_Ctx->getitem(this->chunk_idx)->data[0]; \
+if (another->from > another->to) { \
+    b_char = (uint8_t) another->chunk_idx; \
+} else { \
+    b_char = Glob_Ctx->getitem(another->chunk_idx)->data[0]; \
 }
 
 bool STNode::operator<(STNode * another) {
@@ -69,7 +69,12 @@ void SuffixTree::free_prop() {
 }
 
 void SuffixTree::reset() {
-
+    this->remainder = 0;
+    this->counter = 0;
+    this->act_node = this->root;
+    this->act_chunk_idx = 0;
+    this->act_direct = 0;
+    this->act_offset = 0;
 }
 
 SuffixTree::s_ret SuffixTree::setitem(PiXiuStr *) {
