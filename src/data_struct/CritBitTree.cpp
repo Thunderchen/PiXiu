@@ -208,7 +208,7 @@ PXSGen * CritBitTree::getitem(PiXiuStr * src) {
     return NULL;
 };
 
-char * CritBitTree::repr(void) {
+char * CritBitTree::repr() {
     List_init(char, output);
 
     std::function<void(void *, int)> print = [&](void * ptr, int lv) {
@@ -255,7 +255,7 @@ char * CritBitTree::repr(void) {
     return output;
 }
 
-void CritBitTree::free_prop(void) {
+void CritBitTree::free_prop() {
     if (this->root == NULL) {
         return;
     }

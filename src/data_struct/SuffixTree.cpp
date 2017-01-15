@@ -64,6 +64,11 @@ void SuffixTree::init_prop() {
 }
 
 void SuffixTree::free_prop() {
+    this->local_chunk.free_prop();
+    this->local_pool.free_prop();
+}
+
+void SuffixTree::reset() {
 
 }
 
@@ -77,7 +82,6 @@ char * SuffixTree::repr() {
 
 STNode * STNode_init(void) {
     assert(Glob_Pool != NULL);
-
     auto ret = (STNode *) Glob_Pool->p_malloc(sizeof(STNode));
     ret->successor = NULL;
     ret->subs.root = NULL;

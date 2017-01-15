@@ -53,6 +53,8 @@ struct SuffixTree {
     void init_prop(void);
 
     void free_prop(void);
+
+    void reset(void);
 };
 
 STNode * STNode_init(void);

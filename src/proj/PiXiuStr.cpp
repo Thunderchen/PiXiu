@@ -162,7 +162,7 @@ bool PiXiuChunk::is_delitem(int idx) {
     return adr_is_spec(adr);
 }
 
-void PiXiuChunk::free_prop(void) {
+void PiXiuChunk::free_prop() {
     for (int i = 0; i < PXC_STR_NUM && this->strs[i] != NULL; ++i) {
         PiXiuStr_free(this->getitem(i));
     }
