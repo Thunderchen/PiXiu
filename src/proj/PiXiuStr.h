@@ -79,6 +79,8 @@ struct PiXiuChunk {
     void delitem(int);
 
     bool is_delitem(int);
+
+    void free_prop(void);
 };
 
 PiXiuStr * PiXiuStr_init_key(uint8_t[], int);

@@ -162,6 +162,13 @@ bool PiXiuChunk::is_delitem(int idx) {
     return adr_is_spec(adr);
 }
 
+void PiXiuChunk::free_prop(void) {
+    for (int i = 0; i < PXC_STR_NUM && this->strs[i] != NULL; ++i) {
+        PiXiuStr_free(this->getitem(i));
+    }
+    this->used_num = 0;
+}
+
 PiXiuStr * PiXiuChunk::getitem(int idx) {
     auto adr = this->strs[idx];
     assert(adr != NULL);
@@ -177,9 +184,7 @@ PiXiuChunk * PiXiuChunk_init(void) {
 }
 
 void PiXiuChunk_free(PiXiuChunk * chunk) {
-    for (int i = 0; i < PXC_STR_NUM && chunk->strs[i] != NULL; ++i) {
-        PiXiuStr_free(chunk->getitem(i));
-    }
+    chunk->free_prop();
     free(chunk);
 }
 
