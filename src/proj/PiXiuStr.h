@@ -2,6 +2,7 @@
 #define PIXIU_STR_H
 
 #include "../common/gen.h"
+#include "../common/List.h"
 #include "../common/style.h"
 #include "../common/util.h"
 #include <assert.h>

@@ -19,6 +19,12 @@ struct STNode {
     bool operator<(STNode *);
 
     bool operator==(STNode *);
+
+    bool is_root(void);
+
+    bool is_inner(void);
+
+    bool is_leaf(void);
 };
 
 #endif

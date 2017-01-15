@@ -32,3 +32,15 @@ bool STNode::operator==(STNode * another) {
     AB_CHAR();
     return a_char == b_char;
 }
+
+bool STNode::is_root() {
+    return this->successor == this;
+}
+
+bool STNode::is_inner() {
+    return !this->is_root() && this->subs.root != NULL;
+}
+
+bool STNode::is_leaf() {
+    return !this->is_root() && this->subs.root == NULL;
+}
