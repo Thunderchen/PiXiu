@@ -45,6 +45,15 @@ bool STNode::is_leaf() {
     return !this->is_root() && this->subs.root == NULL;
 }
 
+STNode * STNode_init(void) {
+    assert(Glob_Pool != NULL);
+    auto ret = (STNode *) Glob_Pool->p_malloc(sizeof(STNode));
+    ret->successor = NULL;
+    ret->subs.root = NULL;
+    ret->subs.size = 0;
+    return ret;
+}
+
 void SuffixTree::init_prop() {
     assert(this->local_chunk.used_num == 0);
     assert(this->local_pool.curr_pool == NULL);
@@ -82,14 +91,40 @@ SuffixTree::s_ret SuffixTree::setitem(PiXiuStr *) {
 }
 
 char * SuffixTree::repr() {
+    List_init(char, output);
 
-}
+    std::function<void(STNode *)> print_node = [&](STNode * node) {
+        auto pxs = this->local_chunk.getitem(node->chunk_idx);
+        for (int i = 0; i < pxs->len; ++i) {
+            if (char_visible(pxs->data[i])) {
+                List_append(char, output, pxs->data[i]);
+            }
+        }
+    };
 
-STNode * STNode_init(void) {
-    assert(Glob_Pool != NULL);
-    auto ret = (STNode *) Glob_Pool->p_malloc(sizeof(STNode));
-    ret->successor = NULL;
-    ret->subs.root = NULL;
-    ret->subs.size = 0;
-    return ret;
+    std::function<void(STNode *, int)> print_tree = [&](STNode * node, int lv) {
+        if (lv > 0) {
+            for (int i = 0; i < (lv - 1) * 2; ++i) {
+                List_append(char, output, ' ');
+            }
+            for (int i = 0; i < 2; ++i) {
+                List_append(char, output, '-');
+            }
+            print_node(node);
+        } else {
+            List_append(char, output, '#');
+        }
+        List_append(char, output, '\n');
+
+        if (node->subs.root != NULL) {
+            lv++;
+            STNode * sub_node;
+            for (uint8_t i = 0; i <= UINT8_MAX && (sub_node = node->get_sub(i)) != NULL; ++i) {
+                print_tree(sub_node, lv);
+            }
+        }
+    };
+
+    List_append(char, output, '\0');
+    return output;
 }
