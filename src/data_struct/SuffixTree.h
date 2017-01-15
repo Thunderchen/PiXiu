@@ -8,8 +8,8 @@ struct STNode {
     STNode * successor = NULL;
     ScapegoatTree<STNode> subs;
 
-    uint16_t op;
-    uint16_t ed;
+    uint16_t from;
+    uint16_t to;
     uint16_t chunk_idx;
 
     void set_sub(STNode *);
