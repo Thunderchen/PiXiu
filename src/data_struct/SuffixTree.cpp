@@ -86,10 +86,6 @@ void SuffixTree::reset() {
     this->act_offset = 0;
 }
 
-SuffixTree::s_ret SuffixTree::setitem(PiXiuStr *) {
-
-}
-
 char * SuffixTree::repr() {
     List_init(char, output);
 
@@ -127,4 +123,20 @@ char * SuffixTree::repr() {
 
     List_append(char, output, '\0');
     return output;
+}
+
+static void s_cast_root() {
+
+}
+
+static void s_overflow_fix() {
+
+}
+
+static void s_split_grow() {
+
+}
+
+SuffixTree::s_ret SuffixTree::setitem(PiXiuStr *) {
+
 }
