@@ -93,7 +93,7 @@ int CritBitTree::setitem(PiXiuStr * src, PiXiuChunk * ctx, uint16_t chunk_idx) {
 
         auto spec_mode = false;
         while (crit_gen->operator()(crit_rv) && src_gen->operator()(src_rv) && crit_rv == src_rv) {
-            PXSG_ENCOUNTER_KEY(crit_rv, replace());
+            PXSG_SEE_KEY_BREAK(crit_rv, replace());
             diff_at++;
         }
         if (!spec_mode) { insert(); };
@@ -148,7 +148,7 @@ int CritBitTree::delitem(PiXiuStr * src) {
     auto spec_mode = false;
     while (crit_gen->operator()(rv) && i < src->len && rv == src->data[i]) {
         i++;
-        PXSG_ENCOUNTER_KEY(rv, case_del());
+        PXSG_SEE_KEY_BREAK(rv, case_del());
     }
 
     PXSGen_free(crit_gen);
@@ -174,7 +174,7 @@ bool CritBitTree::contains(PiXiuStr * src) {
     auto spec_mode = false;
     while (crit_gen->operator()(rv) && i < src->len && rv == src->data[i]) {
         i++;
-        PXSG_ENCOUNTER_KEY(rv, sign = true);
+        PXSG_SEE_KEY_BREAK(rv, sign = true);
     }
 
     free(crit_gen);

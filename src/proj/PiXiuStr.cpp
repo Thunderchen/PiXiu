@@ -109,7 +109,7 @@ bool PiXiuStr::key_eq(PiXiuStr * another, PiXiuChunk * ctx) {
     auto spec_mode = false;
     uint8_t my_val, your_val;
     while (my_gen->operator()(my_val) && your_gen->operator()(your_val) && my_val == your_val) {
-        PXSG_ENCOUNTER_KEY(my_val, ret = true);
+        PXSG_SEE_KEY_BREAK(my_val, ret = true);
     }
 
     PXSGen_free(my_gen);

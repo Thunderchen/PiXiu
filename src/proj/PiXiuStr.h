@@ -18,7 +18,7 @@
 #define PXC_STR_NUM 65535
 #define PXSG_MAX_TO 65535
 
-#define PXSG_ENCOUNTER_KEY(val, callback) \
+#define PXSG_SEE_KEY_BREAK(val, callback) \
 if (!spec_mode && val == PXS_UNIQUE) { spec_mode = true; } \
 else if (spec_mode) { \
     if (val == PXS_KEY) { \
