@@ -53,7 +53,7 @@ void t_ScapegoatTree(void) {
         obj->val = i;
         assert(sgt.getitem(obj) == NULL);
         sgt.setitem(obj, adrOf(pool));
-        assert(sgt.getitem(obj)->operator==(obj));
+        assert(sgt.getitem(obj)->val == i);
     }
     pool.free_prop();
 };

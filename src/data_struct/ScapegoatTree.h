@@ -5,7 +5,7 @@
 #include <functional>
 #include <math.h>
 
-#define SGT_FACTOR 0.618
+#define SGT_FACTOR 0.75
 
 template<typename T>
 struct SGTNode {
