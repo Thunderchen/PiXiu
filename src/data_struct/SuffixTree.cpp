@@ -125,18 +125,35 @@ char * SuffixTree::repr() {
     return output;
 }
 
-static void s_cast_root() {
+static void s_cast_root(SuffixTree * self, int chunk_idx, uint8_t msg_char) {
 
 }
 
-static void s_overflow_fix() {
+static void s_overflow_fix(SuffixTree * self, int chunk_idx, int remainder) {
 
 }
 
-static void s_split_grow() {
+static void s_split_grow(SuffixTree * self, int chunk_idx, STNode * collapse_node) {
 
 }
 
-SuffixTree::s_ret SuffixTree::setitem(PiXiuStr *) {
+static void s_insert_char(SuffixTree * self, int chunk_idx, uint8_t msg_char) {
 
+}
+
+SuffixTree::s_ret SuffixTree::setitem(PiXiuStr * src) {
+    auto idx = this->local_chunk.used_num;
+    assert(idx == this->cbt_chunk->used_num);
+
+    this->local_chunk.strs[idx] = src;
+    PiXiuStr_init_stream((PXSMsg) {.chunk_idx__cmd=PXS_STREAM_ON});
+    for (int i = 0; i < src->len; ++i) {
+        s_insert_char(this, idx, src->data[i]);
+    }
+    this->cbt_chunk->strs[idx] =
+            PiXiuStr_init_stream((PXSMsg) {.chunk_idx__cmd=PXS_STREAM_OFF});
+
+    this->local_chunk.used_num++;
+    this->cbt_chunk->used_num++;
+    return s_ret{this->cbt_chunk, idx};
 }
