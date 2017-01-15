@@ -8,8 +8,8 @@ if (another->from > another->to) { \
     b_char = Glob_Ctx->getitem(another->chunk_idx)->data[0]; \
 }
 
-static MemPool * Glob_Pool;
-static PiXiuChunk * Glob_Ctx;
+static MemPool * Glob_Pool = NULL;
+static PiXiuChunk * Glob_Ctx = NULL;
 
 void STNode::set_sub(STNode * node) {
     this->subs.setitem(node, Glob_Pool);
@@ -43,4 +43,44 @@ bool STNode::is_inner() {
 
 bool STNode::is_leaf() {
     return !this->is_root() && this->subs.root == NULL;
+}
+
+void SuffixTree::init_prop() {
+    assert(this->local_chunk.used_num == 0);
+    assert(this->local_pool.curr_pool == NULL);
+
+    Glob_Ctx = adrOf(this->local_chunk);
+    Glob_Pool = adrOf(this->local_pool);
+
+    this->root = STNode_init();
+    this->root->successor = this->root;
+    this->remainder = this->counter = 0;
+
+    this->act_node = this->root;
+    this->act_chunk_idx = this->act_direct = this->act_offset = 0;
+
+    this->cbt_chunk = (PiXiuChunk *) this->local_pool.p_malloc(sizeof(PiXiuChunk));
+    this->cbt_chunk->used_num = 0;
+}
+
+void SuffixTree::free_prop() {
+
+}
+
+SuffixTree::s_ret SuffixTree::setitem(PiXiuStr *) {
+
+}
+
+char * SuffixTree::repr() {
+
+}
+
+STNode * STNode_init(void) {
+    assert(Glob_Pool != NULL);
+
+    auto ret = (STNode *) Glob_Pool->p_malloc(sizeof(STNode));
+    ret->successor = NULL;
+    ret->subs.root = NULL;
+    ret->subs.size = 0;
+    return ret;
 }

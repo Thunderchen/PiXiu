@@ -28,7 +28,7 @@ struct STNode {
 };
 
 struct SuffixTree {
-    STNode root;
+    STNode * root;
     int counter;
     int remainder;
 
@@ -48,9 +48,13 @@ struct SuffixTree {
 
     s_ret setitem(PiXiuStr *);
 
+    char * repr(void);
+
     void init_prop(void);
 
     void free_prop(void);
 };
+
+STNode * STNode_init(void);
 
 #endif
