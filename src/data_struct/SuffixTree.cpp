@@ -1,6 +1,6 @@
 #include "SuffixTree.h"
 
-#define AB_CHAR() \
+#define SET_AB_CHAR() \
 a_char = Glob_Ctx->getitem(this->chunk_idx)->data[0]; \
 if (another->from > another->to) { \
     b_char = (uint8_t) another->chunk_idx; \
@@ -23,13 +23,13 @@ STNode * STNode::get_sub(uint8_t key) {
 
 bool STNode::operator<(STNode * another) {
     uint8_t a_char, b_char;
-    AB_CHAR();
+    SET_AB_CHAR();
     return a_char < b_char;
 }
 
 bool STNode::operator==(STNode * another) {
     uint8_t a_char, b_char;
-    AB_CHAR();
+    SET_AB_CHAR();
     return a_char == b_char;
 }
 

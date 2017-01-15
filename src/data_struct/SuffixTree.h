@@ -27,4 +27,30 @@ struct STNode {
     bool is_leaf(void);
 };
 
+struct SuffixTree {
+    STNode root;
+    int counter;
+    int remainder;
+
+    STNode * act_node;
+    uint16_t act_chunk_idx;
+    uint16_t act_direct;
+    uint16_t act_offset;
+
+    MemPool local_pool;
+    PiXiuChunk local_chunk;
+    PiXiuChunk * cbt_chunk;
+
+    struct s_ret {
+        PiXiuChunk * cbt_chunk;
+        uint16_t idx;
+    };
+
+    s_ret setitem(PiXiuStr *);
+
+    void init_prop(void);
+
+    void free_prop(void);
+};
+
 #endif
