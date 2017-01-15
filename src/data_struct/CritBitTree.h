@@ -56,10 +56,10 @@ $gen(CBTGen) {
     CritBitTree * self;
     PiXiuStr * prefix;
 
-    CBTInner * pa;
     void ** q;
     int q_len;
     int q_capacity;
+    CBTInner * pa;
     int pa_direct;
 
     void * node_sub(CBTInner * node, uint8_t direct) {

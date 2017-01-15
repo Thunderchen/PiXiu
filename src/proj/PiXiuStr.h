@@ -15,8 +15,17 @@
 #define PXS_STREAM_OFF -2
 #define PXS_STREAM_PASS -3
 
-#define PXSG_MAX_TO 65535
 #define PXC_STR_NUM 65535
+#define PXSG_MAX_TO 65535
+
+#define PXSG_ENCOUNTER_KEY(val, callback) \
+if (!spec_mode && val == PXS_UNIQUE) { spec_mode = true; } \
+else if (spec_mode) { \
+    if (val == PXS_KEY) { \
+        callback; \
+        break; \
+    } else { spec_mode = false; } \
+}
 
 struct PiXiuChunk;
 struct PXSGen;
