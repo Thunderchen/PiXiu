@@ -17,13 +17,13 @@
 #define PXS_STREAM_PASS -3
 
 #define PXC_STR_NUM 65535
-#define PXSG_MAX_TO 65535
+#define PXSG_MAX_TO UINT16_MAX
 
-#define PXSG_SEE_KEY_BREAK(val, callback) \
+#define PXSG_SEE_KEY_BREAK(val, cmd) \
 if (!spec_mode && val == PXS_UNIQUE) { spec_mode = true; } \
 else if (spec_mode) { \
     if (val == PXS_KEY) { \
-        callback; \
+        cmd; \
         break; \
     } else { spec_mode = false; } \
 }
@@ -83,9 +83,9 @@ struct PiXiuChunk {
     void free_prop(void);
 };
 
-PiXiuStr * PiXiuStr_init_key(uint8_t[], int);
-
 PiXiuStr * PiXiuStr_init(uint8_t[], int);
+
+PiXiuStr * PiXiuStr_init_key(uint8_t[], int);
 
 PiXiuStr * PiXiuStr_init_stream(PXSMsg);
 
@@ -141,7 +141,6 @@ $gen(PXSGen) {
                         PXSG_TRY_WRITE;
                         i++;
                         cmd = next_cmd;
-
                         PXSG_TRY_WRITE;
                     } else if (next_cmd == PXS_COMPRESS || next_cmd > sizeof(PXSRecordSmall)) {
                         record = valIn((PXSRecord *) adrOf(self->data[i]));
