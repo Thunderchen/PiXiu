@@ -8,9 +8,9 @@ struct STNode {
     STNode * successor = NULL;
     ScapegoatTree<STNode> subs;
 
+    uint16_t chunk_idx;
     uint16_t from;
     uint16_t to;
-    uint16_t chunk_idx;
 
     void set_sub(STNode *);
 
@@ -29,8 +29,8 @@ struct STNode {
 
 struct SuffixTree {
     STNode * root;
-    int counter;
     int remainder;
+    int counter;
 
     STNode * act_node;
     uint16_t act_chunk_idx;
@@ -57,6 +57,6 @@ struct SuffixTree {
     void reset(void);
 };
 
-STNode * STNode_init(void);
+STNode * STNode_p_init(void);
 
 #endif

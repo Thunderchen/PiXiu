@@ -4,6 +4,7 @@ static MemPool * Glob_Pool = NULL;
 static PiXiuChunk * Glob_Ctx = NULL;
 
 void STNode::set_sub(STNode * node) {
+    assert(Glob_Pool != NULL);
     this->subs.setitem(node, Glob_Pool);
 }
 
@@ -13,23 +14,24 @@ STNode * STNode::get_sub(uint8_t key) {
     return this->subs.getitem(adrOf(cmp));
 }
 
-#define SET_AB_CHAR() \
-a_char = Glob_Ctx->getitem(this->chunk_idx)->data[0]; \
+#define SET_AB_CHAR \
+assert(Glob_Ctx != NULL); \
+a_char = Glob_Ctx->getitem(this->chunk_idx)->data[this->from]; \
 if (another->from > another->to) { \
     b_char = (uint8_t) another->chunk_idx; \
 } else { \
-    b_char = Glob_Ctx->getitem(another->chunk_idx)->data[0]; \
+    b_char = Glob_Ctx->getitem(another->chunk_idx)->data[another->from]; \
 }
 
 bool STNode::operator<(STNode * another) {
     uint8_t a_char, b_char;
-    SET_AB_CHAR();
+    SET_AB_CHAR;
     return a_char < b_char;
 }
 
 bool STNode::operator==(STNode * another) {
     uint8_t a_char, b_char;
-    SET_AB_CHAR();
+    SET_AB_CHAR;
     return a_char == b_char;
 }
 
@@ -45,7 +47,7 @@ bool STNode::is_leaf() {
     return !this->is_root() && this->subs.root == NULL;
 }
 
-STNode * STNode_init(void) {
+STNode * STNode_p_init(void) {
     assert(Glob_Pool != NULL);
     auto ret = (STNode *) Glob_Pool->p_malloc(sizeof(STNode));
     ret->successor = NULL;
@@ -61,7 +63,7 @@ void SuffixTree::init_prop() {
     Glob_Ctx = adrOf(this->local_chunk);
     Glob_Pool = adrOf(this->local_pool);
 
-    this->root = STNode_init();
+    this->root = STNode_p_init();
     this->root->successor = this->root;
     this->remainder = this->counter = 0;
 
@@ -91,7 +93,7 @@ char * SuffixTree::repr() {
 
     std::function<void(STNode *)> print_node = [&](STNode * node) {
         auto pxs = this->local_chunk.getitem(node->chunk_idx);
-        for (int i = 0; i < pxs->len; ++i) {
+        for (int i = node->from; i < node->to; ++i) {
             if (char_visible(pxs->data[i])) {
                 List_append(char, output, pxs->data[i]);
             }
@@ -115,8 +117,10 @@ char * SuffixTree::repr() {
         if (node->subs.root != NULL) {
             lv++;
             STNode * sub_node;
-            for (uint8_t i = 0; i <= UINT8_MAX && (sub_node = node->get_sub(i)) != NULL; ++i) {
-                print_tree(sub_node, lv);
+            for (uint8_t i = 0; i <= UINT8_MAX; ++i) {
+                if ((sub_node = node->get_sub(i)) != NULL) {
+                    print_tree(sub_node, lv);
+                }
             }
         }
     };
@@ -125,7 +129,7 @@ char * SuffixTree::repr() {
     return output;
 }
 
-static void s_cast_root(SuffixTree * self, int chunk_idx, uint8_t msg_char) {
+static void s_case_root(SuffixTree * self, int chunk_idx, uint8_t msg_char) {
 
 }
 
@@ -150,8 +154,7 @@ SuffixTree::s_ret SuffixTree::setitem(PiXiuStr * src) {
     for (int i = 0; i < src->len; ++i) {
         s_insert_char(this, idx, src->data[i]);
     }
-    this->cbt_chunk->strs[idx] =
-            PiXiuStr_init_stream((PXSMsg) {.chunk_idx__cmd=PXS_STREAM_OFF});
+    this->cbt_chunk->strs[idx] = PiXiuStr_init_stream((PXSMsg) {.chunk_idx__cmd=PXS_STREAM_OFF});
 
     this->local_chunk.used_num++;
     this->cbt_chunk->used_num++;
