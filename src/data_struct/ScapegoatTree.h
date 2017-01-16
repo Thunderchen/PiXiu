@@ -147,9 +147,6 @@ struct ScapegoatTree {
         add(scapegoat);
         assert(i == size);
 
-        auto pick_mid = [](int op, int ed) -> int {
-            return (op + ed) / 2;
-        };
         std::function<SGTN *(int, int)> build_tree = [&](int op, int ed) -> SGTN * {
             if (op > ed) { return NULL; }
             if (op == ed) {
@@ -157,7 +154,7 @@ struct ScapegoatTree {
                 return ordered_nodes[op];
             }
 
-            auto mid = pick_mid(op, ed);
+            int mid = (op + ed) / 2;
             auto mid_node = ordered_nodes[mid];
             mid_node->small = build_tree(op, mid - 1);
             mid_node->big = build_tree(mid + 1, ed);
