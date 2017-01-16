@@ -27,6 +27,8 @@ struct CritBitTree {
 
     PXSGen * getitem(PiXiuStr *);
 
+    CBTGen * iter(PiXiuStr *);
+
     int delitem(PiXiuStr *);
 
     char * repr(void);
@@ -41,8 +43,6 @@ struct CritBitTree {
     };
 
     fbm_ret find_best_match(PiXiuStr *);
-
-    CBTGen * iter(PiXiuStr *);
 };
 
 CBTInner * CBTInner_init(void);

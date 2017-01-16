@@ -1,4 +1,3 @@
-#include "../common/List.h"
 #include "../common/Que.h"
 #include "CritBitTree.h"
 #include <functional>
@@ -59,8 +58,8 @@ int CritBitTree::setitem(PiXiuStr * src, PiXiuChunk * ctx, uint16_t chunk_idx) {
             inner_node->diff_at = diff_at;
             inner_node->mask = mask;
 
-            CBTInner * parent = NULL;
-            uint8_t parent_direct = 3;
+            CBTInner * replace_parent = NULL;
+            uint8_t rp_direct = 3;
             auto replace_ptr = this->root;
             auto replace_node = (CBTInner *) normal(replace_ptr);
             auto replace_chunk_idx = this->chunk_idx;
@@ -72,19 +71,19 @@ int CritBitTree::setitem(PiXiuStr * src, PiXiuChunk * ctx, uint16_t chunk_idx) {
                 }
 
                 uint8_t crit_byte = src->len > replace_node->diff_at ? src->data[replace_node->diff_at] : (uint8_t) 0;
-                parent_direct = ((uint8_t) 1 + (replace_node->mask | crit_byte)) >> 8;
+                rp_direct = ((uint8_t) 1 + (replace_node->mask | crit_byte)) >> 8;
 
-                parent = replace_node;
-                replace_ptr = replace_node->crit_node_arr[parent_direct];
+                replace_parent = replace_node;
+                replace_ptr = replace_node->crit_node_arr[rp_direct];
                 replace_node = (CBTInner *) normal(replace_ptr);
-                replace_chunk_idx = parent->chunk_idx_arr[parent_direct];
+                replace_chunk_idx = replace_parent->chunk_idx_arr[rp_direct];
             }
 
-            if (parent == NULL) {
+            if (replace_parent == NULL) {
                 this->root = special(inner_node);
             } else {
-                assert(parent_direct >= 0 && pa_direct <= 1);
-                parent->crit_node_arr[parent_direct] = special(inner_node);
+                assert(rp_direct >= 0 && pa_direct <= 1);
+                replace_parent->crit_node_arr[rp_direct] = special(inner_node);
             }
             auto temp_i = (direct + 1) % 2;
             inner_node->crit_node_arr[temp_i] = replace_ptr;
@@ -204,7 +203,6 @@ PXSGen * CritBitTree::getitem(PiXiuStr * src) {
     if (pxs->key_eq(src, chunk)) {
         return pxs->parse(0, PXSG_MAX_TO, chunk);
     }
-
     return NULL;
 };
 
