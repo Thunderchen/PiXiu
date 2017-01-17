@@ -60,7 +60,7 @@ STNode * STNode_p_init(void) {
 void SuffixTree::init_prop() {
     assert(this->local_chunk.used_num == 0);
     assert(this->local_pool.curr_pool == NULL);
-    memset(this->local_chunk.strs, 0, sizeof(PiXiuStr *) * PXC_STR_NUM);
+    memset(this->local_chunk.strs, 0, sizeof(this->local_chunk.strs));
 
     Glob_Ctx = adrOf(this->local_chunk);
     Glob_Pool = adrOf(this->local_pool);
