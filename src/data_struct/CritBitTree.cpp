@@ -321,6 +321,7 @@ void t_CritBitTree(void) {
         for (len = 0; src[len] != '\0'; ++len);
         auto pxs = PiXiuStr_init_key(src, len);
         chunk->strs[chunk->used_num] = pxs;
+
         cbt.setitem(pxs, chunk, chunk->used_num);
         chunk->used_num++;
         assert(cbt.contains(pxs));
@@ -335,13 +336,14 @@ void t_CritBitTree(void) {
     cbt_insert((uint8_t *) "ejjc$");
     cbt_insert((uint8_t *) "acd$");
 
-    assert(!strcmp((output = cbt.repr()), "diff: 0, mask: 251\n"
-            "    diff: 1, mask: 254\n"
-            "        abec$\n"
-            "        acd$\n"
-            "    diff: 1, mask: 247\n"
-            "        ec$\n"
-            "        ejjc$\n"));
+    assert(!strcmp((output = cbt.repr()),
+                   "diff: 0, mask: 251\n"
+                           "    diff: 1, mask: 254\n"
+                           "        abec$\n"
+                           "        acd$\n"
+                           "    diff: 1, mask: 247\n"
+                           "        ec$\n"
+                           "        ejjc$\n"));
     free(output);
 
     auto prefix = PiXiuStr_init((uint8_t *) "e", 1);
@@ -349,8 +351,8 @@ void t_CritBitTree(void) {
 
     auto expect = "ec$ejjc$";
     auto i = 0;
-    PXSGen * pxs_gen;
     uint8_t rv;
+    PXSGen * pxs_gen;
     while (cbt_gen->operator()(pxs_gen)) {
         while (pxs_gen->operator()(rv)) {
             if (char_visible(rv)) {
@@ -376,9 +378,10 @@ void t_CritBitTree(void) {
     cbt_delete((uint8_t *) "ejjc$");
     cbt_delete((uint8_t *) "abec$");
 
-    assert(!strcmp((output = cbt.repr()), "diff: 0, mask: 251\n"
-            "    acd$\n"
-            "    ec$\n"));
+    assert(!strcmp((output = cbt.repr()),
+                   "diff: 0, mask: 251\n"
+                           "    acd$\n"
+                           "    ec$\n"));
     free(output);
 
     cbt_delete((uint8_t *) "ec$");

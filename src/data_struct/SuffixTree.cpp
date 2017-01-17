@@ -129,6 +129,14 @@ char * SuffixTree::repr() {
     return output;
 }
 
+#define MSG_NO_COMPRESS PiXiuStr_init_stream((PXSMsg) {.chunk_idx__cmd=PXS_STREAM_PASS, .val=msg_char})
+#define MSG_COMPRESS(c_idx, p_idx) \
+PiXiuStr_init_stream((PXSMsg) { \
+    .chunk_idx__cmd=c_idx, \
+    .pxs_idx=p_idx, \
+    .val=msg_char \
+})
+
 static void s_case_root(SuffixTree * self, int chunk_idx, uint8_t msg_char) {
 
 }
@@ -142,10 +150,76 @@ static void s_split_grow(SuffixTree * self, int chunk_idx, STNode * collapse_nod
 }
 
 static void s_insert_char(SuffixTree * self, int chunk_idx, uint8_t msg_char) {
+    self->remainder++;
+    uint8_t temp_uchar;
 
+    if (self->act_node->is_root() && self->act_offset == 0) {
+        s_insert_char(self, chunk_idx, msg_char);
+    } else { // 已坍缩
+        temp_uchar = Glob_Ctx->getitem(self->act_chunk_idx)->data[self->act_direct];
+        auto collapse_node = self->act_node->get_sub(temp_uchar);
+        assert(Glob_Ctx->getitem(collapse_node->chunk_idx)->data[collapse_node->from] == temp_uchar);
+
+        // edge 扩大?
+        if (collapse_node->from + self->act_offset == collapse_node->to) {
+            auto next_collapse_node = collapse_node->get_sub(msg_char);
+            if (next_collapse_node != NULL) { // YES
+                self->act_node = collapse_node; // 推移 act_node
+                self->act_chunk_idx = next_collapse_node->chunk_idx;
+                self->act_direct = next_collapse_node->from;
+                self->act_offset = 1;
+                MSG_COMPRESS(next_collapse_node->chunk_idx, next_collapse_node->from);
+                goto end;
+            } else { // NO
+                goto explode;
+            }
+        }
+
+        temp_uchar = Glob_Ctx->getitem(collapse_node->chunk_idx)->data[collapse_node->from + self->act_offset];
+        if (temp_uchar == msg_char) { // YES
+            MSG_COMPRESS(collapse_node->chunk_idx, collapse_node->from + self->act_offset);
+            self->act_offset++;
+        } else { // NO
+            explode: // 炸开累积后缀
+            MSG_NO_COMPRESS;
+            while (self->remainder > 0) {
+                if (!self->act_node->is_inner()) {
+                    s_split_grow(self, chunk_idx, collapse_node);
+                    // 状态转移
+                    self->act_offset--;
+                    self->act_direct++;
+
+                    if (self->act_offset > 0) {
+                        s_overflow_fix(self, chunk_idx, self->remainder);
+                        temp_uchar = Glob_Ctx->getitem(self->act_chunk_idx)->data[self->act_direct];
+                        auto next_collapse_node = self->act_node->get_sub(temp_uchar);
+                        collapse_node->successor = next_collapse_node;
+                        collapse_node = next_collapse_node;
+                    } else { // 后缀已用完, 回到 case root
+                        collapse_node->successor = self->root;
+                        s_case_root(self, chunk_idx, msg_char);
+                        break;
+                    }
+                } else { // 需要使用 suffix link
+                    s_split_grow(self, chunk_idx, collapse_node);
+                    self->act_node = self->act_node->successor;
+                    s_overflow_fix(self, chunk_idx, self->remainder);
+
+                    temp_uchar = Glob_Ctx->getitem(self->act_chunk_idx)->data[self->act_direct];
+                    auto next_collapse_node = self->act_node->get_sub(temp_uchar);
+                    collapse_node->successor = next_collapse_node;
+                    collapse_node = next_collapse_node;
+                }
+            }
+        }
+    }
+
+    end:
+    self->counter++;
 }
 
 SuffixTree::s_ret SuffixTree::setitem(PiXiuStr * src) {
+    assert(Glob_Ctx != NULL && Glob_Pool != NULL);
     auto idx = this->local_chunk.used_num;
     assert(idx == this->cbt_chunk->used_num);
 
@@ -158,5 +232,6 @@ SuffixTree::s_ret SuffixTree::setitem(PiXiuStr * src) {
 
     this->local_chunk.used_num++;
     this->cbt_chunk->used_num++;
+    this->reset();
     return s_ret{this->cbt_chunk, idx};
 }
