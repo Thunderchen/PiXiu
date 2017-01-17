@@ -1,3 +1,4 @@
+#include "../proj/PiXiuStr.h"
 #include "SuffixTree.h"
 
 static MemPool * Glob_Pool = NULL;
@@ -59,6 +60,7 @@ STNode * STNode_p_init(void) {
 void SuffixTree::init_prop() {
     assert(this->local_chunk.used_num == 0);
     assert(this->local_pool.curr_pool == NULL);
+    memset(this->local_chunk.strs, 0, sizeof(PiXiuStr *) * PXC_STR_NUM);
 
     Glob_Ctx = adrOf(this->local_chunk);
     Glob_Pool = adrOf(this->local_pool);
@@ -117,7 +119,7 @@ char * SuffixTree::repr() {
         if (node->subs.root != NULL) {
             lv++;
             STNode * sub_node;
-            for (uint8_t i = 0; i <= UINT8_MAX; ++i) {
+            for (uint8_t i = 0; i < UINT8_MAX; ++i) {
                 if ((sub_node = node->get_sub(i)) != NULL) {
                     print_tree(sub_node, lv);
                 }
