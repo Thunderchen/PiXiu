@@ -16,7 +16,11 @@ STNode * STNode::get_sub(uint8_t key) {
 
 #define SET_AB_CHAR \
 assert(Glob_Ctx != NULL); \
-a_char = Glob_Ctx->getitem(this->chunk_idx)->data[this->from]; \
+if (this->from > this->to) { \
+    a_char = (uint8_t) this->chunk_idx; \
+} else { \
+    a_char = Glob_Ctx->getitem(this->chunk_idx)->data[this->from]; \
+} \
 if (another->from > another->to) { \
     b_char = (uint8_t) another->chunk_idx; \
 } else { \
@@ -121,6 +125,7 @@ char * SuffixTree::repr() {
         }
     };
 
+    print_tree(this->root, 0);
     List_append(char, output, '\0');
     return output;
 }
@@ -201,7 +206,7 @@ static void s_insert_char(SuffixTree * self, uint16_t chunk_idx, uint8_t msg_cha
     uint8_t temp_uchar;
 
     if (self->act_node->is_root() && self->act_offset == 0) {
-        s_insert_char(self, chunk_idx, msg_char);
+        s_case_root(self, chunk_idx, msg_char);
     } else { // 已坍缩
         temp_uchar = Glob_Ctx->getitem(self->act_chunk_idx)->data[self->act_direct];
         auto collapse_node = self->act_node->get_sub(temp_uchar);
@@ -281,4 +286,21 @@ SuffixTree::s_ret SuffixTree::setitem(PiXiuStr * src) {
     this->cbt_chunk->used_num++;
     this->reset();
     return s_ret{this->cbt_chunk, idx};
+}
+
+void t_SuffixTree(void) {
+    SuffixTree st;
+    st.init_prop();
+
+    auto insert = [&](uint8_t src[]) {
+        int len;
+        for (len = 0; src[len] != '\0'; ++len);
+        auto pxs = PiXiuStr_init_key(src, len);
+        st.setitem(pxs);
+        PiXiuStr_free(pxs);
+    };
+    insert((uint8_t *) "MISSISSIPPI");
+    printf("%s", st.repr());
+
+    st.free_prop();
 }
