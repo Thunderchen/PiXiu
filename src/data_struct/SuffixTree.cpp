@@ -43,10 +43,6 @@ bool STNode::is_inner() {
     return !this->is_root() && this->subs.root != NULL;
 }
 
-bool STNode::is_leaf() {
-    return !this->is_root() && this->subs.root == NULL;
-}
-
 STNode * STNode_p_init(void) {
     assert(Glob_Pool != NULL);
     auto ret = (STNode *) Glob_Pool->p_malloc(sizeof(STNode));
@@ -175,7 +171,29 @@ static void s_overflow_fix(SuffixTree * self, uint16_t chunk_idx, uint16_t remai
 }
 
 static void s_split_grow(SuffixTree * self, uint16_t chunk_idx, STNode * collapse_node) {
+    if (collapse_node->to - collapse_node->from > 1 &&
+        collapse_node->from + self->act_offset != collapse_node->to) {
+        auto inherit_node = STNode_p_init();
+        inherit_node->chunk_idx = collapse_node->chunk_idx;
+        inherit_node->from = collapse_node->from + self->act_offset;
+        inherit_node->to = collapse_node->to;
+        inherit_node->successor = collapse_node->successor;
+        inherit_node->subs = collapse_node->subs;
 
+        // 原坍缩点成为 inner_node
+        collapse_node->to = inherit_node->from;
+        collapse_node->subs.root = NULL;
+        collapse_node->subs.size = 0;
+        collapse_node->set_sub(inherit_node);
+    }
+
+    // 新叶节点记录 uchar
+    auto leaf_node = STNode_p_init();
+    leaf_node->chunk_idx = chunk_idx;
+    leaf_node->from = self->counter;
+    leaf_node->to = Glob_Ctx->getitem(chunk_idx)->len;
+    collapse_node->set_sub(leaf_node);
+    self->remainder--;
 }
 
 static void s_insert_char(SuffixTree * self, uint16_t chunk_idx, uint8_t msg_char) {

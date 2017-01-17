@@ -23,8 +23,6 @@ struct STNode {
     bool is_root(void);
 
     bool is_inner(void);
-
-    bool is_leaf(void);
 };
 
 struct SuffixTree {
