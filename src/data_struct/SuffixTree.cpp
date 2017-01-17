@@ -137,19 +137,33 @@ PiXiuStr_init_stream((PXSMsg) { \
     .val=msg_char \
 })
 
-static void s_case_root(SuffixTree * self, int chunk_idx, uint8_t msg_char) {
+static void s_case_root(SuffixTree * self, uint16_t chunk_idx, uint8_t msg_char) {
+    auto collapse_node = self->root->get_sub(msg_char);
+    if (collapse_node == NULL) { // 无法坍缩, 新建叶结点
+        auto leaf_node = STNode_p_init();
+        leaf_node->chunk_idx = chunk_idx;
+        leaf_node->from = self->counter;
+        leaf_node->to = Glob_Ctx->getitem(chunk_idx)->len;
+        self->root->set_sub(leaf_node);
+        self->remainder--;
+        MSG_NO_COMPRESS;
+    } else { // 开始坍缩
+        self->act_chunk_idx = collapse_node->chunk_idx;
+        self->act_direct = collapse_node->from;
+        self->act_offset++;
+        MSG_COMPRESS(collapse_node->chunk_idx, collapse_node->from);
+    }
+}
+
+static void s_overflow_fix(SuffixTree * self, uint16_t chunk_idx, uint16_t remainder) {
 
 }
 
-static void s_overflow_fix(SuffixTree * self, int chunk_idx, int remainder) {
+static void s_split_grow(SuffixTree * self, uint16_t chunk_idx, STNode * collapse_node) {
 
 }
 
-static void s_split_grow(SuffixTree * self, int chunk_idx, STNode * collapse_node) {
-
-}
-
-static void s_insert_char(SuffixTree * self, int chunk_idx, uint8_t msg_char) {
+static void s_insert_char(SuffixTree * self, uint16_t chunk_idx, uint8_t msg_char) {
     self->remainder++;
     uint8_t temp_uchar;
 

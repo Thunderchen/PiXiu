@@ -29,8 +29,8 @@ struct STNode {
 
 struct SuffixTree {
     STNode * root;
-    int remainder;
-    int counter;
+    uint16_t remainder;
+    uint16_t counter;
 
     STNode * act_node;
     uint16_t act_chunk_idx;
