@@ -299,7 +299,6 @@ void t_SuffixTree(void) {
         for (len = 0; src[len] != '\0'; ++len);
         auto pxs = PiXiuStr_init_key(src, len);
         st.setitem(pxs);
-        PiXiuStr_free(pxs);
     };
     insert((uint8_t *) "MISSISSIPPI");
     printf("%s", st.repr());
