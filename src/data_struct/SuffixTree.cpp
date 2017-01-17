@@ -156,7 +156,22 @@ static void s_case_root(SuffixTree * self, uint16_t chunk_idx, uint8_t msg_char)
 }
 
 static void s_overflow_fix(SuffixTree * self, uint16_t chunk_idx, uint16_t remainder) {
+    auto temp_uchar = Glob_Ctx->getitem(self->act_chunk_idx)->data[self->act_direct];
+    auto collapse_node = self->act_node->get_sub(temp_uchar);
 
+    // counter - remainder + 1 = collapse_node.op
+    auto supply = collapse_node->to - collapse_node->from;
+    if (self->act_offset > supply) {
+        self->act_node = collapse_node;
+        remainder -= supply;
+        temp_uchar = Glob_Ctx->getitem(chunk_idx)->data[self->counter - remainder + 1];
+
+        auto next_collapse_node = collapse_node->get_sub(temp_uchar);
+        self->act_chunk_idx = next_collapse_node->chunk_idx;
+        self->act_direct = next_collapse_node->from;
+        self->act_offset -= supply;
+        return s_overflow_fix(self, chunk_idx, remainder);
+    }
 }
 
 static void s_split_grow(SuffixTree * self, uint16_t chunk_idx, STNode * collapse_node) {
