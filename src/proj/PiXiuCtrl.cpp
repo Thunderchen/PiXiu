@@ -44,7 +44,7 @@ int PiXiuCtrl::setitem(uint8_t * k, int k_len, uint8_t * v, int v_len) {
     return this->cbt.setitem(pxs, product.cbt_chunk, product.idx);
 }
 
-#define APPLY(name, action) \
+#define RETURN_APPLY(name, action) \
 assert(name ## _len + 2 <= UINT16_MAX); \
 auto pxs = PiXiuStr_init_key(name, name ## _len); \
 auto ret = action(pxs); \
@@ -52,22 +52,22 @@ PiXiuStr_free(pxs); \
 return ret;
 
 bool PiXiuCtrl::contains(uint8_t * k, int k_len) {
-    APPLY(k, this->cbt.contains);
+    RETURN_APPLY(k, this->cbt.contains);
 }
 
 PXSGen * PiXiuCtrl::getitem(uint8_t * k, int k_len) {
-    APPLY(k, this->cbt.getitem);
+    RETURN_APPLY(k, this->cbt.getitem);
 }
 
 CBTGen * PiXiuCtrl::iter(uint8_t * prefix, int prefix_len) {
-    APPLY(prefix, this->cbt.iter);
+    RETURN_APPLY(prefix, this->cbt.iter);
 }
 
 int PiXiuCtrl::delitem(uint8_t * k, int k_len) {
     if (Glob_Reinsert_Chunk != NULL && Glob_Reinsert_Chunk != this->st.cbt_chunk) {
         this->reinsert(Glob_Reinsert_Chunk);
     }
-    APPLY(k, this->cbt.delitem);
+    RETURN_APPLY(k, this->cbt.delitem);
 }
 
 void PiXiuCtrl::init_prop() {
@@ -83,21 +83,20 @@ void PiXiuCtrl::reinsert(PiXiuChunk *& cbt_chunk) {
     assert(cbt_chunk->used_num < 0.8 * PXC_STR_NUM);
     auto reserve = Glob_Reinsert_Chunk;
 
-    auto i = 0;
-    while (cbt_chunk->used_num != 0) {
-        assert(i <= UINT16_MAX);
-        if (!cbt_chunk->is_delitem(i)) {
+    for (int i = 0; i < PXC_STR_NUM && cbt_chunk->used_num > 0; ++i) {
+        if (cbt_chunk->is_delitem(i)) {
+            PiXiuStr_free(cbt_chunk->getitem(i));
+        } else {
             auto pxs = cbt_chunk->getitem(i);
             this->delitem(pxs->data, pxs->len);
             Glob_Reinsert_Chunk = NULL;
 
             auto product = this->st.setitem(pxs);
             this->cbt.setitem(pxs, product.cbt_chunk, product.idx);
-            Glob_Reinsert_Chunk = NULL;
-        } else {
-            PiXiuStr_free(cbt_chunk->getitem(i));
+            assert(Glob_Reinsert_Chunk = NULL);
         }
     }
+    assert(cbt_chunk->used_num == 0);
     free(cbt_chunk);
 
     Glob_Reinsert_Chunk = reserve;
