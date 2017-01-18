@@ -339,5 +339,54 @@ void t_SuffixTree(void) {
     insert((uint8_t *) "MISSIONARY");
     assert(!strcmp(st.repr(), expect));
 
+    expect = (char *) "#\n"
+            "--ARY\n"
+            "--B\n"
+            "  --BI\n"
+            "  --I\n"
+            "--I\n"
+            "  --BBI\n"
+            "  --ONARY\n"
+            "  --PPI\n"
+            "  --SSI\n"
+            "    --BBI\n"
+            "    --ONARY\n"
+            "    --PPI\n"
+            "    --SSI\n"
+            "      --BBI\n"
+            "      --PPI\n"
+            "--M\n"
+            "  --ISSI\n"
+            "    --ONARY\n"
+            "    --SSI\n"
+            "      --BBI\n"
+            "      --PPI\n"
+            "  --MMMMMMMMMM\n"
+            "--NARY\n"
+            "--ONARY\n"
+            "--P\n"
+            "  --I\n"
+            "  --PI\n"
+            "--RY\n"
+            "--S\n"
+            "  --I\n"
+            "    --BBI\n"
+            "    --ONARY\n"
+            "    --PPI\n"
+            "    --SSI\n"
+            "      --BBI\n"
+            "      --PPI\n"
+            "  --SI\n"
+            "    --BBI\n"
+            "    --ONARY\n"
+            "    --PPI\n"
+            "    --SSI\n"
+            "      --BBI\n"
+            "      --PPI\n"
+            "--Y\n";
+    insert((uint8_t *) "MISSISSIBBI");
+    insert((uint8_t *) "MMMMMMMMMMM");
+    assert(!strcmp(st.repr(), expect));
+
     st.free_prop();
 }
