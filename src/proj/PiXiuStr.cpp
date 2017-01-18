@@ -150,7 +150,6 @@ PXSGen * PiXiuStr::parse(int from, int to, PiXiuChunk * ctx) {
 }
 
 void PiXiuChunk::delitem(int idx) {
-    // todo: recycle event
     auto adr = this->strs[idx];
     assert(adr != NULL && !adr_is_spec(adr));
     this->strs[idx] = adr_mk_spec(adr);
