@@ -14,7 +14,7 @@ int PiXiuCtrl::setitem(uint8_t * k, int k_len, uint8_t * v, int v_len) {
         }
     }
     if (repeat_counter + k_len + v_len + 2 > UINT16_MAX) {
-        return PXC_OVERFLOW;
+        return PX_CTRL_OVERFLOW;
     }
 
     auto pxs_k = PiXiuStr_init_key(k, k_len);
@@ -28,7 +28,13 @@ int PiXiuCtrl::setitem(uint8_t * k, int k_len, uint8_t * v, int v_len) {
 }
 
 bool PiXiuCtrl::contains(uint8_t * k, int k_len) {
-
+    if (k_len + 2 > UINT16_MAX) {
+        return PX_CTRL_OVERFLOW;
+    }
+    auto pxs = PiXiuStr_init_key(k, k_len);
+    auto ret = this->cbt.contains(pxs);
+    PiXiuStr_free(pxs);
+    return ret;
 }
 
 PXSGen * PiXiuCtrl::getitem(uint8_t * k, int k_len) {
