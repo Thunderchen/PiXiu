@@ -293,15 +293,46 @@ SuffixTree::s_ret SuffixTree::setitem(PiXiuStr * src) {
 void t_SuffixTree(void) {
     SuffixTree st;
     st.init_prop();
+    char * expect;
 
     auto insert = [&](uint8_t src[]) {
         int len;
         for (len = 0; src[len] != '\0'; ++len);
-        auto pxs = PiXiuStr_init_key(src, len);
+        auto pxs = PiXiuStr_init(src, len);
         st.setitem(pxs);
     };
+
+    expect = (char *) "#\n"
+            "--ARY\n"
+            "--I\n"
+            "  --ONARY\n"
+            "  --PPI\n"
+            "  --SSI\n"
+            "    --ONARY\n"
+            "    --PPI\n"
+            "    --SSIPPI\n"
+            "--MISSI\n"
+            "  --ONARY\n"
+            "  --SSIPPI\n"
+            "--NARY\n"
+            "--ONARY\n"
+            "--P\n"
+            "  --I\n"
+            "  --PI\n"
+            "--RY\n"
+            "--S\n"
+            "  --I\n"
+            "    --ONARY\n"
+            "    --PPI\n"
+            "    --SSIPPI\n"
+            "  --SI\n"
+            "    --ONARY\n"
+            "    --PPI\n"
+            "    --SSIPPI\n"
+            "--Y\n";
     insert((uint8_t *) "MISSISSIPPI");
-    printf("%s", st.repr());
+    insert((uint8_t *) "MISSIONARY");
+    assert(!strcmp(st.repr(), expect));
 
     st.free_prop();
 }
