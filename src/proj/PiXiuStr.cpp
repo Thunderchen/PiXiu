@@ -1,6 +1,8 @@
 #include "../common/List.h"
 #include "PiXiuStr.h"
 
+PiXiuChunk * Glob_Reinsert_Chunk = NULL;
+
 static PiXiuStr * escape_unique(uint8_t[], int, bool);
 
 PiXiuStr * PiXiuStr_init(uint8_t src[], int src_len) {
@@ -153,6 +155,10 @@ void PiXiuChunk::delitem(int idx) {
     auto adr = this->strs[idx];
     assert(adr != NULL && !adr_is_spec(adr));
     this->strs[idx] = adr_mk_spec(adr);
+
+    if (this->used_num < 0.8 * PXC_STR_NUM) {
+        Glob_Reinsert_Chunk = this;
+    }
 }
 
 bool PiXiuChunk::is_delitem(int idx) {
