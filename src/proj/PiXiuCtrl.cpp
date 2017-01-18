@@ -26,24 +26,23 @@ int PiXiuCtrl::setitem(uint8_t * k, int k_len, uint8_t * v, int v_len) {
     return this->cbt.setitem(pxs, product.cbt_chunk, product.idx);
 }
 
+#define WRAPPER(name, action) \
+assert(name ## _len + 2 <= UINT16_MAX); \
+auto pxs = PiXiuStr_init_key(name, name ## _len); \
+auto ret = action(pxs); \
+PiXiuStr_free(pxs); \
+return ret;
+
 bool PiXiuCtrl::contains(uint8_t * k, int k_len) {
-    assert(k_len + 2 <= UINT16_MAX);
-    auto pxs = PiXiuStr_init_key(k, k_len);
-    auto ret = this->cbt.contains(pxs);
-    PiXiuStr_free(pxs);
-    return ret;
+    WRAPPER(k, this->cbt.contains);
 }
 
 PXSGen * PiXiuCtrl::getitem(uint8_t * k, int k_len) {
-    assert(k_len + 2 <= UINT16_MAX);
-    auto pxs = PiXiuStr_init_key(k, k_len);
-    auto ret = this->cbt.getitem(pxs);
-    PiXiuStr_free(pxs);
-    return ret;
+    WRAPPER(k, this->cbt.getitem);
 }
 
 CBTGen * PiXiuCtrl::iter(uint8_t * prefix, int prefix_len) {
-
+    WRAPPER(prefix, this->cbt.iter);
 }
 
 int PiXiuCtrl::delitem(uint8_t * k, int k_len) {
