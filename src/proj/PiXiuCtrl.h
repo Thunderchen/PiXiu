@@ -19,6 +19,8 @@ struct PiXiuCtrl {
     int delitem(uint8_t *, int);
 
     void free_prop(void);
+
+    void reinsert(PiXiuChunk *);
 };
 
 #endif
