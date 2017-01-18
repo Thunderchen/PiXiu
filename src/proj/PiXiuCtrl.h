@@ -22,7 +22,7 @@ struct PiXiuCtrl {
 
     void free_prop(void);
 
-    void reinsert(PiXiuChunk *);
+    void reinsert(PiXiuChunk *&);
 };
 
 #endif
