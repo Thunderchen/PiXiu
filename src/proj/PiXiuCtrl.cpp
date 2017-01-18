@@ -71,13 +71,35 @@ int PiXiuCtrl::delitem(uint8_t * k, int k_len) {
 }
 
 void PiXiuCtrl::init_prop() {
-
+    this->st.init_prop();
 }
 
 void PiXiuCtrl::free_prop() {
-
+    this->st.free_prop();
+    this->cbt.free_prop();
 }
 
-void PiXiuCtrl::reinsert(PiXiuChunk *&) {
+void PiXiuCtrl::reinsert(PiXiuChunk *& cbt_chunk) {
+    assert(cbt_chunk->used_num < 0.8 * PXC_STR_NUM);
+    auto reserve = Glob_Reinsert_Chunk;
 
+    auto i = 0;
+    while (cbt_chunk->used_num != 0) {
+        assert(i <= UINT16_MAX);
+        if (!cbt_chunk->is_delitem(i)) {
+            auto pxs = cbt_chunk->getitem(i);
+            this->delitem(pxs->data, pxs->len);
+            Glob_Reinsert_Chunk = NULL;
+
+            auto product = this->st.setitem(pxs);
+            this->cbt.setitem(pxs, product.cbt_chunk, product.idx);
+            Glob_Reinsert_Chunk = NULL;
+        } else {
+            PiXiuStr_free(cbt_chunk->getitem(i));
+        }
+    }
+    free(cbt_chunk);
+
+    Glob_Reinsert_Chunk = reserve;
+    cbt_chunk = NULL;
 }
