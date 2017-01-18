@@ -390,5 +390,14 @@ void t_SuffixTree(void) {
     assert(st.cbt_chunk->getitem(2)->len == 9);
     assert(st.cbt_chunk->getitem(3)->len == 8);
 
+    uint8_t temp[259];
+    for (int i = 0; i < lenOf(temp) - 1; ++i) {
+        temp[i] = 'A';
+    }
+    temp[lenOf(temp) - 1] = '\0';
+
+    insert(temp);
+    assert(st.cbt_chunk->getitem(4)->len == 10);
+
     st.free_prop();
 }
