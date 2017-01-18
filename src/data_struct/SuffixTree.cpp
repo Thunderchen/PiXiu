@@ -387,6 +387,8 @@ void t_SuffixTree(void) {
     insert((uint8_t *) "MISSISSIBBI");
     insert((uint8_t *) "MMMMMMMMMMM");
     assert(!strcmp(st.repr(), expect));
+    assert(st.cbt_chunk->getitem(2)->len == 9);
+    assert(st.cbt_chunk->getitem(3)->len == 8);
 
     st.free_prop();
 }
