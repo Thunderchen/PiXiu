@@ -249,7 +249,7 @@ static void s_insert_char(SuffixTree * self, uint16_t chunk_idx, uint8_t msg_cha
                         auto next_collapse_node = self->act_node->get_sub(temp_uchar);
                         collapse_node->successor = next_collapse_node;
                         collapse_node = next_collapse_node;
-                    } else { // 后缀已用完, 回到 case root
+                    } else { // 后缀已用完, 回到 case_root
                         collapse_node->successor = self->root;
                         s_case_root(self, chunk_idx, msg_char, false);
                         break;

@@ -15,7 +15,7 @@ struct MemPool {
     Pool * curr_pool = NULL;
     int used_num;
 
-    void * p_malloc(int size);
+    void * p_malloc(int);
 
     void free_prop(void);
 };
