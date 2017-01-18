@@ -140,7 +140,7 @@ PiXiuStr_init_stream((PXSMsg) { \
     .val=msg_char \
 })
 
-static void s_case_root(SuffixTree * self, uint16_t chunk_idx, uint8_t msg_char) {
+static void s_case_root(SuffixTree * self, uint16_t chunk_idx, uint8_t msg_char, bool send_msg = true) {
     auto collapse_node = self->root->get_sub(msg_char);
     if (collapse_node == NULL) { // 无法坍缩, 新建叶结点
         auto leaf_node = STNode_p_init();
@@ -149,12 +149,12 @@ static void s_case_root(SuffixTree * self, uint16_t chunk_idx, uint8_t msg_char)
         leaf_node->to = Glob_Ctx->getitem(chunk_idx)->len;
         self->root->set_sub(leaf_node);
         self->remainder--;
-        MSG_NO_COMPRESS;
+        if (send_msg) { MSG_NO_COMPRESS; }
     } else { // 开始坍缩
         self->act_chunk_idx = collapse_node->chunk_idx;
         self->act_direct = collapse_node->from;
         self->act_offset++;
-        MSG_COMPRESS(collapse_node->chunk_idx, collapse_node->from);
+        if (send_msg) { MSG_COMPRESS(collapse_node->chunk_idx, collapse_node->from); }
     }
 }
 
@@ -251,7 +251,7 @@ static void s_insert_char(SuffixTree * self, uint16_t chunk_idx, uint8_t msg_cha
                         collapse_node = next_collapse_node;
                     } else { // 后缀已用完, 回到 case root
                         collapse_node->successor = self->root;
-                        s_case_root(self, chunk_idx, msg_char);
+                        s_case_root(self, chunk_idx, msg_char, false);
                         break;
                     }
                 } else { // 需要使用 suffix link
@@ -300,6 +300,11 @@ void t_SuffixTree(void) {
         for (len = 0; src[len] != '\0'; ++len);
         auto pxs = PiXiuStr_init(src, len);
         st.setitem(pxs);
+        assert(!strcmp((char *) src,
+                       st.cbt_chunk
+                               ->getitem(st.cbt_chunk->used_num - 1)
+                               ->parse(0, PXSG_MAX_TO, st.cbt_chunk)
+                               ->consume_repr()));
     };
 
     expect = (char *) "#\n"
