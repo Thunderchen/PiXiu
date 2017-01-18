@@ -4,8 +4,6 @@
 #include "../data_struct/CritBitTree.h"
 #include "../data_struct/SuffixTree.h"
 
-#define PX_CTRL_OVERFLOW -1
-
 struct PiXiuCtrl {
     CritBitTree cbt;
     SuffixTree st;

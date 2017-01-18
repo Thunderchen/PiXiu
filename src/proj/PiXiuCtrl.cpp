@@ -1,21 +1,20 @@
 #include "PiXiuCtrl.h"
 
 int PiXiuCtrl::setitem(uint8_t * k, int k_len, uint8_t * v, int v_len) {
-    auto repeat_counter = 0;
-
+#ifndef NDEBUG
+    auto counter = 0;
     for (int i = 0; i < k_len; ++i) {
         if (k[i] == PXS_UNIQUE) {
-            repeat_counter++;
+            counter++;
         }
     }
     for (int i = 0; i < v_len; ++i) {
         if (v[i] == PXS_UNIQUE) {
-            repeat_counter++;
+            counter++;
         }
     }
-    if (repeat_counter + k_len + v_len + 2 > UINT16_MAX) {
-        return PX_CTRL_OVERFLOW;
-    }
+    assert(counter + k_len + v_len + 2 <= UINT16_MAX);
+#endif
 
     auto pxs_k = PiXiuStr_init_key(k, k_len);
     auto pxs_v = PiXiuStr_init(v, v_len);
@@ -28,9 +27,7 @@ int PiXiuCtrl::setitem(uint8_t * k, int k_len, uint8_t * v, int v_len) {
 }
 
 bool PiXiuCtrl::contains(uint8_t * k, int k_len) {
-    if (k_len + 2 > UINT16_MAX) {
-        return PX_CTRL_OVERFLOW;
-    }
+    assert(k_len + 2 <= UINT8_MAX);
     auto pxs = PiXiuStr_init_key(k, k_len);
     auto ret = this->cbt.contains(pxs);
     PiXiuStr_free(pxs);
