@@ -27,7 +27,7 @@ int PiXiuCtrl::setitem(uint8_t * k, int k_len, uint8_t * v, int v_len) {
 }
 
 bool PiXiuCtrl::contains(uint8_t * k, int k_len) {
-    assert(k_len + 2 <= UINT8_MAX);
+    assert(k_len + 2 <= UINT16_MAX);
     auto pxs = PiXiuStr_init_key(k, k_len);
     auto ret = this->cbt.contains(pxs);
     PiXiuStr_free(pxs);
@@ -35,7 +35,11 @@ bool PiXiuCtrl::contains(uint8_t * k, int k_len) {
 }
 
 PXSGen * PiXiuCtrl::getitem(uint8_t * k, int k_len) {
-
+    assert(k_len + 2 <= UINT16_MAX);
+    auto pxs = PiXiuStr_init_key(k, k_len);
+    auto ret = this->cbt.getitem(pxs);
+    PiXiuStr_free(pxs);
+    return ret;
 }
 
 CBTGen * PiXiuCtrl::iter(uint8_t * prefix, int prefix_len) {
