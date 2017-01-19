@@ -72,7 +72,7 @@ void SuffixTree::init_prop() {
     this->act_node = this->root;
     this->act_chunk_idx = this->act_direct = this->act_offset = 0;
 
-    this->cbt_chunk = (PiXiuChunk *) this->local_pool.p_malloc(sizeof(PiXiuChunk));
+    this->cbt_chunk = (PiXiuChunk *) malloc(sizeof(PiXiuChunk));
     this->cbt_chunk->used_num = 0;
 }
 
