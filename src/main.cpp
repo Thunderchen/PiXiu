@@ -20,6 +20,8 @@ void t_ScapegoatTree(void);
 
 void t_SuffixTree(void);
 
+void t_PiXiuCtrl(void);
+
 int main() {
 #ifndef NDEBUG
     t_CritBitTree();
@@ -30,6 +32,7 @@ int main() {
     t_Que();
     t_ScapegoatTree();
     t_SuffixTree();
+    t_PiXiuCtrl();
 
     printf("\nt_OK\n");
 #endif

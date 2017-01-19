@@ -5,8 +5,8 @@
 #include "../data_struct/SuffixTree.h"
 
 struct PiXiuCtrl {
-    SuffixTree st;
     CritBitTree cbt;
+    SuffixTree st;
 
     int setitem(uint8_t *, int, uint8_t *, int);
 

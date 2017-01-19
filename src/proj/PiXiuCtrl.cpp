@@ -44,7 +44,7 @@ int PiXiuCtrl::setitem(uint8_t * k, int k_len, uint8_t * v, int v_len) {
     return this->cbt.setitem(pxs, product.cbt_chunk, product.idx);
 }
 
-#define RETURN_KEY_APPLY(action) \
+#define RETURN_APPLY(action) \
 assert(k ## _len + 2 <= UINT16_MAX); \
 auto pxs = PiXiuStr_init_key(k, k ## _len); \
 auto ret = action(pxs); \
@@ -52,18 +52,18 @@ PiXiuStr_free(pxs); \
 return ret;
 
 bool PiXiuCtrl::contains(uint8_t * k, int k_len) {
-    RETURN_KEY_APPLY(this->cbt.contains);
+    RETURN_APPLY(this->cbt.contains);
 }
 
 PXSGen * PiXiuCtrl::getitem(uint8_t * k, int k_len) {
-    RETURN_KEY_APPLY(this->cbt.getitem);
+    RETURN_APPLY(this->cbt.getitem);
 }
 
 int PiXiuCtrl::delitem(uint8_t * k, int k_len) {
     if (Glob_Reinsert_Chunk != NULL && Glob_Reinsert_Chunk != this->st.cbt_chunk) {
         this->reinsert(Glob_Reinsert_Chunk);
     }
-    RETURN_KEY_APPLY(this->cbt.delitem);
+    RETURN_APPLY(this->cbt.delitem);
 }
 
 CBTGen * PiXiuCtrl::iter(uint8_t * prefix, int prefix_len) {
@@ -105,4 +105,8 @@ void PiXiuCtrl::reinsert(PiXiuChunk *& cbt_chunk) {
 
     Glob_Reinsert_Chunk = reserve;
     cbt_chunk = NULL;
+}
+
+void t_PiXiuCtrl(void) {
+
 }
