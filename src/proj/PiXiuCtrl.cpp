@@ -93,7 +93,7 @@ void PiXiuCtrl::reinsert(PiXiuChunk *& cbt_chunk) {
             PiXiuStr_free(cbt_chunk->getitem(i));
         } else {
             auto pxs = cbt_chunk->getitem(i);
-            this->delitem(pxs->data, pxs->len);
+            this->cbt.delitem(pxs);
             Glob_Reinsert_Chunk = NULL;
 
             auto product = this->st.setitem(pxs);
@@ -107,6 +107,39 @@ void PiXiuCtrl::reinsert(PiXiuChunk *& cbt_chunk) {
     cbt_chunk = NULL;
 }
 
-void t_PiXiuCtrl(void) {
+#define rand_range(max) ((int) ((double) rand() / (double) RAND_MAX * (double) (max)))
 
+void t_PiXiuCtrl(void) {
+    Glob_Reinsert_Chunk = NULL;
+
+    srand(19950207);
+    List_init(PiXiuStr *, key_keep);
+    List_init(PiXiuStr *, value_keep);
+    PiXiuCtrl ctrl;
+    ctrl.init_prop();
+
+    uint8_t alphabet[] = {'A', 'B', 'C', 'D', 'E', PXS_UNIQUE, 0, 1};
+    uint8_t key[100];
+    uint8_t value[500];
+
+    auto gen_rand = [&](uint8_t * des, int max_len) -> int {
+        auto rand_len = rand_range(max_len - 1) + 1;
+        for (int i = 0; i < rand_len; ++i) {
+            des[i] = alphabet[(rand_range(lenOf(alphabet) - 1))];
+        }
+        return rand_len;
+    };
+
+    // 随机写入
+    for (int i = 0; i < PXC_STR_NUM * 2; ++i) {
+        auto k_len = gen_rand(key, lenOf(key));
+        auto v_len = gen_rand(value, lenOf(value));
+        List_append(PiXiuStr *, key_keep, PiXiuStr_init_key(key, k_len));
+        List_append(PiXiuStr *, value_keep, PiXiuStr_init(value, v_len));
+        ctrl.setitem(key, k_len, value, v_len);
+    }
+
+    List_free(key_keep);
+    List_free(value_keep);
+    ctrl.free_prop();
 }
