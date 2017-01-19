@@ -87,7 +87,8 @@ void PiXiuCtrl::reinsert(PiXiuChunk *& cbt_chunk) {
     assert(cbt_chunk->used_num < 0.8 * PXC_STR_NUM);
     auto reserve = Glob_Reinsert_Chunk;
 
-    for (int i = 0; i < PXC_STR_NUM && cbt_chunk->used_num > 0; ++i) {
+    for (int i = 0; cbt_chunk->used_num > 0; ++i) {
+        assert(i <= PXC_STR_NUM - 1);
         if (cbt_chunk->is_delitem(i)) {
             PiXiuStr_free(cbt_chunk->getitem(i));
         } else {
@@ -97,10 +98,9 @@ void PiXiuCtrl::reinsert(PiXiuChunk *& cbt_chunk) {
 
             auto product = this->st.setitem(pxs);
             this->cbt.setitem(pxs, product.cbt_chunk, product.idx);
-            assert(Glob_Reinsert_Chunk = NULL);
+            assert(Glob_Reinsert_Chunk == NULL);
         }
     }
-    assert(cbt_chunk->used_num == 0);
     free(cbt_chunk);
 
     Glob_Reinsert_Chunk = reserve;
