@@ -240,8 +240,9 @@ static void s_insert_char(SuffixTree * self, uint16_t chunk_idx, uint8_t msg_cha
             explode: // 炸开累积后缀
             MSG_NO_COMPRESS;
             while (self->remainder > 0) {
+                s_split_grow(self, chunk_idx, collapse_node);
+
                 if (!self->act_node->is_inner()) {
-                    s_split_grow(self, chunk_idx, collapse_node);
                     // 状态转移
                     self->act_offset--;
                     self->act_direct++;
@@ -258,7 +259,6 @@ static void s_insert_char(SuffixTree * self, uint16_t chunk_idx, uint8_t msg_cha
                         break;
                     }
                 } else { // 需要使用 suffix link
-                    s_split_grow(self, chunk_idx, collapse_node);
                     self->act_node = self->act_node->successor;
                     s_overflow_fix(self, chunk_idx, self->remainder);
 
@@ -440,4 +440,7 @@ void t_SuffixTree(void) {
     insert((uint8_t *) "CDDDBDDADCCDB");
     assert(!strcmp(st.repr(), expect));
     st.free_prop();
+
+    st.init_prop();
+    insert((uint8_t *) "DACBCBDDDADBADADBD");
 }
