@@ -407,6 +407,26 @@ void t_SuffixTree(void) {
 
     insert(temp);
     assert(st.cbt_chunk->getitem(4)->len == 10);
+    st.free_prop();
 
+    st.init_prop();
+    expect = (char *) "#\n"
+            "--ADCCDB\n"
+            "--BDDADCCDB\n"
+            "--C\n"
+            "  --CDB\n"
+            "  --D\n"
+            "    --B\n"
+            "    --DDBDDADCCDB\n"
+            "--D\n"
+            "  --ADCCDB\n"
+            "  --BDDADCCDB\n"
+            "  --CCDB\n"
+            "  --D\n"
+            "    --ADCCDB\n"
+            "    --BDDADCCDB\n"
+            "    --DBDDADCCDB\n";
+    insert((uint8_t *) "CDDDBDDADCCDB");
+    assert(!strcmp(st.repr(), expect));
     st.free_prop();
 }
