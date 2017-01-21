@@ -267,11 +267,22 @@ static void s_insert_char(SuffixTree * self, uint16_t chunk_idx, uint8_t msg_cha
                     collapse_node->successor = next_collapse_node;
                     collapse_node = next_collapse_node;
                 }
-                temp_uchar = Glob_Ctx
-                        ->getitem(collapse_node->chunk_idx)
-                        ->data[collapse_node->from + self->act_offset];
-                if (temp_uchar == msg_char) {
-                    break;
+
+                if (collapse_node->from + self->act_offset == collapse_node->to) {
+                    auto next_collapse_node = collapse_node->get_sub(msg_char);
+                    if (next_collapse_node != NULL) {
+                        self->act_node = collapse_node;
+                        self->act_chunk_idx = next_collapse_node->chunk_idx;
+                        self->act_direct = next_collapse_node->from;
+                        self->act_offset = 1;
+                        break;
+                    }
+                } else {
+                    assert(collapse_node->from + self->act_offset < collapse_node->to);
+                    if (Glob_Ctx->getitem(collapse_node->chunk_idx)
+                                ->data[collapse_node->from + self->act_offset] == msg_char) {
+                        break;
+                    }
                 }
             }
         }
