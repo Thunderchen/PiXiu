@@ -165,17 +165,15 @@ static void s_overflow_fix(SuffixTree * self, uint16_t chunk_idx, uint16_t remai
     auto temp_uchar = Glob_Ctx->getitem(self->act_chunk_idx)->data[self->act_direct];
     auto collapse_node = self->act_node->get_sub(temp_uchar);
 
-    // counter - remainder + 1 = collapse_node.op
     auto supply = collapse_node->to - collapse_node->from;
     if (self->act_offset > supply) {
         self->act_node = collapse_node;
-        remainder -= supply;
-        temp_uchar = Glob_Ctx->getitem(chunk_idx)->data[self->counter - remainder + 1];
+        self->act_offset -= supply;
+        temp_uchar = Glob_Ctx->getitem(chunk_idx)->data[self->counter - self->act_offset];
 
         auto next_collapse_node = collapse_node->get_sub(temp_uchar);
         self->act_chunk_idx = next_collapse_node->chunk_idx;
         self->act_direct = next_collapse_node->from;
-        self->act_offset -= supply;
         return s_overflow_fix(self, chunk_idx, remainder);
     }
 }
@@ -248,7 +246,7 @@ static void s_insert_char(SuffixTree * self, uint16_t chunk_idx, uint8_t msg_cha
                     self->act_direct++;
 
                     if (self->act_offset > 0) {
-                        s_overflow_fix(self, chunk_idx, self->remainder);
+                        s_overflow_fix(self, chunk_idx, self->remainder - (uint16_t) 1);
                         temp_uchar = Glob_Ctx->getitem(self->act_chunk_idx)->data[self->act_direct];
                         auto next_collapse_node = self->act_node->get_sub(temp_uchar);
                         collapse_node->successor = next_collapse_node;
@@ -260,7 +258,7 @@ static void s_insert_char(SuffixTree * self, uint16_t chunk_idx, uint8_t msg_cha
                     }
                 } else { // 需要使用 suffix link
                     self->act_node = self->act_node->successor;
-                    s_overflow_fix(self, chunk_idx, self->remainder);
+                    s_overflow_fix(self, chunk_idx, self->remainder - (uint16_t) 1);
 
                     temp_uchar = Glob_Ctx->getitem(self->act_chunk_idx)->data[self->act_direct];
                     auto next_collapse_node = self->act_node->get_sub(temp_uchar);
@@ -442,5 +440,34 @@ void t_SuffixTree(void) {
     st.free_prop();
 
     st.init_prop();
+    expect = (char *) "#\n"
+            "--A\n"
+            "  --CBCBDDDADBADADBD\n"
+            "  --D\n"
+            "    --ADBD\n"
+            "    --B\n"
+            "      --ADADBD\n"
+            "      --D\n"
+            "--B\n"
+            "  --ADADBD\n"
+            "  --CBDDDADBADADBD\n"
+            "  --DDDADBADADBD\n"
+            "--CB\n"
+            "  --CBDDDADBADADBD\n"
+            "  --DDDADBADADBD\n"
+            "--D\n"
+            "  --A\n"
+            "    --CBCBDDDADBADADBD\n"
+            "    --DB\n"
+            "      --ADADBD\n"
+            "      --D\n"
+            "  --B\n"
+            "    --ADADBD\n"
+            "    --D\n"
+            "  --D\n"
+            "    --ADBADADBD\n"
+            "    --DADBADADBD\n";
     insert((uint8_t *) "DACBCBDDDADBADADBD");
+    assert(!strcmp(st.repr(), expect));
+    st.free_prop();
 }
