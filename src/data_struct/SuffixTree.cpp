@@ -95,6 +95,9 @@ char * SuffixTree::repr() {
 
     std::function<void(STNode *)> print_node = [&](STNode * node) {
         auto pxs = this->local_chunk.getitem(node->chunk_idx);
+        if (node == this->act_node) {
+            List_append(char, output, '*';)
+        }
         for (int i = node->from; i < node->to; ++i) {
             if (char_visible(pxs->data[i])) {
                 List_append(char, output, pxs->data[i]);
@@ -263,6 +266,12 @@ static void s_insert_char(SuffixTree * self, uint16_t chunk_idx, uint8_t msg_cha
                     auto next_collapse_node = self->act_node->get_sub(temp_uchar);
                     collapse_node->successor = next_collapse_node;
                     collapse_node = next_collapse_node;
+                }
+                temp_uchar = Glob_Ctx
+                        ->getitem(collapse_node->chunk_idx)
+                        ->data[collapse_node->from + self->act_offset];
+                if (temp_uchar == msg_char) {
+                    break;
                 }
             }
         }
