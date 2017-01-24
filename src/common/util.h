@@ -2,9 +2,13 @@
 #define PX_UTIL_H
 
 #include <stdint.h>
+#include <stdio.h>
+
+#define PRINT_FUNC \
+printf(__FUNCTION__); \
+printf("\n");
 
 #define lenOf(arr) (sizeof(arr) / sizeof(arr[0]))
-
 #define char_visible(c) (33 <= (c) && (c) <= 126)
 
 #define adr_is_spec(p) ((bool) (((intptr_t) p) & 1))

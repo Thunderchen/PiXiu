@@ -3,6 +3,7 @@
 #include "common/Que.h"
 #include "data_struct/CritBitTree.h"
 #include "data_struct/ScapegoatTree.h"
+#include <vector>
 
 void t_CritBitTree(void);
 
@@ -28,7 +29,7 @@ int main() {
     t_gen();
     t_List();
     t_MemPool();
-    t_PiXiuCtrl();
+//    t_PiXiuCtrl();
     t_PiXiuStr();
     t_Que();
     t_ScapegoatTree();
@@ -40,22 +41,22 @@ int main() {
 }
 
 void t_ScapegoatTree(void) {
-    struct cmp_int {
+    struct int_cmp {
         int val;
 
-        bool operator<(cmp_int * another) {
+        bool operator<(int_cmp * another) {
             return val < another->val;
         }
 
-        bool operator==(cmp_int * another) {
+        bool operator==(int_cmp * another) {
             return val == another->val;
         }
     };
 
     MemPool pool;
-    ScapegoatTree<cmp_int> sgt;
+    ScapegoatTree<int_cmp> sgt;
     for (int i = 0; i < 100; ++i) {
-        auto obj = (cmp_int *) pool.p_malloc(sizeof(cmp_int));
+        auto obj = (int_cmp *) pool.p_malloc(sizeof(int_cmp));
         obj->val = i;
         assert(sgt.getitem(obj) == NULL);
         sgt.setitem(obj, adrOf(pool));
@@ -103,41 +104,26 @@ void t_gen(void) {
 }
 
 void t_List(void) {
-    int * expect;
-    List_init(int, list);
+    List_init(int, test_list);
+    std::vector<int> ctrl_list;
 
-    List_append(int, list, 3);
-    List_append(int, list, 2);
-    List_append(int, list, 1);
-    expect = (int[]) {3, 2, 1};
-    for (int i = 0; i < list_len; ++i) {
-        assert(list[i] == expect[i]);
+    for (int i = 0; i < 100; ++i) {
+        List_append(int, test_list, i);
+        ctrl_list.push_back(i);
+
+        auto idx = rand() % (ctrl_list.size() + 1);
+        List_insert(int, test_list, idx, i);
+        ctrl_list.insert(ctrl_list.begin() + idx, i);
+
+        idx = rand() % ctrl_list.size();
+        List_del(int, test_list, idx);
+        ctrl_list.erase(ctrl_list.begin() + idx);
     }
-    assert(list_len == 3 && list_capacity == 3);
 
-    List_del(int, list, 1);
-    assert(list[0] == 3 && list[1] == 1);
-    List_del(int, list, 1);
-    assert(list[0] == 3);
-    List_del(int, list, 0);
-    assert(list_len == 0);
-
-    List_insert(int, list, 0, 0);
-    List_insert(int, list, 0, 1);
-    List_insert(int, list, 1, 2);
-    expect = (int[]) {1, 2, 0};
-    for (int i = 0; i < list_len; ++i) {
-        assert(list[i] == expect[i]);
+    assert(test_list_len == ctrl_list.size());
+    for (int i = 0; i < ctrl_list.size(); ++i) {
+        assert(test_list[i] == ctrl_list[i]);
     }
-    assert(list_len == 3);
-
-    List_insert(int, list, 3, 3);
-    List_insert(int, list, 3, 4);
-    expect = (int[]) {1, 2, 0, 4, 3};
-    for (int i = 0; i < list_len; ++i) {
-        assert(list[i] == expect[i]);
-    }
-    assert(list_len == 5 && list_capacity == 6);
-
-    List_free(list);
+    List_free(test_list);
+    PRINT_FUNC;
 }
