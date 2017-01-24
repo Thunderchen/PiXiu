@@ -363,7 +363,7 @@ void t_CritBitTree(void) {
         }
         PXSGen_free(pxs_gen);
     }
-    assert(i!=0);
+    assert(i != 0);
     CBTGen_free(cbt_gen);
     PiXiuStr_free(prefix);
 

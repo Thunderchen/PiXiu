@@ -12,6 +12,8 @@ void t_List(void);
 
 void t_MemPool(void);
 
+void t_PiXiuCtrl(void);
+
 void t_PiXiuStr(void);
 
 void t_Que(void);
@@ -20,19 +22,17 @@ void t_ScapegoatTree(void);
 
 void t_SuffixTree(void);
 
-void t_PiXiuCtrl(void);
-
 int main() {
 #ifndef NDEBUG
     t_CritBitTree();
     t_gen();
     t_List();
     t_MemPool();
+    t_PiXiuCtrl();
     t_PiXiuStr();
     t_Que();
     t_ScapegoatTree();
     t_SuffixTree();
-    t_PiXiuCtrl();
 
     printf("\nt_OK\n");
 #endif
@@ -83,7 +83,6 @@ void t_Que(void) {
 $gen(range0_10) {
     // var
     int i;
-    // constructor
 
     // body
     $emit(int)
