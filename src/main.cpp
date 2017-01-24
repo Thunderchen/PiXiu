@@ -34,8 +34,6 @@ int main() {
     t_Que();
     t_ScapegoatTree();
     t_SuffixTree();
-
-    printf("\nt_OK\n");
 #endif
     return 0;
 }
@@ -124,6 +122,7 @@ void t_List(void) {
     for (int i = 0; i < ctrl_list.size(); ++i) {
         assert(test_list[i] == ctrl_list[i]);
     }
+
     List_free(test_list);
     PRINT_FUNC;
 }
