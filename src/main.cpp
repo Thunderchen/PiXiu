@@ -64,19 +64,21 @@ void t_ScapegoatTree(void) {
 };
 
 void t_Que(void) {
-    int q[] = {0, 0, 0};
-    int q_len = 3;
+    constexpr int q_len = 3;
+    int q[q_len];
     int q_cursor = 0;
+    std::vector<int> ctrl_q;
 
-    Que_push(q, 1);
-    Que_push(q, 2);
-    Que_push(q, 3);
-    Que_push(q, 4);
-    Que_push(q, 5);
+    for (int i = 0; i < 10; ++i) {
+        auto val = rand();
+        Que_push(q, val);
+        ctrl_q.push_back(val);
+    }
 
-    assert(Que_get(q, 0) == 3);
-    assert(Que_get(q, 1) == 4);
-    assert(Que_get(q, 2) == 5);
+    for (int i = 0; i < q_len; ++i) {
+        assert(Que_get(q, i) == ctrl_q[ctrl_q.size() - (q_len - i)]);
+    }
+    PRINT_FUNC;
 }
 
 $gen(range0_10) {
@@ -99,6 +101,7 @@ void t_gen(void) {
         assert(rv == i);
     }
     assert(!gen(rv));
+    PRINT_FUNC;
 }
 
 void t_List(void) {
