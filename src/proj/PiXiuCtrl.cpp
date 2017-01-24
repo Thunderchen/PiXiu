@@ -34,14 +34,22 @@ int PiXiuCtrl::setitem(uint8_t * k, int k_len, uint8_t * v, int v_len) {
         this->reinsert(Glob_Reinsert_Chunk);
     }
 
-    auto pxs_k = PiXiuStr_init_key(k, k_len);
+//    auto pxs_k = PiXiuStr_init_key(k, k_len);
     auto pxs_v = PiXiuStr_init(v, v_len);
-    auto pxs = pxs_k->concat(pxs_v);
-    PiXiuStr_free(pxs_k);
-    PiXiuStr_free(pxs_v);
+//    auto pxs = pxs_k->concat(pxs_v);
+//    PiXiuStr_free(pxs_k);
+//    PiXiuStr_free(pxs_v);
+    for (int i = 0; i < pxs_v->len; ++i) {
+        printf("%c",pxs_v->data[i]);
+    }
+    printf("\n");
 
-    auto product = this->st.setitem(pxs);
-    return this->cbt.setitem(pxs, product.cbt_chunk, product.idx);
+    auto product = this->st.setitem(pxs_v);
+    auto out=product.cbt_chunk->getitem(product.idx)->parse(0,PXSG_MAX_TO,product.cbt_chunk)->consume_repr();
+    for (int i = 0; out[i] != '\0'; i++) {
+        assert(out[i]==pxs_v->data[i]);
+    }
+    return this->cbt.setitem(pxs_v, product.cbt_chunk, product.idx);
 }
 
 #define RETURN_APPLY(action) \
@@ -118,9 +126,9 @@ void t_PiXiuCtrl(void) {
     PiXiuCtrl ctrl;
     ctrl.init_prop();
 
-    uint8_t alphabet[] = {'A', 'B', 'C', 'D', 'E', PXS_UNIQUE, 0, 1};
-    uint8_t key[100];
-    uint8_t value[500];
+    uint8_t alphabet[] = {'A', 'B', 'C', 'D', 'E'};
+    uint8_t key[5];
+    uint8_t value[20];
 
     auto gen_rand = [&](uint8_t * des, int max_len) -> int {
         auto rand_len = rand_range(max_len - 1) + 1;
@@ -132,11 +140,20 @@ void t_PiXiuCtrl(void) {
 
     // 随机写入
     for (int i = 0; i < PXC_STR_NUM * 2; ++i) {
-        auto k_len = gen_rand(key, lenOf(key));
+//        auto k_len = gen_rand(key, lenOf(key));
         auto v_len = gen_rand(value, lenOf(value));
-        List_append(PiXiuStr *, key_keep, PiXiuStr_init_key(key, k_len));
+//        List_append(PiXiuStr *, key_keep, PiXiuStr_init_key(key, k_len));
         List_append(PiXiuStr *, value_keep, PiXiuStr_init(value, v_len));
-        ctrl.setitem(key, k_len, value, v_len);
+//        ctrl.setitem(key, k_len, value, v_len);
+        SuffixTree g;
+        g.init_prop();
+        for (int j = 0; j <value_keep[value_keep_len - 1]->len ; ++j) {
+            printf("%c",value_keep[value_keep_len - 1]->data[j]);
+        }
+        printf("\n");
+        g.setitem(value_keep[value_keep_len - 1]);
+        g.free_prop();
+
     }
 
     List_free(key_keep);

@@ -41,6 +41,7 @@ struct ScapegoatTree {
         auto cursor = this->root;
         while (true) {
             if (cursor->obj->operator==(obj)) {
+                cursor->obj = obj;
                 return;
             }
 

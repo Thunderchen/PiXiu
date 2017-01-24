@@ -332,25 +332,25 @@ void t_CritBitTree(void) {
         free(repr);
     };
 
-    cbt_insert((uint8_t *) "ec$");
-    cbt_insert((uint8_t *) "abec$");
-    cbt_insert((uint8_t *) "ejjc$");
-    cbt_insert((uint8_t *) "acd$");
+    cbt_insert((uint8_t *) "EC.");
+    cbt_insert((uint8_t *) "ABEC.");
+    cbt_insert((uint8_t *) "EJJC.");
+    cbt_insert((uint8_t *) "ACD.");
 
     expect = (char *) "diff: 0, mask: 251\n"
             "    diff: 1, mask: 254\n"
-            "        abec$\n"
-            "        acd$\n"
+            "        ABEC.\n"
+            "        ACD.\n"
             "    diff: 1, mask: 247\n"
-            "        ec$\n"
-            "        ejjc$\n";
+            "        EC.\n"
+            "        EJJC.\n";
     assert(!strcmp((output = cbt.repr()), expect));
     free(output);
 
-    auto prefix = PiXiuStr_init((uint8_t *) "e", 1);
+    auto prefix = PiXiuStr_init((uint8_t *) "E", 1);
     auto cbt_gen = cbt.iter(prefix);
 
-    expect = (char *) "ec$ejjc$";
+    expect = (char *) "EC.EJJC.";
     auto i = 0;
     uint8_t rv;
     PXSGen * pxs_gen;
@@ -363,6 +363,7 @@ void t_CritBitTree(void) {
         }
         PXSGen_free(pxs_gen);
     }
+    assert(i!=0);
     CBTGen_free(cbt_gen);
     PiXiuStr_free(prefix);
 
@@ -376,17 +377,17 @@ void t_CritBitTree(void) {
         PiXiuStr_free(pxs);
     };
 
-    cbt_delete((uint8_t *) "ejjc$");
-    cbt_delete((uint8_t *) "abec$");
+    cbt_delete((uint8_t *) "EJJC.");
+    cbt_delete((uint8_t *) "ABEC.");
 
     expect = (char *) "diff: 0, mask: 251\n"
-            "    acd$\n"
-            "    ec$\n";
+            "    ACD.\n"
+            "    EC.\n";
     assert(!strcmp((output = cbt.repr()), expect));
     free(output);
 
-    cbt_delete((uint8_t *) "ec$");
-    cbt_delete((uint8_t *) "acd$");
+    cbt_delete((uint8_t *) "EC.");
+    cbt_delete((uint8_t *) "ACD.");
     assert(!strcmp(cbt.repr(), "~"));
 
     cbt.free_prop();

@@ -48,6 +48,10 @@ bool STNode::is_inner() {
     return !this->is_root() && this->subs.root != NULL;
 }
 
+bool STNode::is_leaf() {
+    return !this->is_root() && this->subs.root == NULL;
+}
+
 STNode * STNode_p_init(void) {
     assert(Glob_Pool != NULL);
     auto ret = (STNode *) Glob_Pool->p_malloc(sizeof(STNode));
@@ -143,150 +147,143 @@ PiXiuStr_init_stream((PXSMsg) { \
     .val=msg_char \
 })
 
-static void s_case_root(SuffixTree * self, uint16_t chunk_idx, uint8_t msg_char, bool send_msg = true) {
-    auto collapse_node = self->root->get_sub(msg_char);
-    if (collapse_node == NULL) { // 无法坍缩, 新建叶结点
-        auto leaf_node = STNode_p_init();
-        leaf_node->chunk_idx = chunk_idx;
-        leaf_node->from = self->counter;
-        leaf_node->to = Glob_Ctx->getitem(chunk_idx)->len;
-        self->root->set_sub(leaf_node);
-        self->remainder--;
-        if (send_msg) { MSG_NO_COMPRESS; }
-    } else { // 开始坍缩
-        self->act_chunk_idx = collapse_node->chunk_idx;
-        self->act_direct = collapse_node->from;
-        self->act_offset++;
-        if (send_msg) { MSG_COMPRESS(collapse_node->chunk_idx, collapse_node->from); }
-    }
-}
-
-static void s_overflow_fix(SuffixTree * self, uint16_t chunk_idx, uint16_t remainder) {
-    auto temp_uchar = Glob_Ctx->getitem(self->act_chunk_idx)->data[self->act_direct];
-    auto collapse_node = self->act_node->get_sub(temp_uchar);
-
-    auto supply = collapse_node->to - collapse_node->from;
-    if (self->act_offset > supply) {
-        self->act_node = collapse_node;
-        self->act_offset -= supply;
-        temp_uchar = Glob_Ctx->getitem(chunk_idx)->data[self->counter - self->act_offset];
-
-        auto next_collapse_node = collapse_node->get_sub(temp_uchar);
-        self->act_chunk_idx = next_collapse_node->chunk_idx;
-        self->act_direct = next_collapse_node->from;
-        return s_overflow_fix(self, chunk_idx, remainder);
-    }
-}
-
-static void s_split_grow(SuffixTree * self, uint16_t chunk_idx, STNode * collapse_node) {
-    if (collapse_node->to - collapse_node->from > 1 &&
-        collapse_node->from + self->act_offset != collapse_node->to) {
-        auto inherit_node = STNode_p_init();
-        inherit_node->chunk_idx = collapse_node->chunk_idx;
-        inherit_node->from = collapse_node->from + self->act_offset;
-        inherit_node->to = collapse_node->to;
-        inherit_node->successor = collapse_node->successor;
-        inherit_node->subs = collapse_node->subs;
-
-        // 原坍缩点成为 inner_node
-        collapse_node->to = inherit_node->from;
-        collapse_node->subs.root = NULL;
-        collapse_node->subs.size = 0;
-        collapse_node->set_sub(inherit_node);
-    }
-
-    // 新叶节点记录 uchar
-    auto leaf_node = STNode_p_init();
-    leaf_node->chunk_idx = chunk_idx;
-    leaf_node->from = self->counter;
-    leaf_node->to = Glob_Ctx->getitem(chunk_idx)->len;
-    collapse_node->set_sub(leaf_node);
-    self->remainder--;
-}
-
 static void s_insert_char(SuffixTree * self, uint16_t chunk_idx, uint8_t msg_char) {
     self->remainder++;
-    uint8_t temp_uchar;
+    auto curr_pxs = Glob_Ctx->getitem(chunk_idx);
+
+    auto case_root = [&](bool send_msg) {
+        auto edge_node = self->root->get_sub(msg_char);
+        if (edge_node == NULL) {
+            auto leaf_node = STNode_p_init();
+            leaf_node->successor = self->root;
+
+            leaf_node->chunk_idx = chunk_idx;
+            leaf_node->from = self->counter;
+            leaf_node->to = curr_pxs->len;
+            self->root->set_sub(leaf_node);
+            leaf_node->parent = self->root;
+            self->remainder--;
+            if (send_msg) { MSG_NO_COMPRESS; }
+        } else {
+            self->act_chunk_idx = edge_node->chunk_idx;
+            self->act_direct = edge_node->from;
+            self->act_offset++;
+            assert(self->act_offset == 1);
+            if (send_msg) { MSG_COMPRESS(edge_node->chunk_idx, edge_node->from); }
+        }
+    };
 
     if (self->act_node->is_root() && self->act_offset == 0) {
-        s_case_root(self, chunk_idx, msg_char);
-    } else { // 已坍缩
-        temp_uchar = Glob_Ctx->getitem(self->act_chunk_idx)->data[self->act_direct];
-        auto collapse_node = self->act_node->get_sub(temp_uchar);
-        assert(Glob_Ctx->getitem(collapse_node->chunk_idx)->data[collapse_node->from] == temp_uchar);
+        case_root(true);
+    } else {
+        auto edge_pxs = Glob_Ctx->getitem(self->act_chunk_idx);
+        auto edge_node = self->act_node->get_sub(edge_pxs->data[self->act_direct]);
 
-        // edge 扩大?
-        if (collapse_node->from + self->act_offset == collapse_node->to) {
-            auto next_collapse_node = collapse_node->get_sub(msg_char);
-            if (next_collapse_node != NULL) { // YES
-                self->act_node = collapse_node; // 推移 act_node
-                self->act_chunk_idx = next_collapse_node->chunk_idx;
-                self->act_direct = next_collapse_node->from;
-                self->act_offset = 1;
-                MSG_COMPRESS(next_collapse_node->chunk_idx, next_collapse_node->from);
-                goto end;
-            } else { // NO
-                goto explode;
-            }
-        }
-
-        temp_uchar = Glob_Ctx->getitem(collapse_node->chunk_idx)->data[collapse_node->from + self->act_offset];
-        if (temp_uchar == msg_char) { // YES
-            MSG_COMPRESS(collapse_node->chunk_idx, collapse_node->from + self->act_offset);
+        STNode * next_edge_node;
+        if (edge_node->from + self->act_offset == edge_node->to
+            && (next_edge_node = edge_node->get_sub(msg_char))) {
+            self->act_node = edge_node;
+            self->act_chunk_idx = next_edge_node->chunk_idx;
+            self->act_direct = next_edge_node->from;
+            self->act_offset = 1;
+            MSG_COMPRESS(next_edge_node->chunk_idx, next_edge_node->from);
+        } else if (msg_char == edge_pxs->data[edge_node->from + self->act_offset]) {
             self->act_offset++;
-        } else { // NO
-            explode: // 炸开累积后缀
+            MSG_COMPRESS(edge_node->chunk_idx, edge_node->from + self->act_offset);
+        } else {
             MSG_NO_COMPRESS;
+            STNode * prev_inner_node = NULL;
+
+            auto split_grow = [&]() {
+                auto leaf_node = STNode_p_init();
+                leaf_node->successor = self->root;
+
+                leaf_node->chunk_idx = chunk_idx;
+                leaf_node->from = self->counter;
+                leaf_node->to = curr_pxs->len;
+                self->remainder--;
+
+                if ((edge_node->is_leaf() || edge_node->to - edge_node->from > 1)
+                    && edge_node->from + self->act_offset != edge_node->to) {
+                    auto inner_node = STNode_p_init();
+                    inner_node->successor = self->root;
+
+                    if (prev_inner_node != NULL) {
+                        prev_inner_node->successor = inner_node;
+                    }
+                    prev_inner_node = inner_node;
+
+                    inner_node->chunk_idx = edge_node->chunk_idx;
+                    inner_node->from = edge_node->from;
+                    inner_node->to = inner_node->from + self->act_offset;
+                    inner_node->parent = edge_node->parent;
+                    inner_node->parent->set_sub(inner_node);
+
+                    edge_node->from = inner_node->to;
+                    edge_node->parent = inner_node;
+
+                    inner_node->set_sub(edge_node);
+                    inner_node->set_sub(leaf_node);
+                    leaf_node->parent = inner_node;
+                } else {
+                    if (prev_inner_node != NULL) {
+                        prev_inner_node->successor = edge_node;
+                    }
+                    prev_inner_node = edge_node;
+
+                    edge_node->set_sub(leaf_node);
+                    leaf_node->parent = edge_node;
+                }
+            };
+
+            std::function<void()> overflow_fix = [&]() {
+                edge_node = self->act_node->get_sub(curr_pxs->data[self->act_direct]);
+                edge_pxs = Glob_Ctx->getitem(edge_node->chunk_idx);
+                auto supply = edge_node->to - edge_node->from;
+                if (self->act_offset > supply) {
+                    self->act_node = edge_node;
+                    self->act_direct += supply;
+                    self->act_offset -= supply;
+                    return overflow_fix();
+                }
+            };
+
             while (self->remainder > 0) {
-                s_split_grow(self, chunk_idx, collapse_node);
+                printf("%s\n", self->repr());
+                split_grow();
 
                 if (!self->act_node->is_inner()) {
-                    // 状态转移
                     self->act_offset--;
                     self->act_direct++;
 
                     if (self->act_offset > 0) {
-                        s_overflow_fix(self, chunk_idx, self->remainder - (uint16_t) 1);
-                        temp_uchar = Glob_Ctx->getitem(self->act_chunk_idx)->data[self->act_direct];
-                        auto next_collapse_node = self->act_node->get_sub(temp_uchar);
-                        collapse_node->successor = next_collapse_node;
-                        collapse_node = next_collapse_node;
-                    } else { // 后缀已用完, 回到 case_root
-                        collapse_node->successor = self->root;
-                        s_case_root(self, chunk_idx, msg_char, false);
-                        break;
-                    }
-                } else { // 需要使用 suffix link
-                    self->act_node = self->act_node->successor;
-                    s_overflow_fix(self, chunk_idx, self->remainder - (uint16_t) 1);
-
-                    temp_uchar = Glob_Ctx->getitem(self->act_chunk_idx)->data[self->act_direct];
-                    auto next_collapse_node = self->act_node->get_sub(temp_uchar);
-                    collapse_node->successor = next_collapse_node;
-                    collapse_node = next_collapse_node;
-                }
-
-                if (collapse_node->from + self->act_offset == collapse_node->to) {
-                    auto next_collapse_node = collapse_node->get_sub(msg_char);
-                    if (next_collapse_node != NULL) {
-                        self->act_node = collapse_node;
-                        self->act_chunk_idx = next_collapse_node->chunk_idx;
-                        self->act_direct = next_collapse_node->from;
-                        self->act_offset = 1;
+                        overflow_fix();
+                    } else {
+                        case_root(false);
                         break;
                     }
                 } else {
-                    assert(collapse_node->from + self->act_offset < collapse_node->to);
-                    if (Glob_Ctx->getitem(collapse_node->chunk_idx)
-                                ->data[collapse_node->from + self->act_offset] == msg_char) {
-                        break;
+                    self->act_node = self->act_node->successor;
+                    overflow_fix();
+                }
+
+                if (edge_node->from + self->act_offset == edge_node->to
+                    && (next_edge_node = edge_node->get_sub(msg_char))) {
+                    self->act_node = edge_node;
+                    self->act_chunk_idx = next_edge_node->chunk_idx;
+                    self->act_direct = next_edge_node->from;
+                    self->act_offset = 1;
+
+                    if (prev_inner_node) {
+                        prev_inner_node->successor = self->act_node;
                     }
+                    break;
+                } else if (msg_char == edge_pxs->data[edge_node->from + self->act_offset]) {
+                    break;
                 }
             }
         }
     }
-
-    end:
     self->counter++;
 }
 
@@ -324,7 +321,6 @@ void t_SuffixTree(void) {
                                ->parse(0, PXSG_MAX_TO, st.cbt_chunk)
                                ->consume_repr()));
     };
-
     expect = (char *) "#\n"
             "--ARY\n"
             "--I\n"
@@ -356,118 +352,94 @@ void t_SuffixTree(void) {
     insert((uint8_t *) "MISSISSIPPI");
     insert((uint8_t *) "MISSIONARY");
     assert(!strcmp(st.repr(), expect));
+//
+//    expect = (char *) "#\n"
+//            "--ARY\n"
+//            "--B\n"
+//            "  --BI\n"
+//            "  --I\n"
+//            "--I\n"
+//            "  --BBI\n"
+//            "  --ONARY\n"
+//            "  --PPI\n"
+//            "  --SSI\n"
+//            "    --BBI\n"
+//            "    --ONARY\n"
+//            "    --PPI\n"
+//            "    --SSI\n"
+//            "      --BBI\n"
+//            "      --PPI\n"
+//            "--M\n"
+//            "  --ISSI\n"
+//            "    --ONARY\n"
+//            "    --SSI\n"
+//            "      --BBI\n"
+//            "      --PPI\n"
+//            "  --MMMMMMMMMM\n"
+//            "--NARY\n"
+//            "--ONARY\n"
+//            "--P\n"
+//            "  --I\n"
+//            "  --PI\n"
+//            "--RY\n"
+//            "--S\n"
+//            "  --I\n"
+//            "    --BBI\n"
+//            "    --ONARY\n"
+//            "    --PPI\n"
+//            "    --SSI\n"
+//            "      --BBI\n"
+//            "      --PPI\n"
+//            "  --SI\n"
+//            "    --BBI\n"
+//            "    --ONARY\n"
+//            "    --PPI\n"
+//            "    --SSI\n"
+//            "      --BBI\n"
+//            "      --PPI\n"
+//            "--Y\n";
+//    insert((uint8_t *) "MISSISSIBBI");
+//    insert((uint8_t *) "MMMMMMMMMMM");
+//    assert(!strcmp(st.repr(), expect));
+//    assert(st.cbt_chunk->getitem(2)->len == 9);
+//    assert(st.cbt_chunk->getitem(3)->len == 8);
+//
+//    uint8_t temp[259];
+//    for (int i = 0; i < lenOf(temp) - 1; ++i) {
+//        temp[i] = 'A';
+//    }
+//    temp[lenOf(temp) - 1] = '\0';
+//
+//    insert(temp);
+//    assert(st.cbt_chunk->getitem(4)->len == 10);
+//    st.free_prop();
+//
+//    st.init_prop();
+//    expect = (char *) "#\n"
+//            "--ADCCDB\n"
+//            "--BDDADCCDB\n"
+//            "--C\n"
+///            "  --CDB\n"
+//            "  --D\n"
+//            "    --B\n"
+//            "    --DDBDDADCCDB\n"
+//            "--D\n"
+//            "  --ADCCDB\n"
+//            "  --BDDADCCDB\n"
+//            "  --CCDB\n"
+//            "  --D\n"
+//            "    --ADCCDB\n"
+//            "    --BDDADCCDB\n"
+//            "    --DBDDADCCDB\n";
+//    insert((uint8_t *) "CDDDBDDADCCDB");
+////    assert(!strcmp(st.repr(), expect));
+//    st.free_prop();
+//
+//    st.init_prop();
 
-    expect = (char *) "#\n"
-            "--ARY\n"
-            "--B\n"
-            "  --BI\n"
-            "  --I\n"
-            "--I\n"
-            "  --BBI\n"
-            "  --ONARY\n"
-            "  --PPI\n"
-            "  --SSI\n"
-            "    --BBI\n"
-            "    --ONARY\n"
-            "    --PPI\n"
-            "    --SSI\n"
-            "      --BBI\n"
-            "      --PPI\n"
-            "--M\n"
-            "  --ISSI\n"
-            "    --ONARY\n"
-            "    --SSI\n"
-            "      --BBI\n"
-            "      --PPI\n"
-            "  --MMMMMMMMMM\n"
-            "--NARY\n"
-            "--ONARY\n"
-            "--P\n"
-            "  --I\n"
-            "  --PI\n"
-            "--RY\n"
-            "--S\n"
-            "  --I\n"
-            "    --BBI\n"
-            "    --ONARY\n"
-            "    --PPI\n"
-            "    --SSI\n"
-            "      --BBI\n"
-            "      --PPI\n"
-            "  --SI\n"
-            "    --BBI\n"
-            "    --ONARY\n"
-            "    --PPI\n"
-            "    --SSI\n"
-            "      --BBI\n"
-            "      --PPI\n"
-            "--Y\n";
-    insert((uint8_t *) "MISSISSIBBI");
-    insert((uint8_t *) "MMMMMMMMMMM");
-    assert(!strcmp(st.repr(), expect));
-    assert(st.cbt_chunk->getitem(2)->len == 9);
-    assert(st.cbt_chunk->getitem(3)->len == 8);
+//    insert((uint8_t *) "DCACCACADBCDBCACAAB")X;
+//    insert((uint8_t *) "DACDDDCDACABDACAA");
+//    insert((uint8_t *) "ACDCDBBDCDCCADCCADB");
+//    insert((uint8_t *) "BBCAABBAABAABAABBD"); // X
 
-    uint8_t temp[259];
-    for (int i = 0; i < lenOf(temp) - 1; ++i) {
-        temp[i] = 'A';
-    }
-    temp[lenOf(temp) - 1] = '\0';
-
-    insert(temp);
-    assert(st.cbt_chunk->getitem(4)->len == 10);
-    st.free_prop();
-
-    st.init_prop();
-    expect = (char *) "#\n"
-            "--ADCCDB\n"
-            "--BDDADCCDB\n"
-            "--C\n"
-            "  --CDB\n"
-            "  --D\n"
-            "    --B\n"
-            "    --DDBDDADCCDB\n"
-            "--D\n"
-            "  --ADCCDB\n"
-            "  --BDDADCCDB\n"
-            "  --CCDB\n"
-            "  --D\n"
-            "    --ADCCDB\n"
-            "    --BDDADCCDB\n"
-            "    --DBDDADCCDB\n";
-    insert((uint8_t *) "CDDDBDDADCCDB");
-    assert(!strcmp(st.repr(), expect));
-    st.free_prop();
-
-    st.init_prop();
-    expect = (char *) "#\n"
-            "--A\n"
-            "  --CBCBDDDADBADADBD\n"
-            "  --D\n"
-            "    --ADBD\n"
-            "    --B\n"
-            "      --ADADBD\n"
-            "      --D\n"
-            "--B\n"
-            "  --ADADBD\n"
-            "  --CBDDDADBADADBD\n"
-            "  --DDDADBADADBD\n"
-            "--CB\n"
-            "  --CBDDDADBADADBD\n"
-            "  --DDDADBADADBD\n"
-            "--D\n"
-            "  --A\n"
-            "    --CBCBDDDADBADADBD\n"
-            "    --DB\n"
-            "      --ADADBD\n"
-            "      --D\n"
-            "  --B\n"
-            "    --ADADBD\n"
-            "    --D\n"
-            "  --D\n"
-            "    --ADBADADBD\n"
-            "    --DADBADADBD\n";
-    insert((uint8_t *) "DACBCBDDDADBADADBD");
-    assert(!strcmp(st.repr(), expect));
-    st.free_prop();
 }

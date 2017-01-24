@@ -6,6 +6,7 @@
 
 struct STNode {
     STNode * successor = NULL;
+    STNode * parent;
     ScapegoatTree<STNode> subs;
 
     uint16_t chunk_idx;
@@ -23,6 +24,8 @@ struct STNode {
     bool is_root(void);
 
     bool is_inner(void);
+
+    bool is_leaf(void);
 };
 
 struct SuffixTree {
