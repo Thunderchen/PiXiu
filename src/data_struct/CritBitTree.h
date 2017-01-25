@@ -145,7 +145,6 @@ $gen(CBTGen) {
             while (helper->operator()(rv)) {
                 $yield(rv);
             }
-
             helper->free_prop();
             free(helper);
             helper = NULL;

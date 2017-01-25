@@ -186,7 +186,6 @@ PXSGen * CritBitTree::getitem(PiXiuStr * src) {
     if (chunk == NULL) {
         return NULL;
     }
-
     int chunk_idx = pa == NULL ? this->chunk_idx : pa->chunk_idx_arr[pa_direct];
     auto pxs = chunk->getitem(chunk_idx);
 
