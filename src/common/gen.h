@@ -23,5 +23,8 @@ do { \
     _rv = val; return true; case __LINE__:; \
 } while (false);
 
-#define $stop } _line = 0; return false; }
+#define $stop } \
+stop: \
+_line = 0; \
+return false; }
 #endif
