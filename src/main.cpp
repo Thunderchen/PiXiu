@@ -64,7 +64,7 @@ void t_ScapegoatTree(void) {
 };
 
 void t_Que(void) {
-    constexpr int q_len = 3;
+    int q_len = 3;
     int q[q_len];
     int q_cursor = 0;
     std::vector<int> ctrl_q;

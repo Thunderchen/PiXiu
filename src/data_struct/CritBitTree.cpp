@@ -1,6 +1,9 @@
 #include "../common/Que.h"
 #include "CritBitTree.h"
 #include <functional>
+#include <map>
+#include <string>
+#include <vector>
 
 #define is_inner(p) adr_is_spec(p)
 #define normal(p) adr_de_spec(p)
@@ -308,7 +311,30 @@ void CBTGen_free(CBTGen * gen) {
 }
 
 void t_CritBitTree(void) {
+    using namespace std;
     assert(sizeof(CBTInner) == 24);
+
+    string alphabet[] = {'A', 'B', 'C', 'D', 'E'};
+    map<string, int> ctrl;
+    auto test_ctx = PiXiuChunk_init();
+    CritBitTree test;
+
+    for (int i = 0; i < 1000; ++i) {
+        string sample;
+        auto len = rand() % 10;
+        for (int j = 0; j < len; ++j) {
+            sample += alphabet[rand() % lenOf(alphabet)];
+        }
+        sample += '.';
+        auto sample_pxs = PiXiuStr_init_key((uint8_t *) sample.c_str(), (int) sample.size());
+
+        ctrl[sample] = 1;
+        test_ctx->strs[test_ctx->used_num] = sample_pxs;
+        test.setitem(sample_pxs, test_ctx, test_ctx->used_num++);
+    }
+
+    test.free_prop();
+
     CritBitTree cbt;
     char * output;
     char * expect;
