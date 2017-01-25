@@ -270,6 +270,9 @@ CritBitTree::fbm_ret CritBitTree::find_best_match(PiXiuStr * src) {
 }
 
 CBTGen * CritBitTree::iter(PiXiuStr * prefix) {
+    if (this->root == NULL) {
+        return NULL;
+    }
     auto gen = (CBTGen *) malloc(sizeof(CBTGen));
     gen->_line = 0;
 
