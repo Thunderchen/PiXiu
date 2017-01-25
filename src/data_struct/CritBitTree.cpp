@@ -310,11 +310,13 @@ void CBTGen_free(CBTGen * gen) {
     free(gen);
 }
 
+#define SAMPLE_PXS PiXiuStr_init_key((uint8_t *) sample.c_str(), (int) sample.size())
+
 void t_CritBitTree(void) {
     using namespace std;
     assert(sizeof(CBTInner) == 24);
 
-    string alphabet[] = {'A', 'B', 'C', 'D', 'E'};
+    string alphabet[] = {"A", "B", "C", "D", "E"};
     map<string, int> ctrl;
     auto test_ctx = PiXiuChunk_init();
     CritBitTree test;
@@ -329,9 +331,10 @@ void t_CritBitTree(void) {
         sample += '.';
         ctrl[sample] = 1;
 
-        auto sample_pxs = PiXiuStr_init_key((uint8_t *) sample.c_str(), (int) sample.size());
+        auto sample_pxs = SAMPLE_PXS;
         test_ctx->strs[test_ctx->used_num] = sample_pxs;
-        test.setitem(sample_pxs, test_ctx, test_ctx->used_num++);
+        test.setitem(sample_pxs, test_ctx, test_ctx->used_num);
+        test_ctx->used_num++;
         assert(test.contains(sample_pxs));
         // </>
 
@@ -342,7 +345,7 @@ void t_CritBitTree(void) {
             sample = valIn(mi).first;
             ctrl.erase(sample);
 
-            sample_pxs = PiXiuStr_init_key((uint8_t *) sample.c_str(), (int) sample.size());
+            sample_pxs = SAMPLE_PXS;
             assert(test.contains(sample_pxs));
             test.delitem(sample_pxs);
             assert(!test.contains(sample_pxs));
@@ -351,85 +354,21 @@ void t_CritBitTree(void) {
         // </>
     }
 
-    test.free_prop();
+    // <读取>
+    auto read_times = ctrl.size() / 2;
+    for (int i = 0; i < read_times; ++i) {
+        auto mi = ctrl.begin();
+        advance(mi, rand() % (read_times * 2));
+        string sample = valIn(mi).first;
 
-    CritBitTree cbt;
-    char * output;
-    char * expect;
-    auto chunk = PiXiuChunk_init();
-
-    auto cbt_insert = [&](uint8_t src[]) {
-        int len;
-        for (len = 0; src[len] != '\0'; ++len);
-        auto pxs = PiXiuStr_init_key(src, len);
-        chunk->strs[chunk->used_num] = pxs;
-
-        cbt.setitem(pxs, chunk, chunk->used_num);
-        chunk->used_num++;
-        assert(cbt.contains(pxs));
-
-        auto repr = cbt.getitem(pxs)->consume_repr();
-        assert(!strcmp((char *) src, repr));
-        free(repr);
-    };
-
-    cbt_insert((uint8_t *) "EC.");
-    cbt_insert((uint8_t *) "ABEC.");
-    cbt_insert((uint8_t *) "EJJC.");
-    cbt_insert((uint8_t *) "ACD.");
-
-    expect = (char *) "diff: 0, mask: 251\n"
-            "    diff: 1, mask: 254\n"
-            "        ABEC.\n"
-            "        ACD.\n"
-            "    diff: 1, mask: 247\n"
-            "        EC.\n"
-            "        EJJC.\n";
-    assert(!strcmp((output = cbt.repr()), expect));
-    free(output);
-
-    auto prefix = PiXiuStr_init((uint8_t *) "E", 1);
-    auto cbt_gen = cbt.iter(prefix);
-
-    expect = (char *) "EC.EJJC.";
-    auto i = 0;
-    uint8_t rv;
-    PXSGen * pxs_gen;
-    while (cbt_gen->operator()(pxs_gen)) {
-        while (pxs_gen->operator()(rv)) {
-            if (char_visible(rv)) {
-                assert(rv == expect[i]);
-                i++;
-            }
-        }
-        PXSGen_free(pxs_gen);
+        auto sample_pxs = SAMPLE_PXS;
+        auto exist = test.getitem(sample_pxs)->consume_repr();
+        assert(!strcmp(sample.c_str(), exist));
+        free(exist);
+        PiXiuStr_free(sample_pxs);
     }
-    assert(i != 0);
-    CBTGen_free(cbt_gen);
-    PiXiuStr_free(prefix);
+    // </>
 
-    auto cbt_delete = [&](uint8_t src[]) {
-        int len;
-        for (len = 0; src[len] != '\0'; ++len);
-        auto pxs = PiXiuStr_init_key(src, len);
-        cbt.delitem(pxs);
-        assert(!cbt.contains(pxs));
-        assert(cbt.getitem(pxs) == NULL);
-        PiXiuStr_free(pxs);
-    };
-
-    cbt_delete((uint8_t *) "EJJC.");
-    cbt_delete((uint8_t *) "ABEC.");
-
-    expect = (char *) "diff: 0, mask: 251\n"
-            "    ACD.\n"
-            "    EC.\n";
-    assert(!strcmp((output = cbt.repr()), expect));
-    free(output);
-
-    cbt_delete((uint8_t *) "EC.");
-    cbt_delete((uint8_t *) "ACD.");
-    assert(!strcmp(cbt.repr(), "~"));
-
-    cbt.free_prop();
+    test.free_prop();
+    PRINT_FUNC;
 }
