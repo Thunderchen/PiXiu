@@ -96,6 +96,7 @@ $gen(CBTGHelper) {
             } else {
                 direct_end = direct + (uint8_t) 1;
             }
+
             for (; direct < direct_end; ++direct) {
                 sub = (CBTGHelper *) malloc(sizeof(CBTGHelper));
                 sub->init_prop(prefix, harvest, cursor->crit_node_arr[direct], cursor->chunk_idx_arr[direct],
@@ -115,7 +116,6 @@ $gen(CBTGHelper) {
 
         this->prefix = prefix;
         this->harvest = harvest;
-
         this->ptr = ptr;
         this->chunk_idx = chunk_idx;
         this->include_all = include_all;

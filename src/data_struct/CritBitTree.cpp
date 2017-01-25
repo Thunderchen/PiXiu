@@ -275,6 +275,7 @@ CBTGen * CritBitTree::iter(PiXiuStr * prefix) {
     }
     auto gen = (CBTGen *) malloc(sizeof(CBTGen));
     gen->_line = 0;
+    gen->helper = NULL;
 
     gen->self = this;
     gen->prefix = prefix;
