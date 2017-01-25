@@ -61,9 +61,9 @@ $gen(CBTGHelper) {
     CBTInner * cursor;
 
     uint16_t chunk_idx;
-    bool include_all;
     uint8_t direct;
-
+    uint8_t direct_end;
+    bool include_all;
 
     $emit(PXSGen *)
             PiXiuChunk * chunk;
@@ -90,7 +90,13 @@ $gen(CBTGHelper) {
             if (!include_all && cursor->diff_at >= prefix->len) {
                 include_all = true;
             }
-            if (!include_all) {
+            if (include_all) {
+                direct = 0;
+                direct_end = 2;
+            } else {
+                direct_end = direct + (uint8_t) 1;
+            }
+            for (; direct < direct_end; ++direct) {
                 sub = (CBTGHelper *) malloc(sizeof(CBTGHelper));
                 sub->init_prop(prefix, harvest, cursor->crit_node_arr[direct], cursor->chunk_idx_arr[direct],
                                include_all);
@@ -99,19 +105,7 @@ $gen(CBTGHelper) {
                 }
                 sub->free_prop();
                 free(sub);
-                this->sub = NULL;
-            } else {
-                for (direct = 0; direct < 2; ++direct) {
-                    sub = (CBTGHelper *) malloc(sizeof(CBTGHelper));
-                    sub->init_prop(prefix, harvest, cursor->crit_node_arr[direct], cursor->chunk_idx_arr[direct],
-                                   include_all);
-                    while (sub->operator()(rv)) {
-                        $yield(rv);
-                    }
-                    sub->free_prop();
-                    free(sub);
-                    this->sub = NULL;
-                }
+                sub = NULL;
             }
     $stop;
 
