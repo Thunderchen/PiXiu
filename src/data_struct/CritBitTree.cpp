@@ -320,17 +320,35 @@ void t_CritBitTree(void) {
     CritBitTree test;
 
     for (int i = 0; i < 1000; ++i) {
+        // <写入>
         string sample;
         auto len = rand() % 10;
         for (int j = 0; j < len; ++j) {
             sample += alphabet[rand() % lenOf(alphabet)];
         }
         sample += '.';
-        auto sample_pxs = PiXiuStr_init_key((uint8_t *) sample.c_str(), (int) sample.size());
-
         ctrl[sample] = 1;
+
+        auto sample_pxs = PiXiuStr_init_key((uint8_t *) sample.c_str(), (int) sample.size());
         test_ctx->strs[test_ctx->used_num] = sample_pxs;
         test.setitem(sample_pxs, test_ctx, test_ctx->used_num++);
+        assert(test.contains(sample_pxs));
+        // </>
+
+        // <删除>
+        if (rand() % 2) {
+            auto mi = ctrl.begin();
+            advance(mi, rand() % ctrl.size());
+            sample = valIn(mi).first;
+            ctrl.erase(sample);
+
+            sample_pxs = PiXiuStr_init_key((uint8_t *) sample.c_str(), (int) sample.size());
+            assert(test.contains(sample_pxs));
+            test.delitem(sample_pxs);
+            assert(!test.contains(sample_pxs));
+            PiXiuStr_free(sample_pxs);
+        }
+        // </>
     }
 
     test.free_prop();
