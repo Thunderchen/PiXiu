@@ -17,10 +17,7 @@ int CritBitTree::setitem(PiXiuStr * src, PiXiuChunk * ctx, uint16_t chunk_idx) {
         auto crit_chunk = (PiXiuChunk *) ret.crit_node;
         uint8_t pa_direct = ret.pa_direct;
 
-        int crit_chunk_idx = this->chunk_idx;
-        if (pa != NULL) {
-            crit_chunk_idx = pa->chunk_idx_arr[pa_direct];
-        }
+        int crit_chunk_idx = pa == NULL ? this->chunk_idx : pa->chunk_idx_arr[pa_direct];
         auto crit_pxs = crit_chunk->getitem(crit_chunk_idx);
 
         auto crit_gen = crit_pxs->parse(0, PXSG_MAX_TO, crit_chunk);
@@ -58,7 +55,7 @@ int CritBitTree::setitem(PiXiuStr * src, PiXiuChunk * ctx, uint16_t chunk_idx) {
             inner_node->diff_at = diff_at;
             inner_node->mask = mask;
 
-            CBTInner * replace_parent = NULL;
+            CBTInner * rp_parent = NULL;
             uint8_t rp_direct = 3;
             auto replace_ptr = this->root;
             auto replace_node = (CBTInner *) normal(replace_ptr);
@@ -72,18 +69,18 @@ int CritBitTree::setitem(PiXiuStr * src, PiXiuChunk * ctx, uint16_t chunk_idx) {
 
                 uint8_t crit_byte = src->len > replace_node->diff_at ? src->data[replace_node->diff_at] : (uint8_t) 0;
                 rp_direct = ((uint8_t) 1 + (replace_node->mask | crit_byte)) >> 8;
+                rp_parent = replace_node;
 
-                replace_parent = replace_node;
                 replace_ptr = replace_node->crit_node_arr[rp_direct];
                 replace_node = (CBTInner *) normal(replace_ptr);
-                replace_chunk_idx = replace_parent->chunk_idx_arr[rp_direct];
+                replace_chunk_idx = rp_parent->chunk_idx_arr[rp_direct];
             }
 
-            if (replace_parent == NULL) {
+            if (rp_parent == NULL) {
                 this->root = special(inner_node);
             } else {
                 assert(rp_direct >= 0 && pa_direct <= 1);
-                replace_parent->crit_node_arr[rp_direct] = special(inner_node);
+                rp_parent->crit_node_arr[rp_direct] = special(inner_node);
             }
             auto temp_i = (direct + 1) % 2;
             inner_node->crit_node_arr[temp_i] = replace_ptr;
@@ -114,11 +111,7 @@ int CritBitTree::delitem(PiXiuStr * src) {
     auto pa = (CBTInner *) ret.pa;
     auto crit_chunk = (PiXiuChunk *) ret.crit_node;
     uint8_t pa_direct = ret.pa_direct;
-
-    int crit_chunk_idx = this->chunk_idx;
-    if (pa != NULL) {
-        crit_chunk_idx = pa->chunk_idx_arr[pa_direct];
-    }
+    int crit_chunk_idx = pa == NULL ? this->chunk_idx : pa->chunk_idx_arr[pa_direct];
 
     auto case_del = [&]() {
         sign = 0;
@@ -194,10 +187,7 @@ PXSGen * CritBitTree::getitem(PiXiuStr * src) {
         return NULL;
     }
 
-    int chunk_idx = this->chunk_idx;
-    if (pa != NULL) {
-        chunk_idx = pa->chunk_idx_arr[pa_direct];
-    }
+    int chunk_idx = pa == NULL ? this->chunk_idx : pa->chunk_idx_arr[pa_direct];
     auto pxs = chunk->getitem(chunk_idx);
 
     if (pxs->key_eq(src, chunk)) {
@@ -267,7 +257,7 @@ CritBitTree::fbm_ret CritBitTree::find_best_match(PiXiuStr * src) {
     auto q_cursor = 0;
 
     uint8_t direct = 3;
-    auto ptr = Que_get(q, 2);
+    auto ptr = Que_get(q, q_len - 1);
     while (is_inner(ptr)) {
         auto inner = (CBTInner *) normal(ptr);
 
