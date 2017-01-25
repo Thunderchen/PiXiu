@@ -76,7 +76,9 @@ void t_MemPool(void) {
     }
     // </>
 
+    // <回收>
     memPool.free_prop();
     assert(memPool.curr_pool == NULL);
+    // </>
     PRINT_FUNC;
 }
