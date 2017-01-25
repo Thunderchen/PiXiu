@@ -57,7 +57,7 @@ $gen(CBTGHelper) {
     bool * harvest;
     void * ptr;
 
-    CBTGHelper * sub_gen;
+    CBTGHelper * sub;
     CBTInner * cursor;
 
     uint16_t chunk_idx;
@@ -91,33 +91,33 @@ $gen(CBTGHelper) {
                 include_all = true;
             }
             if (!include_all) {
-                sub_gen = (CBTGHelper *) malloc(sizeof(CBTGHelper));
-                sub_gen->init_prop(prefix, harvest, cursor->crit_node_arr[direct], cursor->chunk_idx_arr[direct],
-                                   include_all);
-                while (sub_gen->operator()(rv)) {
+                sub = (CBTGHelper *) malloc(sizeof(CBTGHelper));
+                sub->init_prop(prefix, harvest, cursor->crit_node_arr[direct], cursor->chunk_idx_arr[direct],
+                               include_all);
+                while (sub->operator()(rv)) {
                     $yield(rv);
                 }
-                sub_gen->free_prop();
-                free(sub_gen);
-                this->sub_gen = NULL;
+                sub->free_prop();
+                free(sub);
+                this->sub = NULL;
             } else {
                 for (direct = 0; direct < 2; ++direct) {
-                    sub_gen = (CBTGHelper *) malloc(sizeof(CBTGHelper));
-                    sub_gen->init_prop(prefix, harvest, cursor->crit_node_arr[direct], cursor->chunk_idx_arr[direct],
-                                       include_all);
-                    while (sub_gen->operator()(rv)) {
+                    sub = (CBTGHelper *) malloc(sizeof(CBTGHelper));
+                    sub->init_prop(prefix, harvest, cursor->crit_node_arr[direct], cursor->chunk_idx_arr[direct],
+                                   include_all);
+                    while (sub->operator()(rv)) {
                         $yield(rv);
                     }
-                    sub_gen->free_prop();
-                    free(sub_gen);
-                    this->sub_gen = NULL;
+                    sub->free_prop();
+                    free(sub);
+                    this->sub = NULL;
                 }
             }
     $stop;
 
     void init_prop(PiXiuStr * prefix, bool * harvest, void * ptr, uint16_t chunk_idx, bool include_all) {
         this->_line = 0;
-        this->sub_gen = NULL;
+        this->sub = NULL;
 
         this->prefix = prefix;
         this->harvest = harvest;
@@ -128,9 +128,9 @@ $gen(CBTGHelper) {
     }
 
     void free_prop(void) {
-        if (this->sub_gen != NULL) {
-            this->sub_gen->free_prop();
-            free(this->sub_gen);
+        if (this->sub != NULL) {
+            this->sub->free_prop();
+            free(this->sub);
         }
     }
 };
@@ -151,6 +151,7 @@ $gen(CBTGen) {
             while (helper->operator()(rv)) {
                 $yield(rv);
             }
+
             helper->free_prop();
             free(helper);
             helper = NULL;
