@@ -52,70 +52,108 @@ void CBTInner_free(CBTInner *);
 void CBTGen_free(CBTGen *);
 
 
+$gen(CBTGHelper) {
+    PiXiuStr * prefix;
+    bool * harvest;
+    void * ptr;
+
+    CBTGHelper * sub_gen;
+    CBTInner * cursor;
+
+    uint16_t chunk_idx;
+    bool include_all;
+    uint8_t direct;
+
+
+    $emit(PXSGen *)
+            PiXiuChunk * chunk;
+            PiXiuStr * pxs;
+            PXSGen * rv;
+            uint8_t crit_byte;
+
+            if (!adr_is_spec(ptr)) {
+                chunk = (PiXiuChunk *) ptr;
+                pxs = chunk->getitem(chunk_idx);
+                if (valIn(harvest)) {
+                    $yield(pxs->parse(0, PXSG_MAX_TO, chunk));
+                } else if (pxs->startswith(prefix, chunk)) {
+                    valIn(harvest) = true;
+                    $yield(pxs->parse(0, PXSG_MAX_TO, chunk));
+                }
+                goto stop;
+            }
+
+            cursor = (CBTInner *) adr_de_spec(ptr);
+            crit_byte = prefix->len > cursor->diff_at ? prefix->data[cursor->diff_at] : (uint8_t) 0;
+            direct = ((uint8_t) 1 + (cursor->mask | crit_byte)) >> 8;
+
+            if (!include_all && cursor->diff_at >= prefix->len) {
+                include_all = true;
+            }
+            if (!include_all) {
+                sub_gen = (CBTGHelper *) malloc(sizeof(CBTGHelper));
+                sub_gen->init_prop(prefix, harvest, cursor->crit_node_arr[direct], cursor->chunk_idx_arr[direct],
+                                   include_all);
+                while (sub_gen->operator()(rv)) {
+                    $yield(rv);
+                }
+                sub_gen->free_prop();
+                free(sub_gen);
+                this->sub_gen = NULL;
+            } else {
+                for (direct = 0; direct < 2; ++direct) {
+                    sub_gen = (CBTGHelper *) malloc(sizeof(CBTGHelper));
+                    sub_gen->init_prop(prefix, harvest, cursor->crit_node_arr[direct], cursor->chunk_idx_arr[direct],
+                                       include_all);
+                    while (sub_gen->operator()(rv)) {
+                        $yield(rv);
+                    }
+                    sub_gen->free_prop();
+                    free(sub_gen);
+                    this->sub_gen = NULL;
+                }
+            }
+    $stop;
+
+    void init_prop(PiXiuStr * prefix, bool * harvest, void * ptr, uint16_t chunk_idx, bool include_all) {
+        this->_line = 0;
+        this->sub_gen = NULL;
+
+        this->prefix = prefix;
+        this->harvest = harvest;
+
+        this->ptr = ptr;
+        this->chunk_idx = chunk_idx;
+        this->include_all = include_all;
+    }
+
+    void free_prop(void) {
+        if (this->sub_gen != NULL) {
+            this->sub_gen->free_prop();
+            free(this->sub_gen);
+        }
+    }
+};
+
 $gen(CBTGen) {
     CritBitTree * self;
     PiXiuStr * prefix;
 
-    void ** q;
-    int q_len;
-    int q_capacity;
-    CBTInner * pa;
-    int pa_direct;
-
-    void * node_sub(CBTInner * node, uint8_t direct) {
-        auto ptr = node->crit_node_arr[direct];
-        if (adr_is_spec(ptr)) {
-            return ptr;
-        } else {
-            auto chunk = (PiXiuChunk *) ptr;
-            auto pxs = chunk->getitem(node->chunk_idx_arr[direct]);
-            return pxs->parse(0, PXSG_MAX_TO, chunk);
-        }
-    }
+    CBTGHelper * helper;
+    bool harvest;
 
     $emit(PXSGen *)
-            CBTInner * inner;
-            PiXiuChunk * chunk;
-            PiXiuStr * pxs;
-            void * cursor;
-            uint16_t chunk_idx;
-            CritBitTree::fbm_ret ret;
+            PXSGen * rv;
 
-            ret = self->find_best_match(prefix);
-            pa = (CBTInner *) ret.pa;
-            chunk = (PiXiuChunk *) ret.crit_node;
-            pa_direct = ret.pa_direct;
-
-            chunk_idx = self->chunk_idx;
-            if (pa != NULL) {
-                chunk_idx = pa->chunk_idx_arr[pa_direct];
+            harvest = false;
+            helper = (CBTGHelper *) malloc(sizeof(CBTGHelper));
+            helper->init_prop(prefix, adrOf(harvest), self->root, self->chunk_idx, false);
+            while (helper->operator()(rv)) {
+                $yield(rv);
             }
-            pxs = chunk->getitem(chunk_idx);
-            if (pxs->startswith(prefix, chunk)) {
-                $yield(pxs->parse(0, PXSG_MAX_TO, chunk));
-
-                if (pa_direct != 1) {
-                    q_len = 0;
-                    q_capacity = 2;
-                    q = (void **) malloc(sizeof(void *) * q_capacity);
-                    List_append(void *, q, this->node_sub(pa, 1));
-
-                    while (q_len) {
-                        cursor = q[q_len - 1];
-                        List_del(void *, q, q_len - 1);
-
-                        if (!adr_is_spec(cursor)) {
-                            $yield((PXSGen *) cursor);
-                        } else {
-                            inner = (CBTInner *) adr_de_spec(cursor);
-                            List_append(void *, q, this->node_sub(inner, 1));
-                            List_append(void *, q, this->node_sub(inner, 0));
-                        }
-                    }
-
-                    List_free(q);
-                }
-            }
+            helper->free_prop();
+            free(helper);
+            helper = NULL;
     $stop;
 };
 
