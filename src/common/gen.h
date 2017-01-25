@@ -24,7 +24,5 @@ do { \
 } while (false);
 
 #define $stop } \
-stop: \
-_line = 0; \
-return false; }
+stop: return false; }
 #endif
