@@ -300,6 +300,10 @@ void CBTInner_free(CBTInner * inner) {
 }
 
 void CBTGen_free(CBTGen * gen) {
+    if (gen->helper != NULL) {
+        gen->helper->free_prop();
+        free(gen->helper);
+    }
     free(gen);
 }
 
