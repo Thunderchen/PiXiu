@@ -53,14 +53,25 @@ void t_ScapegoatTree(void) {
 
     MemPool pool;
     ScapegoatTree<int_cmp> sgt;
-    for (int i = 0; i < 100; ++i) {
+    for (int i = 0; i < 256; ++i) {
         auto obj = (int_cmp *) pool.p_malloc(sizeof(int_cmp));
         obj->val = i;
         assert(sgt.getitem(obj) == NULL);
         sgt.setitem(obj, adrOf(pool));
         assert(sgt.getitem(obj)->val == i);
     }
+
+    int_cmp cmp;
+    for (int i = 256 - 1; i >= 0; --i) {
+        cmp.val = i;
+        assert(sgt.getitem(adrOf(cmp))->val == i);
+    }
+    cmp.val = -1;
+    assert(sgt.getitem(adrOf(cmp)) == NULL);
+    cmp.val = 256;
+    assert(sgt.getitem(adrOf(cmp)) == NULL);
     pool.free_prop();
+    PRINT_FUNC;
 };
 
 void t_Que(void) {

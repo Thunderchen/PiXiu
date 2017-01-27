@@ -34,9 +34,10 @@ struct ScapegoatTree {
             this->size++;
             return;
         }
-        auto height = 0;
+
         SGTN * path[max_size];
         auto path_len = 0;
+        auto & height = path_len;
 
         auto cursor = this->root;
         while (true) {
@@ -45,7 +46,6 @@ struct ScapegoatTree {
                 return;
             }
 
-            height++;
             path[path_len] = cursor;
             path_len++;
             if (obj->operator<(cursor->obj)) {
@@ -66,6 +66,7 @@ struct ScapegoatTree {
                 }
             }
         }
+        assert(this->size <= max_size);
 
         if (height > (log(this->size) / log(1 / SGT_FACTOR))) {
             this->rebuild(this->find_scapegoat(path, path_len, cursor));
@@ -97,7 +98,7 @@ struct ScapegoatTree {
     };
 
     fsg_ret find_scapegoat(SGTN * path[], int path_len, SGTN * cursor) {
-        fsg_ret ret{};
+        fsg_ret ret;
         auto size = 1;
         auto height = 0;
 
