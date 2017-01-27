@@ -79,6 +79,8 @@ $gen(CBTGHelper) {
                 } else if (pxs->startswith(prefix, chunk)) {
                     valIn(harvest) = true;
                     $yield(pxs->parse(0, PXSG_MAX_TO, chunk));
+                } else {
+                    $yield(NULL);
                 }
                 goto stop;
             }
@@ -143,6 +145,9 @@ $gen(CBTGen) {
             helper = (CBTGHelper *) malloc(sizeof(CBTGHelper));
             helper->init_prop(prefix, adrOf(harvest), self->root, self->chunk_idx, false);
             while (helper->operator()(rv)) {
+                if (rv == NULL) {
+                    break;
+                }
                 $yield(rv);
             }
             helper->free_prop();

@@ -369,6 +369,42 @@ void t_CritBitTree(void) {
     }
     // </>
 
+    // <遍历>
+    vector<string> ctrl_startswith_c;
+    for (auto mi = ctrl.begin(); mi != ctrl.end(); ++mi) {
+        auto str = valIn(mi).first;
+        if (str[0] == 'C') {
+            ctrl_startswith_c.push_back(str);
+        }
+    }
+
+    List_init(char *, test_startswith_c);
+    auto query_pxs = PiXiuStr_init((uint8_t[]) {'C'}, 1);
+    auto query_gen = test.iter(query_pxs);
+    PXSGen * rv;
+    while (query_gen->operator()(rv)) {
+        List_append(char *, test_startswith_c, rv->consume_repr());
+    }
+
+    assert(test_startswith_c_len == ctrl_startswith_c.size());
+    for (int i = 0; i < test_startswith_c_len; ++i) {
+        assert(!strcmp(test_startswith_c[i], ctrl_startswith_c[i].c_str()));
+    }
+    auto none_pxs = PiXiuStr_init((uint8_t[]) {'F'}, 1);
+    auto none_gen = test.iter(none_pxs);
+    assert(!none_gen->operator()(rv));
+
+    for (int i = 0; i < test_startswith_c_len; ++i) {
+        List_free(test_startswith_c[i]);
+    }
+    List_free(test_startswith_c);
+    PiXiuStr_free(query_pxs);
+    PiXiuStr_free(none_pxs);
+    CBTGen_free(query_gen);
+    CBTGen_free(none_gen);
+    // </>
+
+    free(test.repr());
     test.free_prop();
     PRINT_FUNC;
 }
