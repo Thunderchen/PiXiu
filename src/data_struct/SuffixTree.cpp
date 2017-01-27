@@ -53,7 +53,6 @@ bool STNode::is_leaf() {
 }
 
 STNode * STNode_p_init(void) {
-    assert(Glob_Pool != NULL);
     auto ret = (STNode *) Glob_Pool->p_malloc(sizeof(STNode));
     ret->successor = NULL;
     ret->subs.root = NULL;
@@ -86,22 +85,19 @@ void SuffixTree::free_prop() {
 }
 
 void SuffixTree::reset() {
-    this->remainder = 0;
-    this->counter = 0;
+    this->remainder = this->counter = 0;
     this->act_node = this->root;
-    this->act_chunk_idx = 0;
-    this->act_direct = 0;
-    this->act_offset = 0;
+    this->act_chunk_idx = this->act_direct = this->act_offset = 0;
 }
 
 char * SuffixTree::repr() {
     List_init(char, output);
 
     std::function<void(STNode *)> print_node = [&](STNode * node) {
-        auto pxs = this->local_chunk.getitem(node->chunk_idx);
         if (node == this->act_node) {
             List_append(char, output, '*';)
         }
+        auto pxs = this->local_chunk.getitem(node->chunk_idx);
         for (int i = node->from; i < node->to; ++i) {
             if (char_visible(pxs->data[i])) {
                 List_append(char, output, pxs->data[i]);
@@ -140,10 +136,10 @@ char * SuffixTree::repr() {
 }
 
 #define MSG_NO_COMPRESS PiXiuStr_init_stream((PXSMsg) {.chunk_idx__cmd=PXS_STREAM_PASS, .val=msg_char})
-#define MSG_COMPRESS(c_idx, p_idx) \
+#define MSG_COMPRESS(c_i, p_i) \
 PiXiuStr_init_stream((PXSMsg) { \
-    .chunk_idx__cmd=c_idx, \
-    .pxs_idx=p_idx, \
+    .chunk_idx__cmd=c_i, \
+    .pxs_idx=p_i, \
     .val=msg_char \
 })
 
@@ -249,9 +245,7 @@ static void s_insert_char(SuffixTree * self, uint16_t chunk_idx, uint8_t msg_cha
             };
 
             while (self->remainder > 0) {
-                printf("%s\n", self->repr());
                 split_grow();
-
                 if (!self->act_node->is_inner()) {
                     self->act_offset--;
                     self->act_direct++;
@@ -288,7 +282,6 @@ static void s_insert_char(SuffixTree * self, uint16_t chunk_idx, uint8_t msg_cha
 }
 
 SuffixTree::s_ret SuffixTree::setitem(PiXiuStr * src) {
-    assert(Glob_Ctx != NULL && Glob_Pool != NULL);
     auto idx = this->local_chunk.used_num;
     assert(idx == this->cbt_chunk->used_num);
 
