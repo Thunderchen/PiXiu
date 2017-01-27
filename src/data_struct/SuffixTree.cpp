@@ -302,7 +302,7 @@ SuffixTree::s_ret SuffixTree::setitem(PiXiuStr * src) {
 void t_SuffixTree(void) {
     using namespace std;
 
-    auto contains = [](SuffixTree * self, string item, int begin, int end) -> bool {
+    auto contains = [](SuffixTree * self, uint8_t item[], int begin, int end) -> bool {
         auto edge_node = self->root->get_sub(item[begin]);
         if (edge_node == NULL) {
             return false;
@@ -324,7 +324,25 @@ void t_SuffixTree(void) {
         }
     };
 
-    auto check_suffix = [](SuffixTree * self) {
+    SuffixTree st;
+    string alphabet[] = {"A", "B", "C", "D", "E"};
+    for (int i = 0; i < 200; ++i) {
+        st.init_prop();
 
-    };
+        string sample;
+        auto len = rand() % 20;
+        for (int j = 0; j < len + 1; ++j) {
+            sample += alphabet[rand() % lenOf(alphabet)];
+        }
+
+        auto end = (int) sample.size();
+        auto item = (uint8_t *) sample.c_str();
+        st.setitem(PiXiuStr_init(item, end));
+        for (int begin = 0; begin < end; ++begin) {
+            assert(contains(adrOf(st), item, begin, end));
+        }
+
+        PiXiuChunk_free(st.cbt_chunk);
+        st.free_prop();
+    }
 }
