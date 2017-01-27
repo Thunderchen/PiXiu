@@ -1,5 +1,6 @@
 #include "../proj/PiXiuStr.h"
 #include "SuffixTree.h"
+#include <string>
 
 static MemPool * Glob_Pool = NULL;
 static PiXiuChunk * Glob_Ctx = NULL;
@@ -299,140 +300,31 @@ SuffixTree::s_ret SuffixTree::setitem(PiXiuStr * src) {
 }
 
 void t_SuffixTree(void) {
-    SuffixTree st;
-    st.init_prop();
-    char * expect;
+    using namespace std;
 
-    auto insert = [&](uint8_t src[]) {
-        int len;
-        for (len = 0; src[len] != '\0'; ++len);
-        auto pxs = PiXiuStr_init(src, len);
-        st.setitem(pxs);
-        assert(!strcmp((char *) src,
-                       st.cbt_chunk
-                               ->getitem(st.cbt_chunk->used_num - 1)
-                               ->parse(0, PXSG_MAX_TO, st.cbt_chunk)
-                               ->consume_repr()));
+    auto contains = [](SuffixTree * self, string item, int begin, int end) -> bool {
+        auto edge_node = self->root->get_sub(item[begin]);
+        if (edge_node == NULL) {
+            return false;
+        }
+
+        while (true) {
+            auto edge_pxs = Glob_Ctx->getitem(edge_node->chunk_idx);
+            for (int i = edge_node->from; i < edge_node->to; ++i) {
+                if (edge_pxs->data[i] != item[begin]) {
+                    return false;
+                } else {
+                    begin++;
+                    if (begin == end) {
+                        return true;
+                    }
+                }
+            }
+            edge_node = edge_node->get_sub(item[begin]);
+        }
     };
-    expect = (char *) "#\n"
-            "--ARY\n"
-            "--I\n"
-            "  --ONARY\n"
-            "  --PPI\n"
-            "  --SSI\n"
-            "    --ONARY\n"
-            "    --PPI\n"
-            "    --SSIPPI\n"
-            "--MISSI\n"
-            "  --ONARY\n"
-            "  --SSIPPI\n"
-            "--NARY\n"
-            "--ONARY\n"
-            "--P\n"
-            "  --I\n"
-            "  --PI\n"
-            "--RY\n"
-            "--S\n"
-            "  --I\n"
-            "    --ONARY\n"
-            "    --PPI\n"
-            "    --SSIPPI\n"
-            "  --SI\n"
-            "    --ONARY\n"
-            "    --PPI\n"
-            "    --SSIPPI\n"
-            "--Y\n";
-    insert((uint8_t *) "MISSISSIPPI");
-    insert((uint8_t *) "MISSIONARY");
-    assert(!strcmp(st.repr(), expect));
-//
-//    expect = (char *) "#\n"
-//            "--ARY\n"
-//            "--B\n"
-//            "  --BI\n"
-//            "  --I\n"
-//            "--I\n"
-//            "  --BBI\n"
-//            "  --ONARY\n"
-//            "  --PPI\n"
-//            "  --SSI\n"
-//            "    --BBI\n"
-//            "    --ONARY\n"
-//            "    --PPI\n"
-//            "    --SSI\n"
-//            "      --BBI\n"
-//            "      --PPI\n"
-//            "--M\n"
-//            "  --ISSI\n"
-//            "    --ONARY\n"
-//            "    --SSI\n"
-//            "      --BBI\n"
-//            "      --PPI\n"
-//            "  --MMMMMMMMMM\n"
-//            "--NARY\n"
-//            "--ONARY\n"
-//            "--P\n"
-//            "  --I\n"
-//            "  --PI\n"
-//            "--RY\n"
-//            "--S\n"
-//            "  --I\n"
-//            "    --BBI\n"
-//            "    --ONARY\n"
-//            "    --PPI\n"
-//            "    --SSI\n"
-//            "      --BBI\n"
-//            "      --PPI\n"
-//            "  --SI\n"
-//            "    --BBI\n"
-//            "    --ONARY\n"
-//            "    --PPI\n"
-//            "    --SSI\n"
-//            "      --BBI\n"
-//            "      --PPI\n"
-//            "--Y\n";
-//    insert((uint8_t *) "MISSISSIBBI");
-//    insert((uint8_t *) "MMMMMMMMMMM");
-//    assert(!strcmp(st.repr(), expect));
-//    assert(st.cbt_chunk->getitem(2)->len == 9);
-//    assert(st.cbt_chunk->getitem(3)->len == 8);
-//
-//    uint8_t temp[259];
-//    for (int i = 0; i < lenOf(temp) - 1; ++i) {
-//        temp[i] = 'A';
-//    }
-//    temp[lenOf(temp) - 1] = '\0';
-//
-//    insert(temp);
-//    assert(st.cbt_chunk->getitem(4)->len == 10);
-//    st.free_prop();
-//
-//    st.init_prop();
-//    expect = (char *) "#\n"
-//            "--ADCCDB\n"
-//            "--BDDADCCDB\n"
-//            "--C\n"
-///            "  --CDB\n"
-//            "  --D\n"
-//            "    --B\n"
-//            "    --DDBDDADCCDB\n"
-//            "--D\n"
-//            "  --ADCCDB\n"
-//            "  --BDDADCCDB\n"
-//            "  --CCDB\n"
-//            "  --D\n"
-//            "    --ADCCDB\n"
-//            "    --BDDADCCDB\n"
-//            "    --DBDDADCCDB\n";
-//    insert((uint8_t *) "CDDDBDDADCCDB");
-////    assert(!strcmp(st.repr(), expect));
-//    st.free_prop();
-//
-//    st.init_prop();
 
-//    insert((uint8_t *) "DCACCACADBCDBCACAAB")X;
-//    insert((uint8_t *) "DACDDDCDACABDACAA");
-//    insert((uint8_t *) "ACDCDBBDCDCCADCCADB");
-//    insert((uint8_t *) "BBCAABBAABAABAABBD"); // X
+    auto check_suffix = [](SuffixTree * self) {
 
+    };
 }
