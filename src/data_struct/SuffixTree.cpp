@@ -342,7 +342,9 @@ void t_SuffixTree(void) {
             assert(contains(adrOf(st), item, begin, end));
         }
 
+        free(st.repr());
         PiXiuChunk_free(st.cbt_chunk);
         st.free_prop();
     }
+    PRINT_FUNC;
 }
