@@ -307,10 +307,9 @@ SuffixTree::s_ret SuffixTree::setitem(PiXiuStr * src) {
 
 void t_SuffixTree(void) {
     using namespace std;
-    srand(19950207);
 
-    auto contains = [](SuffixTree * self, uint8_t item[], int begin, int end) -> bool {
-        auto edge_node = self->root->get_sub(item[begin]);
+    auto contains = [](SuffixTree * self, uint8_t src[], int begin, int end) -> bool {
+        auto edge_node = self->root->get_sub(src[begin]);
         if (edge_node == NULL) {
             return false;
         }
@@ -318,7 +317,7 @@ void t_SuffixTree(void) {
         while (true) {
             auto edge_pxs = Glob_Ctx->getitem(edge_node->chunk_idx);
             for (int i = edge_node->from; i < edge_node->to; ++i) {
-                if (edge_pxs->data[i] != item[begin]) {
+                if (edge_pxs->data[i] != src[begin]) {
                     return false;
                 } else {
                     begin++;
@@ -327,26 +326,27 @@ void t_SuffixTree(void) {
                     }
                 }
             }
-            edge_node = edge_node->get_sub(item[begin]);
+            edge_node = edge_node->get_sub(src[begin]);
         }
     };
 
     SuffixTree st;
-    string alphabet[] = {"A", "B", "C", "D", "E"};
     st.init_prop();
 
-    for (int i = 0; i < 200; ++i) {
+    string alphabet[] = {"A", "B", "C", "D", "E"};
+    for (int i = 0; i < 1000; ++i) {
         string sample;
         auto len = rand() % 20;
         for (int j = 0; j < len + 1; ++j) {
             sample += alphabet[rand() % lenOf(alphabet)];
         }
+        sample += '.';
 
         auto end = (int) sample.size();
-        auto item = (uint8_t *) sample.c_str();
-        st.setitem(PiXiuStr_init(item, end));
+        auto src = (uint8_t *) sample.c_str();
+        st.setitem(PiXiuStr_init(src, end));
         for (int begin = 0; begin < end; ++begin) {
-            assert(contains(adrOf(st), item, begin, end));
+            assert(contains(adrOf(st), src, begin, end));
         }
     }
 
