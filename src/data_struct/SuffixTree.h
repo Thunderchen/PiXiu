@@ -5,7 +5,7 @@
 #include "ScapegoatTree.h"
 
 struct STNode {
-    STNode * successor = NULL;
+    STNode * successor;
     STNode * parent;
     ScapegoatTree<STNode> subs;
 

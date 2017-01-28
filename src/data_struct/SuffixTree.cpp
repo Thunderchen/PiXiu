@@ -184,7 +184,8 @@ static void s_insert_char(SuffixTree * self, uint16_t chunk_idx, uint8_t msg_cha
             self->act_direct = next_edge_node->from;
             self->act_offset = 1;
             MSG_COMPRESS(next_edge_node->chunk_idx, next_edge_node->from);
-        } else if (msg_char == edge_pxs->data[edge_node->from + self->act_offset]) {
+        } else if (edge_node->from + self->act_offset < edge_node->to
+                   && msg_char == edge_pxs->data[edge_node->from + self->act_offset]) {
             self->act_offset++;
             MSG_COMPRESS(edge_node->chunk_idx, edge_node->from + self->act_offset);
         } else {
@@ -234,14 +235,20 @@ static void s_insert_char(SuffixTree * self, uint16_t chunk_idx, uint8_t msg_cha
             };
 
             std::function<void()> overflow_fix = [&]() {
-                edge_node = self->act_node->get_sub(curr_pxs->data[self->act_direct]);
+                auto end = self->counter;
+                auto begin = end - self->act_offset;
+                edge_node = self->act_node->get_sub(curr_pxs->data[self->counter - self->act_offset]);
                 edge_pxs = Glob_Ctx->getitem(edge_node->chunk_idx);
-                auto supply = edge_node->to - edge_node->from;
-                if (self->act_offset > supply) {
+
+                int supply;
+                while (end - begin > (supply = edge_node->to - edge_node->from)) {
                     self->act_node = edge_node;
-                    self->act_direct += supply;
+                    begin += supply;
                     self->act_offset -= supply;
-                    return overflow_fix();
+
+                    edge_node = self->act_node->get_sub(curr_pxs->data[begin]);
+                    edge_pxs = Glob_Ctx->getitem(edge_node->chunk_idx);
+                    self->act_direct = edge_node->from;
                 }
             };
 
@@ -273,7 +280,9 @@ static void s_insert_char(SuffixTree * self, uint16_t chunk_idx, uint8_t msg_cha
                         prev_inner_node->successor = self->act_node;
                     }
                     break;
-                } else if (msg_char == edge_pxs->data[edge_node->from + self->act_offset]) {
+                } else if (edge_node->from + self->act_offset < edge_node->to
+                           && msg_char == edge_pxs->data[edge_node->from + self->act_offset]) {
+                    self->act_offset++;
                     break;
                 }
             }
@@ -301,6 +310,7 @@ SuffixTree::s_ret SuffixTree::setitem(PiXiuStr * src) {
 
 void t_SuffixTree(void) {
     using namespace std;
+    srand(19950207);
 
     auto contains = [](SuffixTree * self, uint8_t item[], int begin, int end) -> bool {
         auto edge_node = self->root->get_sub(item[begin]);
@@ -326,25 +336,45 @@ void t_SuffixTree(void) {
 
     SuffixTree st;
     string alphabet[] = {"A", "B", "C", "D", "E"};
-    for (int i = 0; i < 200; ++i) {
+    for (int i = 0; i < 1000; ++i) {
+
+
         st.init_prop();
+        for (int k = 0; k < 2; ++k) {
 
-        string sample;
-        auto len = rand() % 20;
-        for (int j = 0; j < len + 1; ++j) {
-            sample += alphabet[rand() % lenOf(alphabet)];
+            string sample;
+            auto len = rand() % 200;
+            for (int j = 0; j < len + 1; ++j) {
+                sample += alphabet[rand() % lenOf(alphabet)];
+            }
+
+            printf("%ith sample is %s\n", i, sample.c_str());
+            auto end = (int) sample.size();
+            auto item = (uint8_t *) sample.c_str();
+            st.setitem(PiXiuStr_init(item, end));
+            for (int begin = 0; begin < end; ++begin) {
+                assert(contains(adrOf(st), item, begin, end));
+            }
+
+            free(st.repr());
+        printf("Done one\n");
         }
-
-        auto end = (int) sample.size();
-        auto item = (uint8_t *) sample.c_str();
-        st.setitem(PiXiuStr_init(item, end));
-        for (int begin = 0; begin < end; ++begin) {
-            assert(contains(adrOf(st), item, begin, end));
-        }
-
-        free(st.repr());
         PiXiuChunk_free(st.cbt_chunk);
         st.free_prop();
     }
+
+//    string test_set[] = {"CDBBBCBEADDAE", "BAEAADE"};
+//    st.init_prop();
+//    for (int i = 0; i < 2; ++i) {
+//        string sample = test_set[i];
+//
+//        auto end = (int) sample.size();
+//        auto item = (uint8_t *) sample.c_str();
+//        st.setitem(PiXiuStr_init(item, end));
+//        printf("%s\n\n", st.repr());
+//        for (int begin = 0; begin < end; ++begin) {
+//            assert(contains(adrOf(st), item, begin, end));
+//        }
+//    }
     PRINT_FUNC;
 }
