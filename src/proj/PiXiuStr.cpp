@@ -326,8 +326,8 @@ void t_PiXiuStr(void) {
     PiXiuStr_free(pxs);
     // </>
 
-    // parse
     assert(sizeof(PXSRecord) == sizeof(PXSRecordBig));
+    // <Parse>
     PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_ON });
     PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_PASS, .val = 1 });
     PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_PASS, .val = PXS_UNIQUE });
@@ -336,39 +336,37 @@ void t_PiXiuStr(void) {
     PXS_STREAM({ .chunk_idx__cmd = 1, .pxs_idx = 0, .val = PXS_UNIQUE });
     PXS_STREAM({ .chunk_idx__cmd = 1, .pxs_idx = 1, .val = PXS_UNIQUE });
     PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_PASS, .val = 3 });
-    for (int i = 0; i < 11; ++i) {
+    for (int i = 0; i < 11; ++i)
         PXS_STREAM({ .chunk_idx__cmd = 2, .pxs_idx = i, .val = 2 });
-    }
     PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_PASS, .val = 3 });
-    for (int i = 1; i < 257; ++i) {
+    for (int i = 1; i < 257; ++i)
         PXS_STREAM({ .chunk_idx__cmd = 3, .pxs_idx = i, .val = 6 });
-    }
     pxs = PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_OFF });
 
-    set_expect(1, 251, 251, 1, 251, 251, 3, 251, 11, 2, 0, 11, 0, 3, 251, 1, 3, 0, 1, 1, 1, 0);
+    set_expect(1, PXS_UNIQUE, PXS_UNIQUE, 1, PXS_UNIQUE, PXS_UNIQUE, 3,
+               PXS_UNIQUE, 11, 2, 0, 11, 0,
+               3,
+               PXS_UNIQUE, PXS_COMPRESS, 3, 0, 1, 1, 1, 0);
     assert_out(pxs);
 
     PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_ON });
-    for (int i = 0; i < 11; ++i) {
+    for (int i = 0; i < 11; ++i)
         PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_PASS, .val = 2 });
-    }
     PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_PASS, .val = 8 });
-    auto pxs_i2v2 = PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_OFF });
+    auto i2v2 = PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_OFF });
 
     PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_ON });
     PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_PASS, .val = 8 });
-    for (int i = 0; i < 256; ++i) {
+    for (int i = 0; i < 256; ++i)
         PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_PASS, .val = 6 });
-    }
     PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_PASS, .val = 8 });
-    auto pxs_i3v6 = PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_OFF });
+    auto i3v6 = PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_OFF });
 
-    chunk.strs[2] = pxs_i2v2;
-    chunk.strs[3] = pxs_i3v6;
-    auto gen = pxs->parse(1, 272, adrOf(chunk));
-
+    chunk.strs[2] = i2v2;
+    chunk.strs[3] = i3v6;
     uint8_t rv_arr[271];
-    int i = 0;
+    auto i = 0;
+    auto gen = pxs->parse(1, 272, adrOf(chunk));
     while (gen->operator()(rv_arr[i])) {
         i++;
     }
@@ -384,10 +382,11 @@ void t_PiXiuStr(void) {
 
     PXSGen_free(gen);
     PiXiuStr_free(pxs);
-    PiXiuStr_free(pxs_i2v2);
-    PiXiuStr_free(pxs_i3v6);
+    PiXiuStr_free(i2v2);
+    PiXiuStr_free(i3v6);
+    // </>
 
-    // key equal
+    // <Key Equal>
     PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_ON });
     PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_PASS, .val = 1 });
     PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_PASS, .val = PXS_UNIQUE });
@@ -403,11 +402,12 @@ void t_PiXiuStr(void) {
     PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_PASS, .val = PXS_UNIQUE });
     PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_PASS, .val = PXS_KEY });
     PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_PASS, .val = 7 });
-    auto k1_ = PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_OFF });
+    auto k3 = PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_OFF });
 
-    assert(k1->key_eq(k1_, adrOf(chunk)));
+    assert(k1->key_eq(k3, adrOf(chunk)));
     assert(!k1->key_eq(k2, adrOf(chunk)));
     PiXiuStr_free(k1);
     PiXiuStr_free(k2);
-    PiXiuStr_free(k1_);
+    PiXiuStr_free(k3);
+    // </>
 }
