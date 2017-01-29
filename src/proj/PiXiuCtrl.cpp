@@ -2,7 +2,7 @@
 
 extern PiXiuChunk * Glob_Reinsert_Chunk;
 
-int PiXiuCtrl::setitem(uint8_t * k, int k_len, uint8_t * v, int v_len) {
+int PiXiuCtrl::setitem(uint8_t k[], int k_len, uint8_t v[], int v_len) {
 #ifndef NDEBUG
     auto num = 0;
     for (int i = 0; i < k_len; ++i)
@@ -11,7 +11,7 @@ int PiXiuCtrl::setitem(uint8_t * k, int k_len, uint8_t * v, int v_len) {
     for (int i = 0; i < v_len; ++i)
         if (v[i] == PXS_UNIQUE)
             num++;
-    assert(num + k_len + v_len + 2 <= UINT16_MAX);
+    assert(num + k_len + v_len + 2 + 2 <= UINT16_MAX);
 #endif
 
     if (this->st.local_chunk.used_num == UINT16_MAX) {
@@ -30,22 +30,14 @@ int PiXiuCtrl::setitem(uint8_t * k, int k_len, uint8_t * v, int v_len) {
         this->reinsert(Glob_Reinsert_Chunk);
     }
 
-//    auto pxs_k = PiXiuStr_init_key(k, k_len);
-    auto pxs_v = PiXiuStr_init(v, v_len);
-//    auto pxs = pxs_k->concat(pxs_v);
-//    PiXiuStr_free(pxs_k);
-//    PiXiuStr_free(pxs_v);
-    for (int i = 0; i < pxs_v->len; ++i) {
-        printf("%c", pxs_v->data[i]);
-    }
-    printf("\n");
+    auto pxs_k = PiXiuStr_init_key(k, k_len);
+    auto pxs_v = PiXiuStr_init_key(v, v_len);
+    auto merge = pxs_k->concat(pxs_v);
+    PiXiuStr_free(pxs_k);
+    PiXiuStr_free(pxs_v);
 
-    auto product = this->st.setitem(pxs_v);
-    auto out = product.cbt_chunk->getitem(product.idx)->parse(0, PXSG_MAX_TO, product.cbt_chunk)->consume_repr();
-    for (int i = 0; out[i] != '\0'; i++) {
-        assert(out[i] == pxs_v->data[i]);
-    }
-    return this->cbt.setitem(pxs_v, product.cbt_chunk, product.idx);
+    auto product = this->st.setitem(merge);
+    return this->cbt.setitem(merge, product.cbt_chunk, product.idx);
 }
 
 #define RETURN_APPLY(action) \
@@ -55,22 +47,22 @@ auto ret = action(pxs); \
 PiXiuStr_free(pxs); \
 return ret;
 
-bool PiXiuCtrl::contains(uint8_t * k, int k_len) {
+bool PiXiuCtrl::contains(uint8_t k[], int k_len) {
     RETURN_APPLY(this->cbt.contains);
 }
 
-PXSGen * PiXiuCtrl::getitem(uint8_t * k, int k_len) {
+PXSGen * PiXiuCtrl::getitem(uint8_t k[], int k_len) {
     RETURN_APPLY(this->cbt.getitem);
 }
 
-int PiXiuCtrl::delitem(uint8_t * k, int k_len) {
+int PiXiuCtrl::delitem(uint8_t k[], int k_len) {
     if (Glob_Reinsert_Chunk != NULL && Glob_Reinsert_Chunk != this->st.cbt_chunk) {
         this->reinsert(Glob_Reinsert_Chunk);
     }
     RETURN_APPLY(this->cbt.delitem);
 }
 
-CBTGen * PiXiuCtrl::iter(uint8_t * prefix, int prefix_len) {
+CBTGen * PiXiuCtrl::iter(uint8_t prefix[], int prefix_len) {
     assert(prefix_len + 2 <= UINT16_MAX);
     auto pxs = PiXiuStr_init(prefix, prefix_len);
     auto ret = this->cbt.iter(pxs);
@@ -126,7 +118,7 @@ void t_PiXiuCtrl(void) {
     uint8_t key[5];
     uint8_t value[20];
 
-    auto gen_rand = [&](uint8_t * des, int max_len) -> int {
+    auto gen_rand = [&](uint8_t des[], int max_len) -> int {
         auto rand_len = rand_range(max_len - 1) + 1;
         for (int i = 0; i < rand_len; ++i) {
             des[i] = alphabet[(rand_range(lenOf(alphabet) - 1))];
