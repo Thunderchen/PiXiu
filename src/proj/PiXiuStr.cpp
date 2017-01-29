@@ -88,7 +88,6 @@ PiXiuStr * PiXiuStr_init_stream(PXSMsg msg) {
             List_append(uint8_t, list, msg_char);
             break;
     }
-
     return ret;
 };
 
