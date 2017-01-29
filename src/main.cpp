@@ -29,7 +29,7 @@ int main() {
     t_gen();
     t_List();
     t_MemPool();
-//    t_PiXiuCtrl();
+    t_PiXiuCtrl();
     t_PiXiuStr();
     t_Que();
     t_ScapegoatTree();

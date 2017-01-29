@@ -81,17 +81,14 @@ void PiXiuCtrl::reinsert(PiXiuChunk *& cbt_chunk) {
     assert(cbt_chunk->used_num < 0.8 * PXC_STR_NUM);
     auto reserve_chunk = Glob_Reinsert_Chunk;
 
-    for (int i = 0; cbt_chunk->used_num > 0; ++i) {
-        if (cbt_chunk->is_delitem(i)) {
-            PiXiuStr_free(cbt_chunk->getitem(i));
-        } else {
-            auto pxs = cbt_chunk->getitem(i);
-            this->cbt.delitem(pxs);
-            Glob_Reinsert_Chunk = NULL;
+    for (int i = 0; i < lenOf(cbt_chunk->strs); ++i) {
+        if (!cbt_chunk->is_delitem(i)) {
 
-            auto product = this->st.setitem(pxs);
-            this->cbt.setitem(pxs, product.cbt_chunk, product.idx);
-            assert(Glob_Reinsert_Chunk == NULL);
+        }
+    }
+    for (int i = 0; i < lenOf(cbt_chunk->strs); ++i) {
+        if (cbt_chunk->is_delitem(i)) {
+
         }
     }
     free(cbt_chunk);
@@ -100,48 +97,6 @@ void PiXiuCtrl::reinsert(PiXiuChunk *& cbt_chunk) {
     cbt_chunk = NULL;
 }
 
-#define rand_range(max) ((int) ((double) rand() / (double) RAND_MAX * (double) (max)))
-
 void t_PiXiuCtrl(void) {
-    Glob_Reinsert_Chunk = NULL;
 
-    srand(19950207);
-    List_init(PiXiuStr *, key_keep);
-    List_init(PiXiuStr *, value_keep);
-    PiXiuCtrl ctrl;
-    ctrl.init_prop();
-
-    uint8_t alphabet[] = {'A', 'B', 'C', 'D', 'E'};
-    uint8_t key[5];
-    uint8_t value[20];
-
-    auto gen_rand = [&](uint8_t des[], int max_len) -> int {
-        auto rand_len = rand_range(max_len - 1) + 1;
-        for (int i = 0; i < rand_len; ++i) {
-            des[i] = alphabet[(rand_range(lenOf(alphabet) - 1))];
-        }
-        return rand_len;
-    };
-
-    // 随机写入
-    for (int i = 0; i < PXC_STR_NUM * 2; ++i) {
-//        auto k_len = gen_rand(key, lenOf(key));
-        auto v_len = gen_rand(value, lenOf(value));
-//        List_append(PiXiuStr *, key_keep, PiXiuStr_init_key(key, k_len));
-        List_append(PiXiuStr *, value_keep, PiXiuStr_init(value, v_len));
-//        ctrl.setitem(key, k_len, value, v_len);
-        SuffixTree g;
-        g.init_prop();
-        for (int j = 0; j < value_keep[value_keep_len - 1]->len; ++j) {
-            printf("%c", value_keep[value_keep_len - 1]->data[j]);
-        }
-        printf("\n");
-        g.setitem(value_keep[value_keep_len - 1]);
-        g.free_prop();
-
-    }
-
-    List_free(key_keep);
-    List_free(value_keep);
-    ctrl.free_prop();
 }
