@@ -116,6 +116,7 @@ $gen(PXSGen) {
     int ret_cursor;
     int src_cursor;
     int i;
+    int sub_from, sub_to;
 
     uint8_t cmd;
     uint8_t next_cmd;
@@ -123,7 +124,6 @@ $gen(PXSGen) {
 
     // <body>
     $emit(uint8_t)
-            int sub_from, sub_to;
             int supply;
             PXSRecord record;
 
