@@ -14,15 +14,14 @@ PiXiuStr * PiXiuStr_init_key(uint8_t src[], int src_len) {
 };
 
 PiXiuStr * PiXiuStr_init_stream(PXSMsg msg) {
-    static size_t list_len;
-    static size_t list_capacity;
+    static int list_len;
+    static int list_capacity;
     static uint8_t * list;
 
     static int compress_len;
     static int compress_idx;
     static int compress_to;
 
-    PiXiuStr * ret;
     auto chunk_idx = msg.chunk_idx__cmd;
     auto pxs_idx = msg.pxs_idx;
     auto msg_char = msg.val;
@@ -61,13 +60,12 @@ PiXiuStr * PiXiuStr_init_stream(PXSMsg msg) {
         compress_len++;
     };
 
-    ret = NULL;
+    PiXiuStr * ret = NULL;
     switch (chunk_idx) {
         case PXS_STREAM_ON:
             list_len = 0;
             list_capacity = 2;
-            list = (uint8_t *) malloc(list_capacity);
-
+            list = (uint8_t *) malloc((size_t) list_capacity);
             compress_len = 0;
             break;
 
@@ -81,7 +79,7 @@ PiXiuStr * PiXiuStr_init_stream(PXSMsg msg) {
             ret = (PiXiuStr *) malloc(sizeof(PiXiuStr) + list_len);
             ret->len = (uint16_t) list_len;
             assert(list_len <= PXSG_MAX_TO);
-            memcpy(ret->data, list, list_len);
+            memcpy(ret->data, list, (size_t) list_len);
             List_free(list);
             break;
 
