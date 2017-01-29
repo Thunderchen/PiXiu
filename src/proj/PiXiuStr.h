@@ -124,8 +124,8 @@ $gen(PXSGen) {
 
     // <body>
     $emit(uint8_t)
-            int supply;
             PXSRecord record;
+            int supply;
 
             assert(from >= 0 && to >= from);
             sub_gen = NULL;

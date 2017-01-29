@@ -334,7 +334,7 @@ void t_SuffixTree(void) {
     st.init_prop();
 
     string alphabet[] = {"A", "B", "C", "D", "E"};
-    for (int i = 0; i < 1000; ++i) {
+    for (int i = 0; i < 100; ++i) {
         string sample;
         auto len = rand() % 20 + 1;
         for (int j = 0; j < len; ++j) {
