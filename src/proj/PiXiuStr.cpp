@@ -281,7 +281,7 @@ void t_PiXiuStr(void) {
 
     pxs = PiXiuStr_init(input, lenOf(input));
     assert(pxs->len == lenOf(input) + 2);
-    assert_out(pxs);;
+    assert_out(pxs);
     PiXiuStr_free(pxs);
 
     auto a = PiXiuStr_init(input, 2);
@@ -309,7 +309,7 @@ void t_PiXiuStr(void) {
     pxs = PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_OFF });
 
     set_expect(1, 1, 1, 1, 3, 3, 3, 3, 3, 3, 1, PXS_UNIQUE, 7, 3, 0, 7, 0);
-    assert_out(pxs);;
+    assert_out(pxs);
     PiXiuStr_free(pxs);
 
     PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_ON });
@@ -321,8 +321,8 @@ void t_PiXiuStr(void) {
         PXS_STREAM({ .chunk_idx__cmd = 3, .pxs_idx = i, .val = 4 });
     pxs = PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_OFF });
 
-    set_expect(1, PXS_UNIQUE, 255, 2, 0, 255, 0, 1, PXS_UNIQUE, PXS_KEY, 3, 0, 0, 1, 0, 0);
-    assert_out(pxs);;
+    set_expect(1, PXS_UNIQUE, 255, 2, 0, 255, 0, 1, PXS_UNIQUE, PXS_COMPRESS, 3, 0, 0, 1, 0, 0);
+    assert_out(pxs);
     PiXiuStr_free(pxs);
     // </>
 
@@ -346,7 +346,7 @@ void t_PiXiuStr(void) {
     pxs = PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_OFF });
 
     set_expect(1, 251, 251, 1, 251, 251, 3, 251, 11, 2, 0, 11, 0, 3, 251, 1, 3, 0, 1, 1, 1, 0);
-    assert_out(pxs);;
+    assert_out(pxs);
 
     PXS_STREAM({ .chunk_idx__cmd = PXS_STREAM_ON });
     for (int i = 0; i < 11; ++i) {
