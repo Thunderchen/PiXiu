@@ -5,16 +5,12 @@ extern PiXiuChunk * Glob_Reinsert_Chunk;
 int PiXiuCtrl::setitem(uint8_t * k, int k_len, uint8_t * v, int v_len) {
 #ifndef NDEBUG
     auto num = 0;
-    for (int i = 0; i < k_len; ++i) {
-        if (k[i] == PXS_UNIQUE) {
+    for (int i = 0; i < k_len; ++i)
+        if (k[i] == PXS_UNIQUE)
             num++;
-        }
-    }
-    for (int i = 0; i < v_len; ++i) {
-        if (v[i] == PXS_UNIQUE) {
+    for (int i = 0; i < v_len; ++i)
+        if (v[i] == PXS_UNIQUE)
             num++;
-        }
-    }
     assert(num + k_len + v_len + 2 <= UINT16_MAX);
 #endif
 
@@ -40,14 +36,14 @@ int PiXiuCtrl::setitem(uint8_t * k, int k_len, uint8_t * v, int v_len) {
 //    PiXiuStr_free(pxs_k);
 //    PiXiuStr_free(pxs_v);
     for (int i = 0; i < pxs_v->len; ++i) {
-        printf("%c",pxs_v->data[i]);
+        printf("%c", pxs_v->data[i]);
     }
     printf("\n");
 
     auto product = this->st.setitem(pxs_v);
-    auto out=product.cbt_chunk->getitem(product.idx)->parse(0,PXSG_MAX_TO,product.cbt_chunk)->consume_repr();
+    auto out = product.cbt_chunk->getitem(product.idx)->parse(0, PXSG_MAX_TO, product.cbt_chunk)->consume_repr();
     for (int i = 0; out[i] != '\0'; i++) {
-        assert(out[i]==pxs_v->data[i]);
+        assert(out[i] == pxs_v->data[i]);
     }
     return this->cbt.setitem(pxs_v, product.cbt_chunk, product.idx);
 }
@@ -147,8 +143,8 @@ void t_PiXiuCtrl(void) {
 //        ctrl.setitem(key, k_len, value, v_len);
         SuffixTree g;
         g.init_prop();
-        for (int j = 0; j <value_keep[value_keep_len - 1]->len ; ++j) {
-            printf("%c",value_keep[value_keep_len - 1]->data[j]);
+        for (int j = 0; j < value_keep[value_keep_len - 1]->len; ++j) {
+            printf("%c", value_keep[value_keep_len - 1]->data[j]);
         }
         printf("\n");
         g.setitem(value_keep[value_keep_len - 1]);

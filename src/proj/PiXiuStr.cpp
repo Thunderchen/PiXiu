@@ -410,4 +410,5 @@ void t_PiXiuStr(void) {
     PiXiuStr_free(k2);
     PiXiuStr_free(k3);
     // </>
+    PRINT_FUNC;
 }

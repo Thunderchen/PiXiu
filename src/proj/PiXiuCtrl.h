@@ -8,15 +8,15 @@ struct PiXiuCtrl {
     CritBitTree cbt;
     SuffixTree st;
 
-    int setitem(uint8_t *, int, uint8_t *, int);
+    int setitem(uint8_t[], int, uint8_t[], int);
 
-    bool contains(uint8_t *, int);
+    bool contains(uint8_t[], int);
 
-    PXSGen * getitem(uint8_t *, int);
+    PXSGen * getitem(uint8_t[], int);
 
-    CBTGen * iter(uint8_t *, int);
+    CBTGen * iter(uint8_t[], int);
 
-    int delitem(uint8_t *, int);
+    int delitem(uint8_t[], int);
 
     void init_prop(void);
 
