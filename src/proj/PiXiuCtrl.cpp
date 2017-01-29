@@ -41,8 +41,7 @@ int PiXiuCtrl::setitem(uint8_t k[], int k_len, uint8_t v[], int v_len) {
 }
 
 #define RETURN_APPLY(action) \
-assert(k ## _len + 2 <= UINT16_MAX); \
-auto pxs = PiXiuStr_init_key(k, k ## _len); \
+auto pxs = PiXiuStr_init_key(k, k_len); \
 auto ret = action(pxs); \
 PiXiuStr_free(pxs); \
 return ret;
@@ -63,7 +62,6 @@ int PiXiuCtrl::delitem(uint8_t k[], int k_len) {
 }
 
 CBTGen * PiXiuCtrl::iter(uint8_t prefix[], int prefix_len) {
-    assert(prefix_len + 2 <= UINT16_MAX);
     auto pxs = PiXiuStr_init(prefix, prefix_len);
     auto ret = this->cbt.iter(pxs);
     PiXiuStr_free(pxs);
@@ -81,10 +79,9 @@ void PiXiuCtrl::free_prop() {
 
 void PiXiuCtrl::reinsert(PiXiuChunk *& cbt_chunk) {
     assert(cbt_chunk->used_num < 0.8 * PXC_STR_NUM);
-    auto reserve = Glob_Reinsert_Chunk;
+    auto reserve_chunk = Glob_Reinsert_Chunk;
 
     for (int i = 0; cbt_chunk->used_num > 0; ++i) {
-        assert(i <= PXC_STR_NUM - 1);
         if (cbt_chunk->is_delitem(i)) {
             PiXiuStr_free(cbt_chunk->getitem(i));
         } else {
@@ -99,7 +96,7 @@ void PiXiuCtrl::reinsert(PiXiuChunk *& cbt_chunk) {
     }
     free(cbt_chunk);
 
-    Glob_Reinsert_Chunk = reserve;
+    Glob_Reinsert_Chunk = reserve_chunk;
     cbt_chunk = NULL;
 }
 
