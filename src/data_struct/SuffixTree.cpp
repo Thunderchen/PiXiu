@@ -331,27 +331,56 @@ void t_SuffixTree(void) {
     };
 
     SuffixTree st;
-    st.init_prop();
+//    for (int k = 0; k < 10000; ++k) {
+//        st.init_prop();
+//
+//        string alphabet[] = {"A", "B", "C", "D", "E"};
+//        for (int i = 0; i < 2; ++i) {
+//            string sample;
+//            auto len = rand() % 20;
+//            for (int j = 0; j < len + 1; ++j) {
+//                sample += alphabet[rand() % lenOf(alphabet)];
+//            }
+//            sample += '.';
+//            printf("%ith sample is %s\n",i,sample.c_str());
+//
+//            auto end = (int) sample.size();
+//            auto src = (uint8_t *) sample.c_str();
+//            auto ret = st.setitem(PiXiuStr_init(src, end));
+//            for (int begin = 0; begin < end; ++begin) {
+//                assert(contains(adrOf(st), src, begin, end));
+//            }
+//
+//            auto str = ret.cbt_chunk->getitem(ret.idx)->parse(0, PXSG_MAX_TO, ret.cbt_chunk)->consume_repr();
+//            assert(!strcasecmp(str, sample.c_str()));
+//            free(str);
+//        }
+//
+//        free(st.repr());
+//        PiXiuChunk_free(st.cbt_chunk);
+//        st.free_prop();
+//    }
 
-    string alphabet[] = {"A", "B", "C", "D", "E"};
-    for (int i = 0; i < 1000; ++i) {
-        string sample;
-        auto len = rand() % 20;
-        for (int j = 0; j < len + 1; ++j) {
-            sample += alphabet[rand() % lenOf(alphabet)];
-        }
-        sample += '.';
+//    0th sample is EE.
+//    1th sample is AEBADADADADAAAED.
+
+    string test_set[] = {"EE.", "AEBADADADADAAAED."};
+    st.init_prop();
+    for (int i = 0; i < 2; ++i) {
+        string sample = test_set[i];
 
         auto end = (int) sample.size();
-        auto src = (uint8_t *) sample.c_str();
-        st.setitem(PiXiuStr_init(src, end));
+        auto item = (uint8_t *) sample.c_str();
+        auto ret = st.setitem(PiXiuStr_init(item, end));
+        printf("%s\n\n", st.repr());
         for (int begin = 0; begin < end; ++begin) {
-            assert(contains(adrOf(st), src, begin, end));
+            assert(contains(adrOf(st), item, begin, end));
         }
-    }
 
-    free(st.repr());
-    PiXiuChunk_free(st.cbt_chunk);
-    st.free_prop();
+        auto str = ret.cbt_chunk->getitem(ret.idx)->parse(0, PXSG_MAX_TO, ret.cbt_chunk)->consume_repr();
+        printf("Output is %s\n", str);
+        assert(!strcasecmp(str, sample.c_str()));
+        free(str);
+    }
     PRINT_FUNC;
 }
