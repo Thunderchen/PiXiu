@@ -17,7 +17,7 @@
 #define PXS_STREAM_PASS -3
 
 #define PXC_STR_NUM 65535
-#define PXSG_MAX_TO UINT16_MAX
+#define PXSG_MAX_TO 65535
 
 #define PXSG_SEE_KEY_BREAK(val, cmd) \
 if (!spec_mode && val == PXS_UNIQUE) { spec_mode = true; } \
@@ -128,6 +128,7 @@ $gen(PXSGen) {
             PXSRecord record;
 
             assert(from >= 0 && to >= from);
+            sub_gen = NULL;
             len = to - from;
             src_cursor = ret_cursor = 0;
 
@@ -167,6 +168,7 @@ $gen(PXSGen) {
                             }
                             ret_cursor += sub_to - sub_from;
                             PXSGen_free(sub_gen);
+                            sub_gen = NULL;
                         }
                     } else { assert(false); }
                 } else {

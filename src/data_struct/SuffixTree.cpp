@@ -91,7 +91,7 @@ void SuffixTree::reset() {
 char * SuffixTree::repr() {
     List_init(char, output);
 
-    std::function<void(STNode *)> print_node = [&](STNode * node) {
+    auto print_node = [&](STNode * node) {
         if (node == this->act_node) {
             List_append(char, output, '*';)
         }

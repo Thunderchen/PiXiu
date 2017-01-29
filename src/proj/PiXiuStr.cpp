@@ -194,6 +194,9 @@ void PiXiuChunk_free(PiXiuChunk * chunk) {
 }
 
 void PXSGen_free(PXSGen * gen) {
+    if (gen->sub_gen != NULL) {
+        PXSGen_free(gen->sub_gen);
+    }
     free(gen);
 }
 
