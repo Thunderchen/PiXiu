@@ -4,7 +4,7 @@
 
 extern PiXiuChunk * Glob_Reinsert_Chunk;
 
-int PiXiuCtrl::setitem(uint8_t k[], int k_len, uint8_t v[], int v_len) {
+int PiXiuCtrl::setitem(uint8_t k[], int k_len, uint8_t v[], int v_len, bool reinsert = false) {
     if (this->st.local_chunk.used_num == UINT16_MAX) {
         auto last_chunk = this->st.cbt_chunk;
         this->st.free_prop();
@@ -17,18 +17,21 @@ int PiXiuCtrl::setitem(uint8_t k[], int k_len, uint8_t v[], int v_len) {
             this->reinsert(last_chunk);
         }
     }
-    if (Glob_Reinsert_Chunk != NULL && Glob_Reinsert_Chunk != this->st.cbt_chunk) {
+    if (!reinsert && Glob_Reinsert_Chunk != NULL && Glob_Reinsert_Chunk != this->st.cbt_chunk) {
         this->reinsert(Glob_Reinsert_Chunk);
     }
 
     PiXiuStr * doc;
-    if (v_len) {
+    if (k_len && v_len) {
         auto pxs_k = PiXiuStr_init_key(k, k_len);
         auto pxs_v = PiXiuStr_init_key(v, v_len);
         doc = pxs_k->concat(pxs_v);
         PiXiuStr_free(pxs_k);
         PiXiuStr_free(pxs_v);
+    } else if (!k_len && !v_len) {
+        doc = (PiXiuStr *) k;
     } else {
+        assert(k_len);
         doc = PiXiuStr_init_key(k, k_len);
     }
     auto product = this->st.setitem(doc);
