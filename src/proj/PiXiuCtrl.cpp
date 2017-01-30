@@ -81,19 +81,19 @@ void PiXiuCtrl::reinsert(PiXiuChunk *& chunk) {
 
     for (int i = 0; i < lenOf(chunk->strs); ++i) {
         if (!chunk->is_delitem(i)) {
-            auto gen = chunk->strs[i]->parse(0, PXSG_MAX_TO, chunk);
             uint8_t decompress[PXSG_MAX_TO];
+            auto gen = chunk->strs[i]->parse(0, PXSG_MAX_TO, chunk);
 
             uint8_t rv;
-            auto len = 0;
+            uint16_t len = 0;
             while (gen->operator()(rv)) {
                 decompress[len++] = rv;
             }
             PXSGen_free(gen);
 
             auto pxs = (PiXiuStr *) malloc(sizeof(PiXiuStr) + len);
-            pxs->len = (uint16_t) len;
-            memcpy(pxs->data, decompress, (size_t) len);
+            pxs->len = len;
+            memcpy(pxs->data, decompress, len);
             this->setitem((uint8_t *) pxs, 0, NULL, 0, true);
         }
     }
