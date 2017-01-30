@@ -4,8 +4,8 @@
 
 extern PiXiuChunk * Glob_Reinsert_Chunk;
 
-int PiXiuCtrl::setitem(uint8_t k[], int k_len, uint8_t v[], int v_len, bool reinsert = false) {
-    if (this->st.local_chunk.used_num == UINT16_MAX) {
+int PiXiuCtrl::setitem(uint8_t k[], int k_len, uint8_t v[], int v_len, bool reinsert) {
+    if (this->st.local_chunk.used_num == PXC_STR_NUM) {
         auto last_chunk = this->st.cbt_chunk;
         this->st.free_prop();
         this->st.init_prop();
@@ -67,6 +67,7 @@ CBTGen * PiXiuCtrl::iter(uint8_t prefix[], int prefix_len) {
 }
 
 void PiXiuCtrl::init_prop() {
+    Glob_Reinsert_Chunk = NULL;
     this->st.init_prop();
 }
 
@@ -91,10 +92,10 @@ void PiXiuCtrl::reinsert(PiXiuChunk *& chunk) {
             }
             PXSGen_free(gen);
 
-            auto pxs = (PiXiuStr *) malloc(sizeof(PiXiuStr) + len);
-            pxs->len = len;
-            memcpy(pxs->data, decompress, len);
-            this->setitem((uint8_t *) pxs, 0, NULL, 0, true);
+            auto re_pxs = (PiXiuStr *) malloc(sizeof(PiXiuStr) + len);
+            re_pxs->len = len;
+            memcpy(re_pxs->data, decompress, len);
+            this->setitem((uint8_t *) re_pxs, 0, NULL, 0, true);
         }
     }
     PiXiuChunk_free(chunk);
@@ -104,5 +105,29 @@ void PiXiuCtrl::reinsert(PiXiuChunk *& chunk) {
 }
 
 void t_PiXiuCtrl(void) {
+    PiXiuCtrl ctrl;
 
+    // <max len key>
+    ctrl.init_prop();
+    uint8_t max_len_key[PXC_STR_NUM - 2];
+    max_len_key[0] = 233;
+    for (int i = 1; i < lenOf(max_len_key); ++i)
+        max_len_key[i] = 1;
+    ctrl.setitem(max_len_key, lenOf(max_len_key), NULL, 0);
+
+    auto gen = ctrl.getitem(max_len_key, lenOf(max_len_key));
+    printf("Hey Hey\n");
+    uint8_t rv;
+    auto ii = 0;
+    while (gen->operator()(rv)) {
+        printf("%i\n", rv);
+        ii++;
+    }
+    printf("Num is %i\n", ii);
+    PXSGen_free(gen);
+
+    ctrl.free_prop();
+    // </>
+
+    PRINT_FUNC;
 }
