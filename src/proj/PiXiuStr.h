@@ -115,7 +115,7 @@ $gen(PXSGen) {
     int len;
     int ret_cursor;
     int src_cursor;
-    int i;
+    int i, j;
     int sub_from, sub_to;
 
     uint8_t cmd;
@@ -160,15 +160,31 @@ $gen(PXSGen) {
                         if (src_cursor - 1 + supply >= from) {
                             sub_from = record.big.from + max(0, from - src_cursor);
                             sub_to = min<int>(record.big.to, sub_from + (len - ret_cursor));
-                            sub_gen = ctx->strs[record.big.idx]->parse(sub_from, sub_to, ctx);
-
                             uint8_t rv;
-                            while (sub_gen->operator()(rv)) {
-                                $yield(rv);
+
+                            if (sub_from < ret_cursor && ret_cursor < sub_to
+                                && ctx->strs[record.big.idx] == self) {
+                                j = 0;
+                                while (j != sub_to - sub_from) {
+                                    sub_gen = self->parse(sub_from, ret_cursor, ctx);
+                                    while (sub_gen->operator()(rv)) {
+                                        $yield(rv);
+                                        if (++j == sub_to - sub_from) {
+                                            break;
+                                        }
+                                    }
+                                    PXSGen_free(sub_gen);
+                                    sub_gen = NULL;
+                                }
+                            } else {
+                                sub_gen = ctx->strs[record.big.idx]->parse(sub_from, sub_to, ctx);
+                                while (sub_gen->operator()(rv)) {
+                                    $yield(rv);
+                                }
+                                PXSGen_free(sub_gen);
+                                sub_gen = NULL;
                             }
                             ret_cursor += sub_to - sub_from;
-                            PXSGen_free(sub_gen);
-                            sub_gen = NULL;
                         }
                     } else { assert(false); }
                 } else {
