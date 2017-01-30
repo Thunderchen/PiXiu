@@ -13,7 +13,6 @@ int PiXiuCtrl::setitem(uint8_t k[], int k_len, uint8_t v[], int v_len) {
             num++;
     assert(num + k_len + v_len + 2 + 2 <= UINT16_MAX);
 #endif
-
     if (this->st.local_chunk.used_num == UINT16_MAX) {
         auto last_chunk = this->st.cbt_chunk;
         this->st.free_prop();
@@ -30,14 +29,18 @@ int PiXiuCtrl::setitem(uint8_t k[], int k_len, uint8_t v[], int v_len) {
         this->reinsert(Glob_Reinsert_Chunk);
     }
 
-    auto pxs_k = PiXiuStr_init_key(k, k_len);
-    auto pxs_v = PiXiuStr_init_key(v, v_len);
-    auto merge = pxs_k->concat(pxs_v);
-    PiXiuStr_free(pxs_k);
-    PiXiuStr_free(pxs_v);
-
-    auto product = this->st.setitem(merge);
-    return this->cbt.setitem(merge, product.cbt_chunk, product.idx);
+    PiXiuStr * doc;
+    if (v_len) {
+        auto pxs_k = PiXiuStr_init_key(k, k_len);
+        auto pxs_v = PiXiuStr_init_key(v, v_len);
+        doc = pxs_k->concat(pxs_v);
+        PiXiuStr_free(pxs_k);
+        PiXiuStr_free(pxs_v);
+    } else {
+        doc = PiXiuStr_init_key(k, k_len);
+    }
+    auto product = this->st.setitem(doc);
+    return this->cbt.setitem(doc, product.cbt_chunk, product.idx);
 }
 
 #define RETURN_APPLY(action) \
