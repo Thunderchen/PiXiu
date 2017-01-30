@@ -1,24 +1,16 @@
 #include "PiXiuCtrl.h"
 
+#define REINSERT_FACTOR 0.5
+
 extern PiXiuChunk * Glob_Reinsert_Chunk;
 
 int PiXiuCtrl::setitem(uint8_t k[], int k_len, uint8_t v[], int v_len) {
-#ifndef NDEBUG
-    auto num = 0;
-    for (int i = 0; i < k_len; ++i)
-        if (k[i] == PXS_UNIQUE)
-            num++;
-    for (int i = 0; i < v_len; ++i)
-        if (v[i] == PXS_UNIQUE)
-            num++;
-    assert(num + k_len + v_len + 2 + 2 <= UINT16_MAX);
-#endif
     if (this->st.local_chunk.used_num == UINT16_MAX) {
         auto last_chunk = this->st.cbt_chunk;
         this->st.free_prop();
         this->st.init_prop();
 
-        if (last_chunk->used_num < 0.8 * PXC_STR_NUM) {
+        if (last_chunk->used_num < REINSERT_FACTOR * PXC_STR_NUM) {
             if (last_chunk == Glob_Reinsert_Chunk) {
                 Glob_Reinsert_Chunk = NULL;
             }
@@ -81,17 +73,18 @@ void PiXiuCtrl::free_prop() {
 }
 
 void PiXiuCtrl::reinsert(PiXiuChunk *& cbt_chunk) {
-    assert(cbt_chunk->used_num < 0.8 * PXC_STR_NUM);
-    auto ori_chunk = Glob_Reinsert_Chunk;
+    assert(cbt_chunk->used_num < REINSERT_FACTOR * PXC_STR_NUM);
+    auto chunk = Glob_Reinsert_Chunk;
 
     for (int i = 0; i < lenOf(cbt_chunk->strs); ++i) {
         if (!cbt_chunk->is_delitem(i)) {
-
+            auto pxs = cbt_chunk->strs[i];
+            pxs->parse(0, PXSG_MAX_TO, cbt_chunk);
         }
     }
     PiXiuChunk_free(cbt_chunk);
 
-    Glob_Reinsert_Chunk = ori_chunk;
+    Glob_Reinsert_Chunk = chunk;
     cbt_chunk = NULL;
 }
 
