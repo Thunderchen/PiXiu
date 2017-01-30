@@ -109,21 +109,20 @@ void t_PiXiuCtrl(void) {
 
     // <max len key>
     ctrl.init_prop();
-    uint8_t max_len_key[PXC_STR_NUM - 2];
+
+    uint8_t max_len_key[PXSG_MAX_TO - 2];
     max_len_key[0] = 233;
     for (int i = 1; i < lenOf(max_len_key); ++i)
         max_len_key[i] = 1;
     ctrl.setitem(max_len_key, lenOf(max_len_key), NULL, 0);
 
     auto gen = ctrl.getitem(max_len_key, lenOf(max_len_key));
-    printf("Hey Hey\n");
     uint8_t rv;
-    auto ii = 0;
+    auto j = 0;
     while (gen->operator()(rv)) {
-        printf("%i\n", rv);
-        ii++;
+        j++;
     }
-    printf("Num is %i\n", ii);
+    assert(j == PXSG_MAX_TO);
     PXSGen_free(gen);
 
     ctrl.free_prop();
