@@ -75,20 +75,32 @@ void PiXiuCtrl::free_prop() {
     this->cbt.free_prop();
 }
 
-void PiXiuCtrl::reinsert(PiXiuChunk *& cbt_chunk) {
-    assert(cbt_chunk->used_num < REINSERT_FACTOR * PXC_STR_NUM);
-    auto chunk = Glob_Reinsert_Chunk;
+void PiXiuCtrl::reinsert(PiXiuChunk *& chunk) {
+    assert(chunk->used_num < REINSERT_FACTOR * PXC_STR_NUM);
+    auto glob_chunk = Glob_Reinsert_Chunk;
 
-    for (int i = 0; i < lenOf(cbt_chunk->strs); ++i) {
-        if (!cbt_chunk->is_delitem(i)) {
-            auto pxs = cbt_chunk->strs[i];
-            pxs->parse(0, PXSG_MAX_TO, cbt_chunk);
+    for (int i = 0; i < lenOf(chunk->strs); ++i) {
+        if (!chunk->is_delitem(i)) {
+            auto gen = chunk->strs[i]->parse(0, PXSG_MAX_TO, chunk);
+            uint8_t decompress[PXSG_MAX_TO];
+
+            uint8_t rv;
+            auto len = 0;
+            while (gen->operator()(rv)) {
+                decompress[len++] = rv;
+            }
+            PXSGen_free(gen);
+
+            auto pxs = (PiXiuStr *) malloc(sizeof(PiXiuStr) + len);
+            pxs->len = (uint16_t) len;
+            memcpy(pxs->data, decompress, (size_t) len);
+            this->setitem((uint8_t *) pxs, 0, NULL, 0, true);
         }
     }
-    PiXiuChunk_free(cbt_chunk);
+    PiXiuChunk_free(chunk);
 
-    Glob_Reinsert_Chunk = chunk;
-    cbt_chunk = NULL;
+    Glob_Reinsert_Chunk = glob_chunk;
+    chunk = NULL;
 }
 
 void t_PiXiuCtrl(void) {
