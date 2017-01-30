@@ -82,21 +82,16 @@ void PiXiuCtrl::free_prop() {
 
 void PiXiuCtrl::reinsert(PiXiuChunk *& cbt_chunk) {
     assert(cbt_chunk->used_num < 0.8 * PXC_STR_NUM);
-    auto reserve_chunk = Glob_Reinsert_Chunk;
+    auto ori_chunk = Glob_Reinsert_Chunk;
 
     for (int i = 0; i < lenOf(cbt_chunk->strs); ++i) {
         if (!cbt_chunk->is_delitem(i)) {
 
         }
     }
-    for (int i = 0; i < lenOf(cbt_chunk->strs); ++i) {
-        if (cbt_chunk->is_delitem(i)) {
+    PiXiuChunk_free(cbt_chunk);
 
-        }
-    }
-    free(cbt_chunk);
-
-    Glob_Reinsert_Chunk = reserve_chunk;
+    Glob_Reinsert_Chunk = ori_chunk;
     cbt_chunk = NULL;
 }
 
