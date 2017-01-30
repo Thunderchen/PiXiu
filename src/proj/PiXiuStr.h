@@ -52,7 +52,7 @@ union PXSRecord {
 };
 
 struct PXSMsg {
-    int chunk_idx__cmd;
+    int chunk_idx_Cmd;
     int pxs_idx;
     uint8_t val;
 };

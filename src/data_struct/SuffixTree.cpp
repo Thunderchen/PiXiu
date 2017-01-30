@@ -133,10 +133,10 @@ char * SuffixTree::repr() {
     return output;
 }
 
-#define MSG_NO_COMPRESS PiXiuStr_init_stream((PXSMsg) {.chunk_idx__cmd=PXS_STREAM_PASS, .val=msg_char})
+#define MSG_NO_COMPRESS PiXiuStr_init_stream((PXSMsg) {.chunk_idx_Cmd=PXS_STREAM_PASS, .val=msg_char})
 #define MSG_COMPRESS(c_i, p_i) \
 PiXiuStr_init_stream((PXSMsg) { \
-    .chunk_idx__cmd=c_i, \
+    .chunk_idx_Cmd=c_i, \
     .pxs_idx=p_i, \
     .val=msg_char \
 })
@@ -293,11 +293,11 @@ SuffixTree::s_ret SuffixTree::setitem(PiXiuStr * src) {
     assert(idx == this->cbt_chunk->used_num);
 
     this->local_chunk.strs[idx] = src;
-    PiXiuStr_init_stream((PXSMsg) {.chunk_idx__cmd=PXS_STREAM_ON});
+    PiXiuStr_init_stream((PXSMsg) {.chunk_idx_Cmd=PXS_STREAM_ON});
     for (int i = 0; i < src->len; ++i) {
         s_insert_char(this, idx, src->data[i]);
     }
-    this->cbt_chunk->strs[idx] = PiXiuStr_init_stream((PXSMsg) {.chunk_idx__cmd=PXS_STREAM_OFF});
+    this->cbt_chunk->strs[idx] = PiXiuStr_init_stream((PXSMsg) {.chunk_idx_Cmd=PXS_STREAM_OFF});
 
     this->local_chunk.used_num++;
     this->cbt_chunk->used_num++;
