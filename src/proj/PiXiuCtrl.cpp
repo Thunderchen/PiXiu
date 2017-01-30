@@ -117,9 +117,23 @@ void t_PiXiuCtrl(void) {
     ctrl.setitem(max_len_key, lenOf(max_len_key), NULL, 0);
 
     auto gen = ctrl.getitem(max_len_key, lenOf(max_len_key));
-    uint8_t rv;
     auto j = 0;
+    uint8_t rv;
     while (gen->operator()(rv)) {
+        switch (j) {
+            case 0:
+                assert(rv == 233);
+                break;
+            case PXSG_MAX_TO - 1:
+                assert(rv == 0);
+                break;
+            case PXSG_MAX_TO - 2:
+                assert(rv == PXS_UNIQUE);
+                break;
+            default:
+                assert(rv == 1);
+                break;
+        }
         j++;
     }
     assert(j == PXSG_MAX_TO);
