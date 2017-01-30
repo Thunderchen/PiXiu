@@ -8,7 +8,7 @@ struct PiXiuCtrl {
     CritBitTree cbt;
     SuffixTree st;
 
-    int setitem(uint8_t[], int, uint8_t[], int, bool);
+    int setitem(uint8_t[], int, uint8_t[], int, bool = false);
 
     bool contains(uint8_t[], int);
 
