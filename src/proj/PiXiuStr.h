@@ -117,6 +117,7 @@ $gen(PXSGen) {
     int src_cursor;
     int i, j;
     int sub_from, sub_to;
+    int supply;
 
     uint8_t cmd;
     uint8_t next_cmd;
@@ -125,7 +126,6 @@ $gen(PXSGen) {
     // <body>
     $emit(uint8_t)
             PXSRecord record;
-            int supply;
 
             assert(from >= 0 && to >= from);
             sub_gen = NULL;
@@ -186,6 +186,7 @@ $gen(PXSGen) {
                             }
                             ret_cursor += sub_to - sub_from;
                         }
+                        src_cursor += supply;
                     } else { assert(false); }
                 } else {
                     PXSG_TRY_WRITE;

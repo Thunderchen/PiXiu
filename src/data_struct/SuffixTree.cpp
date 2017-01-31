@@ -133,8 +133,7 @@ char * SuffixTree::repr() {
     return output;
 }
 
-#define MSG_NO_COMPRESS PiXiuStr_init_stream((PXSMsg) {.chunk_idx_Cmd=PXS_STREAM_PASS, .val=msg_char});
-
+#define MSG_NO_COMPRESS PiXiuStr_init_stream((PXSMsg) {.chunk_idx_Cmd=PXS_STREAM_PASS, .val=msg_char})
 #define MSG_COMPRESS(c_i, p_i) \
 PiXiuStr_init_stream((PXSMsg) { \
     .chunk_idx_Cmd=c_i, \
@@ -308,7 +307,6 @@ SuffixTree::s_ret SuffixTree::setitem(PiXiuStr * src) {
 
 void t_SuffixTree(void) {
     using namespace std;
-    srand(1000);
 
     auto contains = [](SuffixTree * self, uint8_t src[], int begin, int end) -> bool {
         auto edge_node = self->root->get_sub(src[begin]);
@@ -336,7 +334,7 @@ void t_SuffixTree(void) {
     st.init_prop();
 
     string alphabet[] = {"A", "B", "C", "D", "E"};
-    for (int i = 0; i < 2000; ++i) {
+    for (int i = 0; i < 3000; ++i) {
         string sample;
         auto len = rand() % 20 + 1;
         for (int j = 0; j < len; ++j) {
