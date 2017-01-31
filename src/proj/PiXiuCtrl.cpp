@@ -147,10 +147,19 @@ void t_PiXiuCtrl(void) {
 
     uint8_t max_k[100];
     uint8_t max_v[PXSG_MAX_TO - (lenOf(max_k) + 2) - 2];
-    for (int i = 0; i < lenOf(max_k); ++i) max_k[i] = 1;
+    for (int i = 0; i < lenOf(max_k); ++i) max_k[i] = 6;
     for (int i = 0; i < lenOf(max_v); ++i) max_v[i] = 2;
     ctrl.setitem(max_k, lenOf(max_k), max_v, lenOf(max_v));
 
+    gen = ctrl.getitem(max_k, lenOf(max_k));
+    j = 0;
+    while (gen->operator()(rv)) {
+        if (0 <= j && j <= lenOf(max_k) - 1) { assert(rv == 6); }
+        else { assert(rv != 6); }
+        j++;
+    }
+    assert(j == PXSG_MAX_TO);
+    PXSGen_free(gen);
 
     ctrl.free_prop();
     // </>
