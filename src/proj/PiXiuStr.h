@@ -10,6 +10,7 @@
 
 #define PXS_UNIQUE 251
 #define PXS_KEY 0
+#define PXS_KEY_SEC 2
 #define PXS_COMPRESS 1
 
 #define PXS_STREAM_ON -1
@@ -138,7 +139,8 @@ $gen(PXSGen) {
                 if (cmd == PXS_UNIQUE) {
                     next_cmd = self->data[i + 1];
 
-                    if (next_cmd == PXS_KEY || next_cmd == PXS_UNIQUE) {
+                    if (next_cmd == PXS_KEY || next_cmd == PXS_UNIQUE ||
+                        next_cmd == PXS_KEY_SEC) {
                         PXSG_TRY_WRITE;
                         i++;
                         cmd = next_cmd;
