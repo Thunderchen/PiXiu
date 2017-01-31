@@ -20,7 +20,11 @@ int PiXiuCtrl::setitem(uint8_t k[], int k_len, uint8_t v[], int v_len, bool rein
         }
     }
     if (!reinsert && Glob_Reinsert_Chunk != NULL && Glob_Reinsert_Chunk != this->st.cbt_chunk) {
-        this->reinsert(Glob_Reinsert_Chunk);
+        if (Glob_Reinsert_Chunk->used_num < REINSERT_RATE * PXC_STR_NUM) {
+            this->reinsert(Glob_Reinsert_Chunk);
+        } else {
+            Glob_Reinsert_Chunk = NULL;
+        }
     }
 
     PiXiuStr * doc;
@@ -111,17 +115,17 @@ void PiXiuCtrl::reinsert(PiXiuChunk *& chunk) {
 void t_PiXiuCtrl(void) {
     using namespace std;
     srand(19950207);
-    PiXiuCtrl pxc;
+    PiXiuCtrl pixiu_ctrl;
 
     // <max len elem>
-    pxc.init_prop();
+    pixiu_ctrl.init_prop();
 
     uint8_t max_elem[PXSG_MAX_TO - 2];
     max_elem[0] = 233;
     for (int i = 1; i < lenOf(max_elem); ++i) max_elem[i] = 1;
-    pxc.setitem(max_elem, lenOf(max_elem), NULL, 0);
+    pixiu_ctrl.setitem(max_elem, lenOf(max_elem), NULL, 0);
 
-    auto gen = pxc.getitem(max_elem, lenOf(max_elem));
+    auto gen = pixiu_ctrl.getitem(max_elem, lenOf(max_elem));
     auto j = 0;
     uint8_t rv;
     while (gen->operator()(rv)) {
@@ -144,19 +148,19 @@ void t_PiXiuCtrl(void) {
     assert(j == PXSG_MAX_TO);
     PXSGen_free(gen);
 
-    pxc.free_prop();
+    pixiu_ctrl.free_prop();
     // </>
 
     // <max len kv>
-    pxc.init_prop();
+    pixiu_ctrl.init_prop();
 
     uint8_t max_k[100];
     uint8_t max_v[PXSG_MAX_TO - (lenOf(max_k) + 2) - 2];
     for (int i = 0; i < lenOf(max_k); ++i) max_k[i] = 6;
     for (int i = 0; i < lenOf(max_v); ++i) max_v[i] = 2;
-    pxc.setitem(max_k, lenOf(max_k), max_v, lenOf(max_v));
+    pixiu_ctrl.setitem(max_k, lenOf(max_k), max_v, lenOf(max_v));
 
-    gen = pxc.getitem(max_k, lenOf(max_k));
+    gen = pixiu_ctrl.getitem(max_k, lenOf(max_k));
     j = 0;
     while (gen->operator()(rv)) {
         if (0 <= j && j <= lenOf(max_k) - 1) { assert(rv == 6); }
@@ -165,32 +169,31 @@ void t_PiXiuCtrl(void) {
     }
     PXSGen_free(gen);
 
-    pxc.free_prop();
+    pixiu_ctrl.free_prop();
     // </>
 
     // <CRUD>
-    pxc.init_prop();
+    pixiu_ctrl.init_prop();
 
     string alphabet[] = {"A", "B", "C", "D", "E"};
-    map<string, string> ctrl_group;
+    map<string, string> cmp_map;
     for (int i = 0; i < PXC_STR_NUM * 1.5; ++i) {
         string sample_k;
         auto len = rand() % 50 + 1;
-        for (int k = 0; k < len; ++k) {
+        for (int l = 0; l < len; ++l) {
             sample_k += alphabet[rand() % lenOf(alphabet)];
         }
-        sample_k += '.';
         string sample_v;
         len = rand() % 50 + 1;
-        for (int k = 0; k < len; ++k) {
+        for (int l = 0; l < len; ++l) {
             sample_v += alphabet[rand() % lenOf(alphabet)];
         }
-        sample_v += '.';
-        pxc.setitem((uint8_t *) sample_k.c_str(), (int) sample_k.size(),
-                    (uint8_t *) sample_v.c_str(), (int) sample_v.size());
+
+        pixiu_ctrl.setitem((uint8_t *) sample_k.c_str(), (int) sample_k.size(),
+                           (uint8_t *) sample_v.c_str(), (int) sample_v.size());
     }
 
-    pxc.free_prop();
+    pixiu_ctrl.free_prop();
     // </>
 
     PRINT_FUNC;
