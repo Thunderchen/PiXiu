@@ -68,6 +68,7 @@ CBTGen * PiXiuCtrl::iter(uint8_t prefix[], int prefix_len) {
 
 void PiXiuCtrl::init_prop() {
     Glob_Reinsert_Chunk = NULL;
+    this->cbt.root = NULL;
     this->st.init_prop();
 }
 
@@ -107,16 +108,15 @@ void PiXiuCtrl::reinsert(PiXiuChunk *& chunk) {
 void t_PiXiuCtrl(void) {
     PiXiuCtrl ctrl;
 
-    // <max len key>
+    // <max len elem>
     ctrl.init_prop();
 
-    uint8_t max_len_key[PXSG_MAX_TO - 2];
-    max_len_key[0] = 233;
-    for (int i = 1; i < lenOf(max_len_key); ++i)
-        max_len_key[i] = 1;
-    ctrl.setitem(max_len_key, lenOf(max_len_key), NULL, 0);
+    uint8_t max_elem[PXSG_MAX_TO - 2];
+    max_elem[0] = 233;
+    for (int i = 1; i < lenOf(max_elem); ++i) max_elem[i] = 1;
+    ctrl.setitem(max_elem, lenOf(max_elem), NULL, 0);
 
-    auto gen = ctrl.getitem(max_len_key, lenOf(max_len_key));
+    auto gen = ctrl.getitem(max_elem, lenOf(max_elem));
     auto j = 0;
     uint8_t rv;
     while (gen->operator()(rv)) {
@@ -138,6 +138,19 @@ void t_PiXiuCtrl(void) {
     }
     assert(j == PXSG_MAX_TO);
     PXSGen_free(gen);
+
+    ctrl.free_prop();
+    // </>
+
+    // <max len kv>
+    ctrl.init_prop();
+
+    uint8_t max_k[100];
+    uint8_t max_v[PXSG_MAX_TO - (lenOf(max_k) + 2) - 2];
+    for (int i = 0; i < lenOf(max_k); ++i) max_k[i] = 1;
+    for (int i = 0; i < lenOf(max_v); ++i) max_v[i] = 2;
+    ctrl.setitem(max_k, lenOf(max_k), max_v, lenOf(max_v));
+
 
     ctrl.free_prop();
     // </>
