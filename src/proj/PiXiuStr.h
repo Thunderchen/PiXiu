@@ -88,7 +88,7 @@ PiXiuStr * PiXiuStr_init(uint8_t[], int);
 
 PiXiuStr * PiXiuStr_init_key(uint8_t[], int);
 
-PiXiuStr * PiXiuStr_init_stream(PXSMsg);
+PiXiuStr * PiXiuStr_init_stream(PXSMsg, bool = true);
 
 PiXiuChunk * PiXiuChunk_init(void);
 
@@ -165,7 +165,7 @@ $gen(PXSGen) {
                             uint8_t rv;
 
                             if (sub_from < ret_cursor && ret_cursor < sub_to
-                                && ctx->strs[record.big.idx] == self) {
+                                && ctx->getitem(record.big.idx) == self) {
                                 j = 0;
                                 while (j != sub_to - sub_from) {
                                     sub_gen = self->parse(sub_from, ret_cursor, ctx);
@@ -179,7 +179,7 @@ $gen(PXSGen) {
                                     sub_gen = NULL;
                                 }
                             } else {
-                                sub_gen = ctx->strs[record.big.idx]->parse(sub_from, sub_to, ctx);
+                                sub_gen = ctx->getitem(record.big.idx)->parse(sub_from, sub_to, ctx);
                                 while (sub_gen->operator()(rv)) {
                                     $yield(rv);
                                 }

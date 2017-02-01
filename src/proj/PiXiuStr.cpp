@@ -13,7 +13,7 @@ PiXiuStr * PiXiuStr_init_key(uint8_t src[], int src_len) {
     return escape_unique(src, src_len, true);
 };
 
-PiXiuStr * PiXiuStr_init_stream(PXSMsg msg) {
+PiXiuStr * PiXiuStr_init_stream(PXSMsg msg, bool outside_call) {
     static int list_len;
     static int list_capacity;
     static uint8_t * list;
@@ -22,9 +22,36 @@ PiXiuStr * PiXiuStr_init_stream(PXSMsg msg) {
     static int compress_idx;
     static int compress_to;
 
+    static int msg_num = 0;
+    static PXSMsg msg_buffer[2];
+
     auto chunk_idx = msg.chunk_idx_Cmd;
     auto pxs_idx = msg.pxs_idx;
     auto msg_char = msg.val;
+    PiXiuStr * ret = NULL;
+
+    begin:
+    if (outside_call) {
+        if ((msg_num == 0 && msg_char == PXS_UNIQUE) || msg_num == 1) {
+            msg_buffer[msg_num++] = msg;
+            return ret;
+        }
+        if (msg_num == 2) {
+            if ((msg_buffer[0].chunk_idx_Cmd >= 0 && msg_buffer[1].chunk_idx_Cmd >= 0) ||
+                (msg_buffer[0].chunk_idx_Cmd == PXS_STREAM_PASS && msg_buffer[1].chunk_idx_Cmd == PXS_STREAM_PASS)) {
+                for (int i = 0; i < msg_num; ++i) {
+                    PiXiuStr_init_stream(msg_buffer[i], false);
+                }
+            } else {
+                for (int i = 0; i < msg_num; ++i) {
+                    msg_buffer[i].chunk_idx_Cmd = PXS_STREAM_PASS;
+                    PiXiuStr_init_stream(msg_buffer[i], false);
+                }
+            }
+            msg_num = 0;
+            goto begin;
+        }
+    }
 
     auto try_explode = [&]() {
         if (compress_len > 0) {
@@ -60,7 +87,6 @@ PiXiuStr * PiXiuStr_init_stream(PXSMsg msg) {
         compress_len++;
     };
 
-    PiXiuStr * ret = NULL;
     switch (chunk_idx) {
         case PXS_STREAM_ON:
             list_len = 0;

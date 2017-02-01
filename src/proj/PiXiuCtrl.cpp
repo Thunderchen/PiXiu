@@ -191,6 +191,8 @@ void t_PiXiuCtrl(void) {
 
         pixiu_ctrl.setitem((uint8_t *) sample_k.c_str(), (int) sample_k.size(),
                            (uint8_t *) sample_v.c_str(), (int) sample_v.size());
+        assert(pixiu_ctrl.contains((uint8_t *) sample_k.c_str(), (int) sample_k.size()));
+        cmp_map[sample_k] = sample_v;
     }
 
     pixiu_ctrl.free_prop();
