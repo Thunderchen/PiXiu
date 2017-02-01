@@ -321,7 +321,7 @@ void t_CritBitTree(void) {
     auto test_ctx = PiXiuChunk_init();
     CritBitTree test;
 
-    for (int i = 0; i < 1000; ++i) {
+    for (uint16_t i = 0; i < 1000; ++i) {
         // <写入>
         string sample;
         auto len = rand() % 10;
@@ -332,8 +332,8 @@ void t_CritBitTree(void) {
         ctrl[sample] = 1;
 
         auto sample_pxs = SAMPLE_PXS;
-        test_ctx->strs[test_ctx->used_num] = sample_pxs;
-        test.setitem(sample_pxs, test_ctx, test_ctx->used_num);
+        test_ctx->strs[i] = sample_pxs;
+        test.setitem(sample_pxs, test_ctx, i);
         test_ctx->used_num++;
         assert(test.contains(sample_pxs));
         // </>
