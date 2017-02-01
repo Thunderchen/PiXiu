@@ -290,8 +290,6 @@ static void s_insert_char(SuffixTree * self, uint16_t chunk_idx, uint8_t msg_cha
 
 SuffixTree::s_ret SuffixTree::setitem(PiXiuStr * src) {
     auto idx = this->local_chunk.used_num;
-    assert(idx == this->cbt_chunk->used_num);
-
     this->local_chunk.strs[idx] = src;
     PiXiuStr_init_stream((PXSMsg) {.chunk_idx_Cmd=PXS_STREAM_ON});
     for (int i = 0; i < src->len; ++i) {
