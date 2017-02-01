@@ -114,8 +114,8 @@ void PiXiuCtrl::reinsert(PiXiuChunk *& chunk) {
 
 void t_PiXiuCtrl(void) {
     using namespace std;
-    srand(19950207);
     PiXiuCtrl pixiu_ctrl;
+    srand(19950207);
 
     // <max len elem>
     pixiu_ctrl.init_prop();
@@ -174,10 +174,11 @@ void t_PiXiuCtrl(void) {
 
     // <CRUD>
     pixiu_ctrl.init_prop();
+    map<string, string> cmp_map;
 
     string alphabet[] = {"A", "B", "C", "D", "E"};
-    map<string, string> cmp_map;
     for (int i = 0; i < PXC_STR_NUM * 1.5; ++i) {
+        // <CU>
         string sample_k;
         auto len = rand() % 50 + 1;
         for (int l = 0; l < len; ++l) {
@@ -189,10 +190,38 @@ void t_PiXiuCtrl(void) {
             sample_v += alphabet[rand() % lenOf(alphabet)];
         }
 
+        cmp_map[sample_k] = sample_v;
         pixiu_ctrl.setitem((uint8_t *) sample_k.c_str(), (int) sample_k.size(),
                            (uint8_t *) sample_v.c_str(), (int) sample_v.size());
         assert(pixiu_ctrl.contains((uint8_t *) sample_k.c_str(), (int) sample_k.size()));
-        cmp_map[sample_k] = sample_v;
+        // </>
+
+        // <R>
+        auto mi = cmp_map.begin();
+        advance(mi, rand() % cmp_map.size());
+        sample_k = valIn(mi).first;
+        sample_v = valIn(mi).second;
+
+        auto repr = pixiu_ctrl.getitem((uint8_t *) sample_k.c_str(), (int) sample_k.size())->consume_repr();
+        auto l = 0;
+        for (int m = 0; m < sample_k.size(); ++m)
+            assert(sample_k[m] == repr[l++]);
+        for (int m = 0; m < sample_v.size(); ++m)
+            assert(sample_v[m] == repr[l++]);
+        free(repr);
+        // </>
+
+        // <D>
+        if (rand() % 2) {
+            mi = cmp_map.begin();
+            advance(mi, rand() % cmp_map.size());
+            sample_k = valIn(mi).first;
+
+            cmp_map.erase(sample_k);
+            pixiu_ctrl.delitem((uint8_t *) sample_k.c_str(), (int) sample_k.size());
+            assert(!pixiu_ctrl.contains((uint8_t *) sample_k.c_str(), (int) sample_k.size()));
+        }
+        // </>
     }
 
     pixiu_ctrl.free_prop();
