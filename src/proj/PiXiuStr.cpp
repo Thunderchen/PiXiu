@@ -178,6 +178,7 @@ void PiXiuChunk::delitem(int idx) {
     auto adr = this->strs[idx];
     assert(adr != NULL && !adr_is_spec(adr));
     this->strs[idx] = adr_mk_spec(adr);
+    this->used_num--;
 
     if (this->used_num < 0.8 * PXC_STR_NUM) {
         Glob_Reinsert_Chunk = this;
