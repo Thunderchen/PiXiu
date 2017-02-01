@@ -86,7 +86,7 @@ void PiXiuCtrl::free_prop() {
 
 void PiXiuCtrl::reinsert(PiXiuChunk *& chunk) {
     assert(chunk->used_num < REINSERT_RATE * PXC_STR_NUM);
-    auto glob_chunk = Glob_Reinsert_Chunk;
+    auto curr_glob_chunk = Glob_Reinsert_Chunk;
 
     for (int i = 0; i < lenOf(chunk->strs); ++i) {
         if (!chunk->is_delitem(i)) {
@@ -108,14 +108,14 @@ void PiXiuCtrl::reinsert(PiXiuChunk *& chunk) {
     }
     PiXiuChunk_free(chunk);
 
-    Glob_Reinsert_Chunk = glob_chunk;
+    Glob_Reinsert_Chunk = curr_glob_chunk;
     chunk = NULL;
 }
 
 void t_PiXiuCtrl(void) {
     using namespace std;
     PiXiuCtrl pixiu_ctrl;
-    srand(19950207);
+    srand(19950207); // 吉姆的生日
 
     // <max len elem>
     pixiu_ctrl.init_prop();
