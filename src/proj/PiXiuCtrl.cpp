@@ -1,6 +1,7 @@
 #include "PiXiuCtrl.h"
 #include <map>
 #include <string>
+#include <vector>
 
 #define REINSERT_RATE 0.5
 
@@ -223,6 +224,35 @@ void t_PiXiuCtrl(void) {
         }
         // </>
     }
+
+    // <遍历>
+    vector<string> cmp_list;
+    vector<string> tst_list;
+
+    auto startswith_a = pixiu_ctrl.iter((uint8_t *) "A", 1);
+    for (auto mi = cmp_map.begin(); mi != cmp_map.end(); ++mi) {
+        auto k = valIn(mi).first;
+        auto v = valIn(mi).second;
+        if (k[0] != 'A') {
+            assert(!startswith_a->operator()(gen));
+            break;
+        }
+        cmp_list.push_back(k + v);
+
+        startswith_a->operator()(gen);
+        auto repr = gen->consume_repr();
+        tst_list.push_back(string(repr));
+        free(repr);
+    }
+    CBTGen_free(startswith_a);
+
+    assert(tst_list.size() == cmp_list.size());
+    sort(tst_list.begin(), tst_list.end());
+    sort(cmp_list.begin(), cmp_list.end());
+    for (int i = 0; i < tst_list.size(); ++i) {
+        assert(tst_list[i] == cmp_list[i]);
+    }
+    // </>
 
     pixiu_ctrl.free_prop();
     // </>
