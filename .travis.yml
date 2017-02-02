@@ -1,5 +1,4 @@
-language: cpp
-compiler: clang
+language: generic
 srcipt:
   -mkdir build-debug
   -cd build-bebug/
