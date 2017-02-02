@@ -1,11 +1,11 @@
 sudo: required
 language: generic
-before_install:
 
+before_install:
+  -mkdir build-debug
+  -cd build-debug/
 install:
   sudo apt-get install cmake &&
-  mkdir build-debug &&
-  cd build-bebug/ &&
   cmake .. &&
   make &&
   ./PiXiuPlus
