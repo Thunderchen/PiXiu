@@ -1,11 +1,2 @@
 language: cpp
-addons:
-  apt:
-    sources:
-      - kalakris-cmake
-    packages:
-      - cmake-3.6
-compiler:
-  - gcc
-  - clang
 script: cmake . && make && ./PiXiuPlus
