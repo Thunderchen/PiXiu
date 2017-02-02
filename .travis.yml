@@ -1,13 +1,11 @@
-sudo: required
-dist: trusty
 language: cpp
 addons:
   apt:
     sources:
-      - george-edison55-precise-backports
+      - kalakris-cmake
+      - ubuntu-toolchain-r-test
     packages:
       - cmake
-      - cmake-data
 compiler:
   - gcc
   - clang
