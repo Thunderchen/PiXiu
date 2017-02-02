@@ -1,4 +1,8 @@
-language: generic
+sudo: required
+language: cpp
+compiler: clang
+before_install:
+  - sudo apt-get install cmake
 srcipt:
   -mkdir build-debug
   -cd build-bebug/
