@@ -1,3 +1,9 @@
 language: cpp
+addons:
+  apt:
+    sources:
+      - llvm-toolchain-precise
+    packages:
+      - clang-3.7
 compiler: clang
 script: cmake . && make && ./PiXiuPlus
