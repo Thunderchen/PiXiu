@@ -2,12 +2,10 @@ sudo: required
 language: cpp
 compiler: clang
 
-install:
-  - sudo apt-get install cmake
+install: sudo apt-get install cmake
 srcipt:
-  -mkdir build-debug
-  -cd build-bebug/
-  -cmake ..
-  -make
-after_success:
-  -./PiXiuPlus
+  mkdir build-debug &&
+  cd build-bebug/ &&
+  cmake .. &&
+  make &&
+  ./PiXiuPlus
