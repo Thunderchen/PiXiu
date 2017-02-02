@@ -1,18 +1,17 @@
 sudo: required
 language: generic
-
 before_install:
-install:
-  sudo apt-get install cmake
 
-before_script:
-srcipt:
+install:
+  sudo apt-get install cmake &&
   mkdir build-debug &&
   cd build-bebug/ &&
   cmake .. &&
   make &&
   ./PiXiuPlus
 
+before_script:
+srcipt:
 after_success:
 after_failure:
 after_script:
