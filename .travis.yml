@@ -1,0 +1,8 @@
+language: cpp
+compiler: clang
+srcipt:
+  -mkdir build-debug
+  -cd build-bebug/
+  -cmake ..
+  -make
+  -./PiXiuPlus
