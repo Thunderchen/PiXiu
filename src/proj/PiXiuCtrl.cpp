@@ -20,12 +20,9 @@ int PiXiuCtrl::setitem(uint8_t k[], int k_len, uint8_t v[], int v_len, bool rein
             this->reinsert(last_chunk);
         }
     }
-    if (!reinsert && Glob_Reinsert_Chunk != NULL && Glob_Reinsert_Chunk != this->st.cbt_chunk) {
-        if (Glob_Reinsert_Chunk->used_num < REINSERT_RATE * PXC_STR_NUM) {
-            this->reinsert(Glob_Reinsert_Chunk);
-        } else {
-            Glob_Reinsert_Chunk = NULL;
-        }
+    if (!reinsert && Glob_Reinsert_Chunk != NULL && Glob_Reinsert_Chunk != this->st.cbt_chunk
+        && Glob_Reinsert_Chunk->used_num < REINSERT_RATE * PXC_STR_NUM) {
+        this->reinsert(Glob_Reinsert_Chunk);
     }
 
     PiXiuStr * doc;
@@ -61,7 +58,8 @@ PXSGen * PiXiuCtrl::getitem(uint8_t k[], int k_len) {
 }
 
 int PiXiuCtrl::delitem(uint8_t k[], int k_len) {
-    if (Glob_Reinsert_Chunk != NULL && Glob_Reinsert_Chunk != this->st.cbt_chunk) {
+    if (Glob_Reinsert_Chunk != NULL && Glob_Reinsert_Chunk != this->st.cbt_chunk
+        && Glob_Reinsert_Chunk->used_num < REINSERT_RATE * PXC_STR_NUM) {
         this->reinsert(Glob_Reinsert_Chunk);
     }
     RETURN_APPLY(this->cbt.delitem);
