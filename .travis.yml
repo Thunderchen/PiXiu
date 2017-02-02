@@ -1,5 +1,7 @@
+sudo: require
 language: cpp
 compiler:
   - gcc
   - clang
+install: sudo apt-get install cmake
 script: cmake . && make && ./PiXiuPlus
