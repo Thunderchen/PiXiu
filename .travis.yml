@@ -6,5 +6,5 @@ compiler:
 install:
   - sudo apt-add-repository -y ppa:ubuntu-toolchain-r/test
   - sudo apt-get update -qq
-  - sudo apt-get install cmake
+  - sudo apt-get install -y cmake
 script: cmake . && make && ./PiXiuPlus
