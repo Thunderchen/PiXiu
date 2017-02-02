@@ -292,11 +292,9 @@ void t_PiXiuStr(void) {
     PiXiuChunk_free(chunk_nf);
     // </>
 
-#ifndef NDEBUG
 #define PXS_STREAM(...) PiXiuStr_init_stream((PXSMsg) __VA_ARGS__)
 #define set_expect(...) expect = (uint8_t[]) { __VA_ARGS__ }
 #define assert_out(arr) for(int i=0;i<arr->len;++i) assert(arr->data[i]==expect[i])
-#endif
     uint8_t * expect;
 
     // <转义>
