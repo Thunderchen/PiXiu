@@ -1,17 +1,14 @@
-sudo: require
+sudo: required
+dist: trusty
 language: cpp
 addons:
   apt:
     sources:
-    - ubuntu-toolchain-r-test
-    - llvm-toolchain-precise-3.6
+      - george-edison55-precise-backports
     packages:
-    - gcc-5
-    - g++-5
-    - clang-3.6
-    - cmake
+      - cmake
+      - cmake-data
 compiler:
   - gcc
   - clang
-install:
 script: cmake . && make && ./PiXiuPlus
