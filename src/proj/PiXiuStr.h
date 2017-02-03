@@ -146,12 +146,13 @@ $gen(PXSGen) {
                         cmd = next_cmd;
                         PXSG_TRY_WRITE;
                     } else if (next_cmd == PXS_COMPRESS || next_cmd > sizeof(PXSRecordSmall)) {
-                        record = valIn((PXSRecord *) adrOf(self->data[i]));
                         if (next_cmd == PXS_COMPRESS) {
+                            record.big = valIn((PXSRecordBig *) adrOf(self->data[i]));
                             assert(record.big.head == PXS_UNIQUE);
                             assert(record.big.sign == PXS_COMPRESS);
                             i += sizeof(PXSRecordBig) - 1;
                         } else {
+                            record.small = valIn((PXSRecordSmall *) adrOf(self->data[i]));
                             assert(record.small.head == PXS_UNIQUE);
                             assert(record.small.idx == record.big.idx);
                             i += sizeof(PXSRecordSmall) - 1;
