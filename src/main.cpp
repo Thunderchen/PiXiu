@@ -27,47 +27,52 @@ void t_SuffixTree(void);
 
 int main() {
 #ifndef NDEBUG
-//    t_CritBitTree();
-//    t_gen();
-//    t_List();
-//    t_MemPool();
-//    t_PiXiuStr();
-//    t_Que();
-//    t_ScapegoatTree();
-//    t_SuffixTree();
-//    t_PiXiuCtrl();
+    t_CritBitTree();
+    t_gen();
+    t_List();
+    t_MemPool();
+    t_PiXiuStr();
+    t_Que();
+    t_ScapegoatTree();
+    t_SuffixTree();
+    t_PiXiuCtrl();
 #else
-#endif
     PiXiuCtrl ctrl;
     ctrl.init_prop();
 
     std::string cmd;
     while (true) {
-        std::cout << "Command:";
+        std::cout << "Command: ";
         std::getline(std::cin, cmd);
         if (cmd[0] == '~') {
             break;
         }
 
-        constexpr int cmd_len = 4;
-        if (start_with(cmd.c_str(), "GET ", cmd_len)) {
-            auto g = ctrl.getitem((uint8_t *) (cmd.c_str() + cmd_len), (int) (cmd.size() - cmd_len));
-            if (g != NULL) {
-                auto res = g->consume_repr();
+        long total_diff = 0;
+        constexpr int token_len = 4;
+        if (start_with(cmd.c_str(), "GET ", token_len)) {
+            auto gen = ctrl.getitem((uint8_t *) (cmd.c_str() + token_len), (int) (cmd.size() - token_len));
+            if (gen != NULL) {
+                auto res = gen->consume_repr();
                 std::cout << res << std::endl;
                 free(res);
             }
-        } else if (start_with(cmd.c_str(), "SET ", cmd_len)) {
-            auto k_end = cmd.find("::");
-            if (k_end != std::string::npos) {
-                auto k = cmd.substr(cmd_len, k_end - cmd_len);
-                auto v = cmd.substr(k_end);
+        } else if (start_with(cmd.c_str(), "SET ", token_len)) {
+            auto k_pos = cmd.find("::");
+            if (k_pos != std::string::npos) {
+                auto k = cmd.substr(token_len, k_pos - token_len);
+                auto v = cmd.substr(k_pos);
                 ctrl.setitem((uint8_t *) k.c_str(), (int) k.size(), (uint8_t *) v.c_str(), (int) v.size());
+
+                int diff = (int) cmd.size() - ctrl.st.cbt_chunk->getitem(ctrl.st.local_chunk.used_num - 1)->len;
+                std::cout << "Curr Diff is " << diff << std::endl;
+                total_diff += diff;
+                std::cout << "Total Diff is " << total_diff << std::endl;
             }
         }
     }
-
     ctrl.free_prop();
+#endif
     return 0;
 }
 
