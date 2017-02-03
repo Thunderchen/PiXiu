@@ -172,7 +172,7 @@ bool CritBitTree::contains(PiXiuStr * src) {
         PXSG_SEE_KEY_BREAK(rv, sign = true);
     }
 
-    free(crit_gen);
+    PXSGen_free(crit_gen);
     return sign;
 };
 
@@ -362,6 +362,7 @@ void t_CritBitTree(void) {
     //    </>
     //  </>
 
+    test_ctx->used_num = 2;
     test.free_prop();
     test.root = NULL;
     // <free_empty>
