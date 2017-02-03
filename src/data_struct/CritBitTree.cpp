@@ -340,7 +340,7 @@ void t_CritBitTree(void) {
     free(test.repr());
     //  </>
 
-    //  <get_no_exist>
+    //  <no_exist>
     foo = PiXiuStr_init_key((uint8_t *) "KDA123", 6);
     test_ctx->strs[2] = foo;
     bar = PiXiuStr_init_key((uint8_t *) "KDA321", 6);
