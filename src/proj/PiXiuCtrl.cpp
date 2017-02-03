@@ -1,7 +1,6 @@
 #include "PiXiuCtrl.h"
+#include <algorithm>
 #include <map>
-#include <string>
-#include <vector>
 
 #define REINSERT_RATE 0.5
 
@@ -121,9 +120,9 @@ void t_PiXiuCtrl(void) {
     uint8_t max_elem[PXSG_MAX_TO - 2];
     max_elem[0] = 233;
     for (int i = 1; i < lenOf(max_elem); ++i) max_elem[i] = 1;
-    pixiu_ctrl.setitem(max_elem, lenOf(max_elem), NULL, 0);
+    pixiu_ctrl.setitem(max_elem, (int) lenOf(max_elem), NULL, 0);
 
-    auto gen = pixiu_ctrl.getitem(max_elem, lenOf(max_elem));
+    auto gen = pixiu_ctrl.getitem(max_elem, (int) lenOf(max_elem));
     auto j = 0;
     uint8_t rv;
     while (gen->operator()(rv)) {
@@ -156,9 +155,9 @@ void t_PiXiuCtrl(void) {
     uint8_t max_v[PXSG_MAX_TO - (lenOf(max_k) + 2) - 2];
     for (int i = 0; i < lenOf(max_k); ++i) max_k[i] = 6;
     for (int i = 0; i < lenOf(max_v); ++i) max_v[i] = 2;
-    pixiu_ctrl.setitem(max_k, lenOf(max_k), max_v, lenOf(max_v));
+    pixiu_ctrl.setitem(max_k, (int) lenOf(max_k), max_v, (int) lenOf(max_v));
 
-    gen = pixiu_ctrl.getitem(max_k, lenOf(max_k));
+    gen = pixiu_ctrl.getitem(max_k, (int) lenOf(max_k));
     j = 0;
     while (gen->operator()(rv)) {
         if (0 <= j && j <= lenOf(max_k) - 1) { assert(rv == 6); }

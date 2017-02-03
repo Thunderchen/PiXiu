@@ -2,7 +2,6 @@
 #include "CritBitTree.h"
 #include <functional>
 #include <map>
-#include <string>
 #include <vector>
 
 #define is_inner(p) adr_is_spec(p)
