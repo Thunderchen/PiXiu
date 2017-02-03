@@ -2,7 +2,6 @@
 #include "style.h"
 #include "util.h"
 #include <assert.h>
-#include <stdlib.h>
 
 void * MemPool::p_malloc(int size) {
     if (this->curr_pool == NULL) {

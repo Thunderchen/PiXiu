@@ -1,5 +1,6 @@
 #include "../proj/PiXiuStr.h"
 #include "SuffixTree.h"
+#include <string>
 
 static MemPool * Glob_Pool = NULL;
 static PiXiuChunk * Glob_Ctx = NULL;

@@ -1,6 +1,8 @@
 #include "PiXiuCtrl.h"
 #include <algorithm>
 #include <map>
+#include <string>
+#include <vector>
 
 #define REINSERT_RATE 0.5
 
