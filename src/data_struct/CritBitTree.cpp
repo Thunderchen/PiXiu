@@ -186,12 +186,8 @@ PXSGen * CritBitTree::getitem(PiXiuStr * src) {
     auto chunk = (PiXiuChunk *) ret.crit_node;
     uint8_t pa_direct = ret.pa_direct;
 
-    if (chunk == NULL) {
-        return NULL;
-    }
     int chunk_idx = pa == NULL ? this->chunk_idx : pa->chunk_idx_arr[pa_direct];
     auto pxs = chunk->getitem(chunk_idx);
-
     if (pxs->key_eq(src, chunk)) {
         return pxs->parse(0, PXSG_MAX_TO, chunk);
     }
@@ -319,8 +315,49 @@ void t_CritBitTree(void) {
 
     string alphabet[] = {"A", "B", "C", "D", "E"};
     map<string, int> ctrl;
-    auto test_ctx = PiXiuChunk_init();
     CritBitTree test;
+    auto test_ctx = PiXiuChunk_init();
+
+    //<spec cases>
+    //  <replace root>
+    auto foo = PiXiuStr_init_key((uint8_t *) "K", 1);
+    test_ctx->strs[0] = foo;
+    auto bar = PiXiuStr_init_key((uint8_t *) "K", 1);
+    test_ctx->strs[1] = bar;
+    assert(test.setitem(foo, test_ctx, 0) == 0);
+    assert(test.setitem(bar, test_ctx, 1) == CBT_SET_REPLACE);
+    assert(test.contains(bar) && test_ctx->is_delitem(0));
+    //  </>
+
+    //  <del @ empty>
+    test.delitem(bar);
+    assert(test.delitem(NULL) == CBT_DEL_NOT_FOUND);
+    //  </>
+    //  <get @ empty>
+    assert(test.getitem(NULL) == NULL);
+    //  </>
+
+    //  <get no exist>
+    foo = PiXiuStr_init_key((uint8_t *) "KDA123", 6);
+    test_ctx->strs[2] = foo;
+    bar = PiXiuStr_init_key((uint8_t *) "KDA321", 6);
+    test_ctx->strs[3] = bar;
+    test.setitem(foo, test_ctx, 2);
+    test.setitem(bar, test_ctx, 3);
+
+    auto t = PiXiuStr_init((uint8_t *) "G", 1);
+    assert(test.getitem(t) == NULL);
+    PiXiuStr_free(t);
+
+    t = PiXiuStr_init((uint8_t *) "KDA312", 6);
+    assert(test.getitem(t) == NULL);
+    PiXiuStr_free(t);
+    //  </>
+
+    test.free_prop();
+    test.root = NULL;
+    test_ctx = PiXiuChunk_init();
+    //</>
 
     for (uint16_t i = 0; i < 1000; ++i) {
         // <写入>
