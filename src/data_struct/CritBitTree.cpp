@@ -307,6 +307,7 @@ void CBTGen_free(CBTGen * gen) {
         gen->helper->free_prop();
         free(gen->helper);
     }
+    PiXiuStr_free(gen->prefix);
     free(gen);
 }
 
@@ -398,8 +399,6 @@ void t_CritBitTree(void) {
         List_free(test_startswith_c[i]);
     }
     List_free(test_startswith_c);
-    PiXiuStr_free(query_pxs);
-    PiXiuStr_free(none_pxs);
     CBTGen_free(query_gen);
     CBTGen_free(none_gen);
     // </>

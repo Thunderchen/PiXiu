@@ -68,7 +68,6 @@ int PiXiuCtrl::delitem(uint8_t k[], int k_len) {
 CBTGen * PiXiuCtrl::iter(uint8_t prefix[], int prefix_len) {
     auto pxs = PiXiuStr_init(prefix, prefix_len);
     auto ret = this->cbt.iter(pxs);
-    PiXiuStr_free(pxs);
     return ret;
 }
 
