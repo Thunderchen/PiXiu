@@ -48,10 +48,21 @@ int main() {
         if (cmd[0] == '~') {
             break;
         }
-        if (startswith(cmd.c_str(), "GET", 3)) {
 
-        } else if (startswith(cmd.c_str(), "SET", 3)) {
-
+        if (start_with(cmd.c_str(), "GET", 3)) {
+            auto gen = ctrl.getitem((uint8_t *) (cmd.c_str() + 3), (int) cmd.size());
+            if (gen != NULL) {
+                auto answer = gen->consume_repr();
+                std::cout << answer << std::endl;
+                free(answer);
+            }
+        } else if (start_with(cmd.c_str(), "SET", 3)) {
+            auto k_end = cmd.find("::");
+            if (k_end != std::string::npos) {
+                auto k = cmd.substr(3, k_end);
+                auto v = cmd.substr(k_end);
+                ctrl.setitem((uint8_t *) k.c_str(), (int) k.size(), (uint8_t *) v.c_str(), (int) v.size());
+            }
         }
     }
 

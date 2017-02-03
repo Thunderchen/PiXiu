@@ -1,5 +1,6 @@
 #include "../common/Que.h"
 #include "CritBitTree.h"
+#include <cstddef>
 #include <functional>
 #include <map>
 #include <vector>
