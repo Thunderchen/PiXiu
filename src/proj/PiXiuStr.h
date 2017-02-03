@@ -129,7 +129,6 @@ $gen(PXSGen) {
             PXSRecord record;
 
             assert(from >= 0 && to >= from);
-            sub_gen = NULL;
             len = to - from;
             src_cursor = ret_cursor = 0;
 

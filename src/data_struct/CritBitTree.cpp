@@ -355,7 +355,7 @@ void t_CritBitTree(void) {
     assert(test.getitem(temp) == NULL);
     //    <interrupt iter>
     auto iter = test.iter(temp);
-    PXSGen * g;
+    PXSGen * g = NULL;
     iter->operator()(g);
     PXSGen_free(g);
     CBTGen_free(iter);

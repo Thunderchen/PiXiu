@@ -171,6 +171,7 @@ PXSGen * PiXiuStr::parse(int from, int to, PiXiuChunk * ctx) {
     gen->from = from;
     gen->to = to;
     gen->ctx = ctx;
+    gen->sub_gen = NULL;
     return gen;
 }
 
