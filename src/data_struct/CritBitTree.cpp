@@ -329,20 +329,26 @@ void t_CritBitTree(void) {
     assert(test.contains(bar) && test_ctx->is_delitem(0));
     //  </>
 
-    //  <del @ empty>
+    //  <del_empty>
     test.delitem(bar);
     assert(test.delitem(NULL) == CBT_DEL_NOT_FOUND);
     //  </>
-    //  <get @ empty>
+    //  <get_empty>
     assert(test.getitem(NULL) == NULL);
     //  </>
+    //  <repr_empty>
+    free(test.repr());
+    //  </>
 
-    //  <get no exist>
+    //  <get_no_exist>
     foo = PiXiuStr_init_key((uint8_t *) "KDA123", 6);
     test_ctx->strs[2] = foo;
     bar = PiXiuStr_init_key((uint8_t *) "KDA321", 6);
     test_ctx->strs[3] = bar;
     test.setitem(foo, test_ctx, 2);
+    //    <repr_single>
+    free(test.repr());
+    //    </>
     test.setitem(bar, test_ctx, 3);
 
     auto t = PiXiuStr_init((uint8_t *) "G", 1);
