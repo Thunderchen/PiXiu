@@ -212,7 +212,7 @@ void t_PiXiuCtrl(void) {
         // <D>
         if (rand() % 3 >= 1) {
             mi = cmp_map.begin();
-            advance(mi, rand() % cmp_map.size());
+            advance(mi, rand() % cmp_map.size() % 100);
             sample_k = valIn(mi).first;
 
             cmp_map.erase(sample_k);
