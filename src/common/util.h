@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include <string.h>
 
 #define PRINT_FUNC \
 printf(__FUNCTION__); \
@@ -10,6 +11,7 @@ printf("\n");
 
 #define char_visible(c) (33 <= (c) && (c) <= 126)
 #define lenOf(arr) (sizeof(arr) / sizeof(arr[0]))
+#define start_with(str, sub_str, sub_len) (strncmp(str, sub_str, sub_len) == 0)
 
 #define adr_is_spec(p) ((bool) (((intptr_t) p) & 1))
 
@@ -31,10 +33,6 @@ T min(T a, T b) {
 template<typename T>
 T max(T a, T b) {
     return a > b ? a : b;
-}
-
-bool startswith(const char str[], const char sub_str[], size_t sub_len) {
-    return strncmp(str, sub_str, sub_len) == 0;
 }
 
 #endif
