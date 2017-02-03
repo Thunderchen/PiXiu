@@ -26,7 +26,7 @@ int CritBitTree::setitem(PiXiuStr * src, PiXiuChunk * ctx, uint16_t chunk_idx) {
         auto crit_gen = crit_pxs->parse(0, PXSG_MAX_TO, crit_chunk);
         auto src_gen = src->parse(0, PXSG_MAX_TO, NULL);
         uint16_t diff_at = 0;
-        uint8_t crit_rv, src_rv;
+        uint8_t crit_rv = 0, src_rv = 0;
 
         auto replace = [&]() {
             sign = CBT_SET_REPLACE;
