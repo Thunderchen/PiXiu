@@ -175,7 +175,7 @@ void t_PiXiuCtrl(void) {
     map<string, string> cmp_map;
 
     string alphabet[] = {"A", "B", "C", "D", "E"};
-    for (int i = 0; i < PXC_STR_NUM * 1.5; ++i) {
+    for (int i = 0; i < PXC_STR_NUM * 10; ++i) {
         // <CU>
         string sample_k;
         auto len = rand() % 50 + 1;
