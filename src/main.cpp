@@ -27,15 +27,15 @@ void t_SuffixTree(void);
 
 int main() {
 #ifndef NDEBUG
-    t_CritBitTree();
-    t_gen();
-    t_List();
-    t_MemPool();
-    t_PiXiuStr();
-    t_Que();
-    t_ScapegoatTree();
-    t_SuffixTree();
-    t_PiXiuCtrl();
+//    t_CritBitTree();
+//    t_gen();
+//    t_List();
+//    t_MemPool();
+//    t_PiXiuStr();
+//    t_Que();
+//    t_ScapegoatTree();
+//    t_SuffixTree();
+//    t_PiXiuCtrl();
 #else
 #endif
     PiXiuCtrl ctrl;
@@ -49,17 +49,18 @@ int main() {
             break;
         }
 
-        if (start_with(cmd.c_str(), "GET", 3)) {
-            auto gen = ctrl.getitem((uint8_t *) (cmd.c_str() + 3), (int) cmd.size());
-            if (gen != NULL) {
-                auto answer = gen->consume_repr();
-                std::cout << answer << std::endl;
-                free(answer);
+        constexpr int cmd_len = 4;
+        if (start_with(cmd.c_str(), "GET ", cmd_len)) {
+            auto g = ctrl.getitem((uint8_t *) (cmd.c_str() + cmd_len), (int) (cmd.size() - cmd_len));
+            if (g != NULL) {
+                auto res = g->consume_repr();
+                std::cout << res << std::endl;
+                free(res);
             }
-        } else if (start_with(cmd.c_str(), "SET", 3)) {
+        } else if (start_with(cmd.c_str(), "SET ", cmd_len)) {
             auto k_end = cmd.find("::");
             if (k_end != std::string::npos) {
-                auto k = cmd.substr(3, k_end);
+                auto k = cmd.substr(cmd_len, k_end - cmd_len);
                 auto v = cmd.substr(k_end);
                 ctrl.setitem((uint8_t *) k.c_str(), (int) k.size(), (uint8_t *) v.c_str(), (int) v.size());
             }
