@@ -346,22 +346,30 @@ void t_CritBitTree(void) {
     bar = PiXiuStr_init_key((uint8_t *) "KDA321", 6);
     test_ctx->strs[3] = bar;
     test.setitem(foo, test_ctx, 2);
-    //    <repr_single>
+    //    <repr_one>
     free(test.repr());
     //    </>
     test.setitem(bar, test_ctx, 3);
 
-    auto t = PiXiuStr_init((uint8_t *) "G", 1);
-    assert(test.getitem(t) == NULL);
-    PiXiuStr_free(t);
-
-    t = PiXiuStr_init((uint8_t *) "KDA312", 6);
-    assert(test.getitem(t) == NULL);
-    PiXiuStr_free(t);
+    auto temp = PiXiuStr_init((uint8_t *) "K", 1);
+    assert(test.getitem(temp) == NULL);
+    //    <interrupt iter>
+    auto iter = test.iter(temp);
+    PXSGen * g;
+    iter->operator()(g);
+    PXSGen_free(g);
+    CBTGen_free(iter);
+    //    </>
     //  </>
 
     test.free_prop();
     test.root = NULL;
+    // <free_empty>
+    test.free_prop();
+    // </>
+    // <iter_empty>
+    assert(test.iter(NULL) == NULL);
+    // </>
     test_ctx = PiXiuChunk_init();
     //</>
 
