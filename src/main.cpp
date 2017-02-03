@@ -3,6 +3,8 @@
 #include "common/Que.h"
 #include "data_struct/CritBitTree.h"
 #include "data_struct/ScapegoatTree.h"
+#include "proj/PiXiuCtrl.h"
+#include <iostream>
 #include <vector>
 
 void t_CritBitTree(void);
@@ -34,7 +36,26 @@ int main() {
     t_ScapegoatTree();
     t_SuffixTree();
     t_PiXiuCtrl();
+#else
 #endif
+    PiXiuCtrl ctrl;
+    ctrl.init_prop();
+
+    std::string cmd;
+    while (true) {
+        std::cout << "Command:";
+        std::getline(std::cin, cmd);
+        if (cmd[0] == '~') {
+            break;
+        }
+        if (startswith(cmd.c_str(), "GET", 3)) {
+
+        } else if (startswith(cmd.c_str(), "SET", 3)) {
+
+        }
+    }
+
+    ctrl.free_prop();
     return 0;
 }
 
