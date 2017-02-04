@@ -41,6 +41,7 @@ int main() {
     ctrl.init_prop();
 
     std::string cmd;
+    long total_diff = 0;
     while (true) {
         std::cout << "Command: ";
         std::getline(std::cin, cmd);
@@ -48,7 +49,6 @@ int main() {
             break;
         }
 
-        long total_diff = 0;
         constexpr int token_len = 4;
         if (start_with(cmd.c_str(), "GET ", token_len)) {
             auto gen = ctrl.getitem((uint8_t *) (cmd.c_str() + token_len), (int) (cmd.size() - token_len));
