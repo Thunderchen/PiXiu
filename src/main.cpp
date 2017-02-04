@@ -58,10 +58,10 @@ int main() {
                 free(res);
             }
         } else if (start_with(cmd.c_str(), "SET ", token_len)) {
-            auto k_pos = cmd.find("::");
-            if (k_pos != std::string::npos) {
-                auto k = cmd.substr(token_len, k_pos - token_len);
-                auto v = cmd.substr(k_pos);
+            auto pos = cmd.find("::");
+            if (pos != std::string::npos) {
+                auto k = cmd.substr(token_len, pos - token_len);
+                auto v = cmd.substr(pos);
                 ctrl.setitem((uint8_t *) k.c_str(), (int) k.size(), (uint8_t *) v.c_str(), (int) v.size());
 
                 int diff = (int) cmd.size() - ctrl.st.cbt_chunk->getitem(ctrl.st.local_chunk.used_num - 1)->len;
