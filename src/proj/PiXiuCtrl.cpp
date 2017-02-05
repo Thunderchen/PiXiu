@@ -5,16 +5,18 @@
 #include <vector>
 
 #define REINSERT_RATE 0.5
+#define need_reinsert(cbt_chunk) (cbt_chunk->used_num < cbt_chunk->total_num * REINSERT_RATE)
 
 extern PiXiuChunk * Glob_Reinsert_Chunk;
 
 int PiXiuCtrl::setitem(uint8_t k[], int k_len, uint8_t v[], int v_len, bool reinsert) {
-    if (this->st.local_chunk.used_num == PXC_STR_NUM) {
+    if (this->st.local_pool.nth >= 2048 || this->st.local_chunk.used_num == PXC_STR_NUM) {
         auto last_chunk = this->st.cbt_chunk;
+        last_chunk->total_num = this->st.local_chunk.used_num;
         this->st.free_prop();
         this->st.init_prop();
 
-        if (last_chunk->used_num < REINSERT_RATE * PXC_STR_NUM) {
+        if (need_reinsert(last_chunk)) {
             if (last_chunk == Glob_Reinsert_Chunk) {
                 Glob_Reinsert_Chunk = NULL;
             }
@@ -22,7 +24,7 @@ int PiXiuCtrl::setitem(uint8_t k[], int k_len, uint8_t v[], int v_len, bool rein
         }
     }
     if (!reinsert && Glob_Reinsert_Chunk != NULL && Glob_Reinsert_Chunk != this->st.cbt_chunk
-        && Glob_Reinsert_Chunk->used_num < REINSERT_RATE * PXC_STR_NUM) {
+        && need_reinsert(Glob_Reinsert_Chunk)) {
         this->reinsert(Glob_Reinsert_Chunk);
     }
 
@@ -60,7 +62,7 @@ PXSGen * PiXiuCtrl::getitem(uint8_t k[], int k_len) {
 
 int PiXiuCtrl::delitem(uint8_t k[], int k_len) {
     if (Glob_Reinsert_Chunk != NULL && Glob_Reinsert_Chunk != this->st.cbt_chunk
-        && Glob_Reinsert_Chunk->used_num < REINSERT_RATE * PXC_STR_NUM) {
+        && need_reinsert(Glob_Reinsert_Chunk)) {
         this->reinsert(Glob_Reinsert_Chunk);
     }
     RETURN_APPLY(this->cbt.delitem);
