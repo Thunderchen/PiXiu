@@ -65,12 +65,13 @@ int main() {
                 ctrl.setitem((uint8_t *) k.c_str(), (int) k.size(), (uint8_t *) v.c_str(), (int) v.size());
 
                 int diff = (int) cmd.size() - ctrl.st.cbt_chunk->getitem(ctrl.st.local_chunk.used_num - 1)->len;
-                std::cout << "Curr Diff is " << diff << std::endl;
+                std::cout << "本次节约内存数 " << diff << std::endl;
                 total_diff += diff;
-                std::cout << "Total Diff is " << total_diff << std::endl;
+                std::cout << "总共节约内存数 " << total_diff << std::endl;
             }
         }
     }
+
     ctrl.free_prop();
 #endif
     return 0;
