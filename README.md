@@ -62,7 +62,7 @@ Playground
 >
 > SET KEY::VALUE
 >
-> 存储KV，返回当前（current）和总共（total）压缩的bytes数
+> 存储KV，返回压缩（节约）的bytes数
 
 例子：
 
