@@ -5,7 +5,7 @@
 #include <vector>
 
 #define REINSERT_RATE 0.5
-#define need_reinsert(cbt_chunk) (cbt_chunk->used_num < cbt_chunk->total_num * REINSERT_RATE)
+#define need_reinsert(cbt_chunk) (cbt_chunk->used_num < REINSERT_RATE * cbt_chunk->total_num)
 
 extern PiXiuChunk * Glob_Reinsert_Chunk;
 
