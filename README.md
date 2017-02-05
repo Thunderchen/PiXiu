@@ -23,9 +23,8 @@ PiXiu（貔貅）是我脑洞大开下的产物，灵感来源于[TerarkDB][1]�
 
 后缀树是目前所学中个人觉得最接近理论完美的算法。它能在N的时间，N的空间，表示N个排列，还是一个在线算法。
 
-####还有一个问题！
+#### 还有一个问题！
 数据嵌套压缩之后，对比操作将会疯狂递归来解析字符串，这对性能是不是会有影响？必然的。所以红黑树以及别的树就不是那么适用了。还好，我发现了[CritBit Tree][2]。这个算法的特点是所有原始数据永远只会对比一次，其余时间都是用CritBit（我译为特征比特）进行跳转。每添加一条数据，永远只会付出一个指针，一个16bit int，一个8bit int的空间代价。与此同时，时间上界还特别好，跟普通的Trie一样。缺点是指针跳转太多，不利于CPU Cache。
-
 
 这里有什么？
 ---
@@ -53,7 +52,6 @@ Python抓取数万HTML页面，URL作为Key，页面代码作为Value，存入Pi
 
 以QQ首页 http://www.qq.com/ 为根，采集1W页面，每个取其开始的6W ASCII字符，写入PiXiu。页面总大小：395782474字节，PiXiu压缩大小：334142231字节，**压缩率高达84%！** 当然，这有注水猪肉嫌疑，但你有没有被打动呢？想打我脸的话，快来试试吧～ CPU运行时间相对来说会慢一点。如果每条记录100字节，1秒能写入1W-2W条。纯Hash应该上10W是很轻松的。算法必然会有trade off。
 
-
 Playground
 ---
 正如我前面提到的，这是一个完整的索引引擎。不过，为了让人快速玩起来，我给PiXiu封装了一个简单的命令行。实际API不止这两个，下一章我会说明。
@@ -72,21 +70,28 @@ Playground
 ```
 YUANJINdeMBP:cmake-build-release yuanjinlin$ ./PiXiuPlus
 Command: GET 123
+
 Command: SET 123::321
 本次节约内存数 0
 总共节约内存数 0
+
 Command: GET 123
 123::321
+
 Command: SET BOBO::https://www.zhihu.com/question/55439090
 本次节约内存数 0
 总共节约内存数 0
+
 Command: SET BOBO1::https://www.zhihu.com/question/22454692
 本次节约内存数 27
 总共节约内存数 27
+
 Command: GET BOBO
 BOBO::https://www.zhihu.com/question/55439090
+
 Command: GET BOBO1
 BOBO1::https://www.zhihu.com/question/22454692
+
 Command: ~
 ```
 
@@ -130,8 +135,8 @@ ctrl.contains((uint8_t *) first_key.c_str(), (int) first_key.size());
 // 建议看下 https://www.codeproject.com/tips/29524/generators-in-c
 // 里面描述如何用C++写0浪费的协程
 // getitem返回的是一个PiXiuStr的生成器
-uint8_t rv;
 PXSGen * gen = ctrl.getitem((uint8_t *) first_key.c_str(), (int) first_key.size());
+uint8_t rv;
 while (gen->operator()(rv)) {
     printf("%c", rv); // 将会打印出 ChengLin
 }
@@ -145,7 +150,33 @@ ctrl.free_prop(); // 释放资源
 
 注意事项、缺陷、可能的解决方案
 ---
+### PiXiu编码
+前文举例的时候，使用$作为压缩组的标记，实际实现的时候必须要考虑二进制安全。所以，我设计了PiXiu编码，所有值为251的byte将被escape为251,251。如果你的输入包含100个251，那么实际存储的时候将会有200个251（不考虑压缩）。e.g. (1,2,3,251,2,3) => (1,2,3,251,251,3)
 
+为什么我不把这一细节隐藏起来呢？因为KV的分割跟251，很有关系。Key的结尾是251,0，Value的结尾是251,2。上一章的例子，{"WhoAmI":"ChengLin"}，实际返回的会是WhoAmI 251,0 ChengLin 251,2。我确信这一细节对于理解PiXiu的设计与局限很重要，就暴露了出来。
+
+解决方案：
+真正使用的时候再套一层简单的Parser。
+如果只是存储ASCII字符，把所有不可见的字符都忽略即可。
+
+PiXiu编码还带来了另一个局限就是每一个记录最多记录**65531-值为251的bytes数**。4个bytes用来标记Key和Value。比如，我有65531个字符，但里面有100个251，那么escape之后就是65631个字符，那就超出了最大大小。开发的时候用CMake的Debug模式，越界会有assert的警告。
+
+解决方案：
+将超大数据分块，每一个escape之后都不KV加起来都不超过65535。
+
+实际上，每一个记录不止二进制安全而需要escape的成本，额外还会有12bit的内存overhead。所以，一大票零零散散的小数据，可能不会有压缩的效果。
+
+解决方案：
+很简单，把10条记录写成一个大记录就好了，参考B-Tree的做法。
+
+### 编译
+这是一个巨坑。16年10月的时候我只是想要学C，后面开始写PiXiu。C很简单，但缺乏很多基础设施。我甚至自己用Macro模仿了一个vector。后面就切换到C++去了，用的是Mac OSX下的CLion，标准也定在了C++14。
+
+这导致了严重的兼容问题，不管是Linux还是Mac OSX下，都只能用CMake 3.6以及Clang 3.8以上的工具链编译。
+
+Mac下我强烈建议下一个Clion 2016，然后直接编译。手工的话，如果环境都有就很简单了，mkdir build&&cd build&&cmake -DCMAKE_BUILD_TYPE=Release ..&&make。
+
+Linux下一般都是高手，记得CXX=clang++的flag就好了。
 
 发布协议
 ---
