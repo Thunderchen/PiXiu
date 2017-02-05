@@ -117,23 +117,23 @@ struct PiXiuCtrl {
     void reinsert(PiXiuChunk *&);
 };
 ```
-以插入{"WhoAmI":"ChengLin"}为例子：
+插入{"WhoAmI":"ChengLin"}为例子：
 ```cpp
 PiXiuCtrl ctrl;
-ctrl.init_prop();
+ctrl.init_prop(); // 初始化
 std::string first_key = "WhoAmI";
 std::string first_val = "ChengLin";
 
 // 存入数据
 ctrl.setitem((uint8_t *) first_key.c_str(), (int) first_key.size(),
              (uint8_t *) first_val.c_str(), (int) first_val.size());
+
 // 判断是否存在
 ctrl.contains((uint8_t *) first_key.c_str(), (int) first_key.size());
 
-// 获得数据有点麻烦，建议看下 https://www.codeproject.com/tips/29524/generators-in-c
+// 建议看下 https://www.codeproject.com/tips/29524/generators-in-c
 // 里面描述如何用C++写0浪费的协程
 // getitem返回的是一个PiXiuStr的生成器
-
 uint8_t rv;
 PXSGen * gen = ctrl.getitem((uint8_t *) first_key.c_str(), (int) first_key.size());
 while (gen->operator()(rv)) {
@@ -143,7 +143,8 @@ while (gen->operator()(rv)) {
 
 // 删除数据
 ctrl.delitem((uint8_t *) first_key.c_str(), (int) first_key.size());
-ctrl.free_prop();
+
+ctrl.free_prop(); // 释放资源
 ```
 
 注意事项、缺陷、可能的解决方案
