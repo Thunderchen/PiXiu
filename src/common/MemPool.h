@@ -14,6 +14,7 @@ struct Pool {
 struct MemPool {
     Pool * curr_pool = NULL;
     int used_num;
+    int nth = 0;
 
     void * p_malloc(int);
 

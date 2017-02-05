@@ -8,12 +8,14 @@ void * MemPool::p_malloc(int size) {
         this->curr_pool = (Pool *) malloc(sizeof(Pool));
         this->curr_pool->prev_pool = NULL;
         this->used_num = 0;
+        this->nth++;
     }
 
     if (size > POOL_BLOCK_SIZE * POOL_BLOCK_NUM) {
         auto pool = (Pool *) malloc(sizeof(Pool::prev_pool) + size);
         pool->prev_pool = this->curr_pool->prev_pool;
         this->curr_pool->prev_pool = pool;
+        this->nth++;
         return adrOf(pool->blocks);
     }
 
@@ -22,6 +24,7 @@ void * MemPool::p_malloc(int size) {
         pool->prev_pool = this->curr_pool;
         this->curr_pool = pool;
         this->used_num = 0;
+        this->nth++;
     }
 
     auto ret = adrOf(this->curr_pool->blocks[this->used_num]);
@@ -40,6 +43,7 @@ void MemPool::free_prop() {
         cursor = next_cursor;
     }
     this->curr_pool = cursor;
+    this->nth = 0;
 }
 
 void t_MemPool(void) {
