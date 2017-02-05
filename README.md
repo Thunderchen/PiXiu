@@ -122,20 +122,20 @@ struct PiXiuCtrl {
 ```cpp
 PiXiuCtrl ctrl;
 ctrl.init_prop(); // 初始化
-std::string first_key = "WhoAmI";
-std::string first_val = "ChengLin";
+std::string key = "WhoAmI";
+std::string val = "ChengLin";
 
 // 存入数据
-ctrl.setitem((uint8_t *) first_key.c_str(), (int) first_key.size(),
-             (uint8_t *) first_val.c_str(), (int) first_val.size());
+ctrl.setitem((uint8_t *) key.c_str(), (int) key.size(),
+             (uint8_t *) val.c_str(), (int) val.size());
 
 // 判断是否存在
-ctrl.contains((uint8_t *) first_key.c_str(), (int) first_key.size());
+ctrl.contains((uint8_t *) key.c_str(), (int) key.size());
 
 // 建议看下 https://www.codeproject.com/tips/29524/generators-in-c
 // 里面描述如何用C++写0浪费的协程
 // getitem返回的是一个生成器
-PXSGen * gen = ctrl.getitem((uint8_t *) first_key.c_str(), (int) first_key.size());
+PXSGen * gen = ctrl.getitem((uint8_t *) key.c_str(), (int) key.size());
 uint8_t rv;
 while (gen->operator()(rv)) {
     printf("%c", rv); // 将会打印出 ChengLin
@@ -144,7 +144,7 @@ PXSGen_free(gen);
 // 遍历（iter方法）也是类似的
 
 // 删除数据
-ctrl.delitem((uint8_t *) first_key.c_str(), (int) first_key.size());
+ctrl.delitem((uint8_t *) key.c_str(), (int) key.size());
 
 ctrl.free_prop(); // 释放资源
 ```
@@ -154,7 +154,7 @@ ctrl.free_prop(); // 释放资源
 ### PiXiu编码
 前文举例的时候，使用$作为压缩组的标记，实际实现的时候必须要考虑二进制安全。所以，我设计了PiXiu编码，所有值为251的byte将被escape为251,251。如果你的输入包含100个251，那么实际存储的时候将会有200个251（不考虑压缩）。e.g. (1,2,3,251,2,3) => (1,2,3,251,251,3)
 
-为什么我不把这一细节隐藏起来呢？因为KV的分割跟251，很有关系。Key的结尾标记是251,0，Value的结尾标记是251,2。上章的{"WhoAmI":"ChengLin"}，实际返回的会是WhoAmI 251,0 ChengLin 251,2。我确信这一细节对于理解PiXiu的设计与局限很重要，就暴露了出来。
+为什么我不把这一细节隐藏起来呢？因为KV的分割跟251很有关系。Key的结尾标记是251,0，Value的结尾标记是251,2。上章的{"WhoAmI":"ChengLin"}，实际返回的会是WhoAmI 251,0 ChengLin 251,2。我确信这一细节对于理解PiXiu的设计与局限很重要，就暴露了出来。
 
 - 解决方案：
 套一层简单的Parser。
@@ -162,12 +162,12 @@ ctrl.free_prop(); // 释放资源
 
 PiXiu编码还带来了另一个局限就是每一个记录最多记录**65531-值为251的bytes数**。比如，我有65531个字符，但里面有100个251，那么escape之后就是65631个字符，超出了最大大小。开发的时候用CMake的Debug模式，越界会有我写的assert提示。
 
-解决方案：
-将超大数据分块，使得每条记录escape之后KV加起来都不超过65535。
+- 解决方案：
+将超大数据分块，使得每条记录escape之后KV加起来不超过65535。
 
 实际上，每一个记录不止二进制安全而需要escape的成本，额外还会有12bit的内存overhead。所以，一大票零零散散的小数据，可能不会有压缩的效果。
 
-解决方案：
+- 解决方案：
 把多条记录写成一个大记录就好了，参考B-Tree的做法。
 
 ### 编译
