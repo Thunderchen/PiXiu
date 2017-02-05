@@ -97,10 +97,8 @@ API
 后续的开发者只要调用PiXiuCtrl这个类就好了。别的最好不要动，我花了巨大的精力才把Bug杀干净。我想把PiXiu做成简历上的明星项目，有问题，一定回答和解决！
 ```cpp
 struct PiXiuCtrl {
-    CritBitTree cbt;
-    SuffixTree st;
 
-    int setitem(uint8_t[], int, uint8_t[], int, bool = false);
+    int setitem(uint8_t[], int, uint8_t[], int);
 
     bool contains(uint8_t[], int);
 
@@ -113,8 +111,6 @@ struct PiXiuCtrl {
     void init_prop(void);
 
     void free_prop(void);
-
-    void reinsert(PiXiuChunk *&);
 };
 ```
 插入{"WhoAmI":"ChengLin"}为例子：
