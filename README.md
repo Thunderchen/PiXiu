@@ -66,7 +66,7 @@ Playground
 >
 > 存储KV，返回压缩（节约）的bytes数
 
-准备：下载本仓库中release目录下的PiXiuPlus文件，目前只有Linux（Ubuntu）和Mac版本
+下载本仓库中release目录下的PiXiuPlus文件，目前只有Linux（Ubuntu）和Mac版本
 
 例子：
 ```
@@ -94,7 +94,57 @@ Command: ~
 
 API
 ---
+后续的开发者只要调用PiXiuCtrl这个类就好了。别的最好不要动，我花了巨大的精力才把Bug修干净。我想把PiXiu做成简历上的明星项目，有问题，我一定回答和解决！
+```
+struct PiXiuCtrl {
+    CritBitTree cbt;
+    SuffixTree st;
 
+    int setitem(uint8_t[], int, uint8_t[], int, bool = false);
+
+    bool contains(uint8_t[], int);
+
+    PXSGen * getitem(uint8_t[], int);
+
+    CBTGen * iter(uint8_t[], int);
+
+    int delitem(uint8_t[], int);
+
+    void init_prop(void);
+
+    void free_prop(void);
+
+    void reinsert(PiXiuChunk *&);
+};
+```
+以插入{"WhoAmI":"ChengLin"}为例子：
+```
+PiXiuCtrl ctrl;
+ctrl.init_prop();
+std::string first_key = "WhoAmI";
+std::string first_val = "ChengLin";
+
+// 存入数据
+ctrl.setitem((uint8_t *) first_key.c_str(), (int) first_key.size(),
+             (uint8_t *) first_val.c_str(), (int) first_val.size());
+// 判断是否存在
+ctrl.contains((uint8_t *) first_key.c_str(), (int) first_key.size());
+
+// 获得数据有点麻烦，建议看下 https://www.codeproject.com/tips/29524/generators-in-c
+// 里面描述如何用C++写0浪费的协程
+// getitem返回的是一个PiXiuStr的生成器
+
+uint8_t rv;
+PXSGen * gen = ctrl.getitem((uint8_t *) first_key.c_str(), (int) first_key.size());
+while (gen->operator()(rv)) {
+    printf("%c", rv); // 将会打印出 ChengLin
+}
+// 遍历（iter方法）也是类似的
+
+// 删除数据
+ctrl.delitem((uint8_t *) first_key.c_str(), (int) first_key.size());
+ctrl.free_prop();
+```
 
 注意事项、缺陷、可能的解决方案
 ---
