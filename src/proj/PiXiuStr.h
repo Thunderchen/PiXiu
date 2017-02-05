@@ -74,6 +74,7 @@ struct PiXiuStr {
 struct PiXiuChunk {
     PiXiuStr * strs[PXC_STR_NUM];
     uint16_t used_num = 0;
+    uint16_t total_num;
 
     PiXiuStr * getitem(int);
 
